@@ -382,9 +382,9 @@ function getApiEndpoint(path) {
   if (customUrl) {
     return `${customUrl.replace(/\/$/, '')}${path}`;
   }
-  // В мобильном приложении Android и веб-версии по умолчанию используется онлайн Cloudflare ИИ-сервер
+  // По умолчанию подключение к локальному серверу на порту 8080
   if (window.location.protocol === 'file:' || window.location.protocol === 'capacitor:') {
-    return `https://notices-comparing-confident-restoration.trycloudflare.com${path}`;
+    return `http://127.0.0.1:8080${path}`;
   }
   return path;
 }
