@@ -3,59 +3,75 @@
  * Интеграция с g4f (GPT4Free), 100% ИИ Защита Реализма (быстрый арбитр с анимированным статусом), 3D d20 Dice Mechanics, Инвентарь, Память Мира.
  */
 
-// Сценарии по умолчанию (Bilingual: English & Russian)
+// Сценарии по умолчанию (Multilingual: English, Spanish, Ukrainian, Russian)
 const SCENARIOS = {
   fantasy: {
-    title: { en: "Medieval Fantasy", ru: "Средневековое Фэнтези" },
+    title: { en: "Medieval Fantasy", es: "Fantasía Medieval", uk: "Середньовічне Фентезі", ru: "Средневековое Фэнтези" },
     era: "medieval fantasy",
     inventory: {
       en: ["Iron Longsword", "Leather Armor", "Healing Salve (x2)"],
+      es: ["Espada Larga de Hierro", "Armadura de Cuero", "Bálsamo Curativo (x2)"],
+      uk: ["Залізний довгий меч", "Шкіряний обладунок", "Цілющий бальзам (x2)"],
       ru: ["Железный длинный меч", "Кожаный доспех", "Целебный бальзам (x2)"]
     },
     intro: {
       en: "You stand at the ancient stone gates of Oak Keep, lost in the mists of the Whispering Peaks. The wind carries the scent of damp pine and old rain. The sword in your hand feels heavy. Legend says a dark artifact is hidden beneath the citadel.",
+      es: "Te encuentras ante las antiguas puertas de piedra de Fortaleza del Roble, perdida en las brumas de los Picos Susurrantes. El viento trae el olor a pino húmedo y lluvia vieja. La espada en tu mano se siente pesada. La leyenda dice que un oscuro artefacto se oculta bajo la ciudadela.",
+      uk: "Ви стоїте біля стародавніх кам'яних воріт Дубової Фортеці, загубленої у туманах Шепочущих Піків. Вітер доносить запах сирої сосни та старого дощу. Меч у вашій руці здається важким. Легенда говорить, що під цитаделлю схований темний артефакт.",
       ru: "Вы стоите у древних каменных ворот Дубовой Крепости, затерянной в туманах Шепчущих Пиков. Ветер доносит запах сырой сосны и старого дождя. Меч в вашей руке кажется тяжелым. Легенда гласит, что под цитаделью скрыт темный артефакт."
     }
   },
   cyberpunk: {
-    title: { en: "Cyberpunk Netrunner", ru: "Киберпанк Нетраннер" },
+    title: { en: "Cyberpunk Netrunner", es: "Netrunner Cyberpunk", uk: "Кіберпанк Нетраннер", ru: "Киберпанк Нетраннер" },
     era: "cyberpunk",
     inventory: {
       en: ["Cyberdeck (MK-IV)", "Monofilament Whip", "Encrypted Datapad", "Stimpack"],
+      es: ["Cibercubierta (MK-IV)", "Látigo de Monofilamento", "Datapad Cifrado", "Estimulante"],
+      uk: ["Кібердека (MK-IV)", "Моноволоконний батіг", "Зашифрований датапад", "Стимулятор"],
       ru: ["Кибердека (MK-IV)", "Моноволоконный хлыст", "Зашифрованный датапад", "Стимулятор"]
     },
     intro: {
       en: "Neon rain shimmers on the wet asphalt of Sector 7, while holographic ads flicker overhead. You pull up your collar against the chemical smog. Your cyberdeck chimed 5 minutes ago — an anonymous client uploaded a contract to hack a corporate database.",
+      es: "La lluvia de neón brilla en el asfalto mojado del Sector 7, mientras los anuncios holográficos parpadean. Subes tu cuello para protegerte del smog químico. Tu cibercubierta sonó hace 5 minutos: un cliente anónimo subió un contrato para hackear una base de datos corporativa.",
+      uk: "Неоновий дощ блищить на мокрому асфальті Сектора 7, а над головою мерехтять голографічні вивіски. Ви піднімаєте комір, захищаючись від хімічного смогу. Ваша кібердека дзенкнула 5 хвилин тому — анонімний замовник завантажив контракт на злам корпоративної бази.",
       ru: "Неоновый дождь блестит на мокром асфальте Сектора 7, а над головой мерцают голографические вывески. Вы поднимаете воротник, защищаясь от химозного смога. Ваша кибердека звякнула 5 минут назад — анонимный заказчик загрузил контракт на взлом корпоративной базы."
     }
   },
   zombie: {
-    title: { en: "Zombie Apocalypse", ru: "Зомби Апокалипсис" },
+    title: { en: "Zombie Apocalypse", es: "Apocalipsis Zombie", uk: "Зомбі Апокаліпсис", ru: "Зомби Апокалипсис" },
     era: "modern post-apocalypse",
     inventory: {
       en: ["Machete", "Water Canteen", "Flashlight (low battery)", "Bandages"],
+      es: ["Machete", "Cantimplora de Agua", "Linterna (batería baja)", "Vendas"],
+      uk: ["Мачете", "Фляга з водою", "Ліхтарик (сідає батарея)", "Бинти"],
       ru: ["Мачете", "Фляга с водой", "Фонарик (садится батарея)", "Бинты"]
     },
     intro: {
       en: "The sirens fell silent months ago. You crouch behind a rusted minivan on 5th Avenue, peering into broken shop windows. Two walkers wander near an abandoned grocery store across the street. Supplies are running low.",
+      es: "Las sirenas se силиaron hace meses. Te agachas detrás de una minivan oxidada en la Quinta Avenida, mirando a través de escaparates rotos. Dos caminantes vagan cerca de una tienda abandonada al otro lado de la calle. Los suministros se agotan.",
+      uk: "Сирени затихли кілька місяців тому. Ви сидите на карточках за заржавілим мінівеном на 5-й авеню, вдивляючись у розбиті вітрини. Два ходока блукають біля покинутого гастроному через дорогу. Припаси на межі.",
       ru: "Сирены затихли несколько месяцев назад. Вы сидите на корточках за заржавевшим минивэном на 5-й авеню, всматриваясь в выбитые витрины. Два ходока бродят возле заброшенного гастронома через дорогу. Припасы на исходе."
     }
   },
   detective: {
-    title: { en: "Noir Detective", ru: "Нуарный Детектив" },
+    title: { en: "Noir Detective", es: "Detective Noir", uk: "Нуарний Детектив", ru: "Нуарный Детектив" },
     era: "1940s-noir detective",
     inventory: {
       en: [".38 Revolver", "Notepad & Pen", "Silver Lighter", "Trenchcoat"],
+      es: ["Revólver .38", "Cuaderno y Bolígrafo", "Encendedor de Plata", "Gabardina"],
+      uk: ["Револьвер .38", "Блокнот і ручка", "Срібна запальничка", "Плащ"],
       ru: ["Револьвер .38", "Блокнот и ручка", "Серебряная зажигалка", "Плащ"]
     },
     intro: {
       en: "Rain beats a steady rhythm against your office window. The wall clock shows two in the morning. You pour a glass of cheap bourbon when the silhouette of a man in a fedora appears on the frosted glass door.",
+      es: "La lluvia golpea un ritmo constante contra la ventana de tu oficina. El reloj marca las dos de la mañana. Sirves un vaso de bourbon barato cuando la silueta de un hombre con sombrero aparece en la puerta de cristal esmerilado.",
+      uk: "Дощ відбиває чіткий ритм по склу вашого кабінету. Годинник на стіні показує другу годину ночі. Ви наливаєте склянку дешевого бурбону, коли на матовому склі дверей з'являється силует чоловіка в капелюсі.",
       ru: "Дождь отбивает четкий ритм по стеклу вашего кабинета. Часы на стене показывают два часа ночи. Вы наливаете стакан дешевого бурбона, когда на матовом стекле двери появляется силуэт человека в шляпе."
     }
   }
 };
 
-// Полный словарь локализации (English default & Russian)
+// Словарь локализации на 4 языка (en, es, uk, ru)
 const I18N = {
   en: {
     appTitle: "OdAI",
@@ -64,7 +80,7 @@ const I18N = {
     settingsTitle: "AI & Connection Settings",
     saveBtn: "Save",
     backBtn: "Back",
-    languageLabel: "Language / Язык",
+    languageLabel: "Language / Idioma",
     selectLanguageLabel: "Choose Interface & Story Language:",
     aiProvidersTitle: "AI Providers (Select Active)",
     inventoryTitle: "Inventory & World Memory",
@@ -103,6 +119,100 @@ const I18N = {
     noMessages: "No chats yet. Tap + to start a new adventure!",
     messagesCount: "msgs",
     lastMsg: "Last:"
+  },
+  es: {
+    appTitle: "OdAI",
+    chatsTitle: "Tus Aventuras",
+    newChatBtn: "Nueva Aventura",
+    settingsTitle: "Ajustes de IA y Conexión",
+    saveBtn: "Guardar",
+    backBtn: "Volver",
+    languageLabel: "Idioma / Language",
+    selectLanguageLabel: "Elige el idioma de la interfaz e historia:",
+    aiProvidersTitle: "Proveedores de IA (Seleccionar Activo)",
+    inventoryTitle: "Inventario y Memoria",
+    inventoryLabel: "Objetos del Inventario",
+    addItemPlaceholder: "Añadir objeto (ej. Antorcha)...",
+    addBtn: "Añadir",
+    memoryLabel: "Memoria del Mundo (Recordar)",
+    memoryPlaceholder: "Hechos clave que la IA debe recordar...",
+    authorNoteLabel: "Nota del Autor (Estilo y Tono)",
+    authorNotePlaceholder: "ej. Fantasía oscura, prosa inmersiva...",
+    inputPlaceholder: "Escribe un mensaje... *acción* o (nota OOC)",
+    sendBtn: "Enviar",
+    d20Btn: "d20: Auto",
+    undoBtn: "Deshacer",
+    retryBtn: "Reintentar",
+    eraseBtn: "Borrar",
+    realismGuard: "Guardia Realismo",
+    changeScenario: "Cambiar Mundo",
+    masterName: "Dungeon Master",
+    youName: "Tú",
+    exportJson: "📥 Exportar JSON",
+    exportTxt: "📄 Exportar Texto",
+    importBackup: "📤 Importar Copia",
+    backupTitle: "Copia de Seguridad y Exportación",
+    backupSub: "Guardar y restaurar datos del juego",
+    caiTitle: "Importar Personaje de Character.AI / Tarjeta",
+    caiPlaceholder: "Pega enlace c.ai (https://character.ai/chat/...)",
+    caiBtn: "Importar",
+    caiFileBtn: "📁 Cargar archivo de tarjeta (.json)",
+    scenarioModalTitle: "Elige Tu Mundo",
+    startCustomBtn: "Iniciar Mundo Personalizado",
+    customPromptPlaceholder: "Te despiertas en una taberna tranquila sin recordar cómo llegaste...",
+    aiGenerating: "La IA está creando la continuación...",
+    realismChecking: "El Árbitro está verificando el realismo...",
+    testConnection: "Probar Conexión",
+    noMessages: "¡No hay chats aún. Toca + para empezar!",
+    messagesCount: "mensajes",
+    lastMsg: "Último:"
+  },
+  uk: {
+    appTitle: "OdAI",
+    chatsTitle: "Ваші Пригоди",
+    newChatBtn: "Нова Пригода",
+    settingsTitle: "Налаштування ШІ та З'єднань",
+    saveBtn: "Зберегти",
+    backBtn: "Назад",
+    languageLabel: "Мова / Language",
+    selectLanguageLabel: "Оберіть мову інтерфейсу та історії:",
+    aiProvidersTitle: "Провайдери ШІ (Оберіть активний)",
+    inventoryTitle: "Інвентар та Пам'ять",
+    inventoryLabel: "Предмети в інвентарі",
+    addItemPlaceholder: "Додати предмет (напр. Смолоскип)...",
+    addBtn: "Додати",
+    memoryLabel: "Пам'ять світу (Remember)",
+    memoryPlaceholder: "Ключові факти, які ШІ повинен пам'ятати...",
+    authorNoteLabel: "Замітка автора (Стиль)",
+    authorNotePlaceholder: "напр. Похмуре фентезі, атмосферний стиль...",
+    inputPlaceholder: "Напишіть повідомлення... *дія* або (уточнення)",
+    sendBtn: "Надіслати",
+    d20Btn: "d20: Авто",
+    undoBtn: "Скасувати",
+    retryBtn: "Повторити",
+    eraseBtn: "Стерти",
+    realismGuard: "Захист Реалізму",
+    changeScenario: "Змінити Світ",
+    masterName: "Майстер Гри",
+    youName: "Ви",
+    exportJson: "📥 Експорт JSON",
+    exportTxt: "📄 Експорт Текст",
+    importBackup: "📤 Імпорт Бэкапу",
+    backupTitle: "Резервне копіювання та Експорт",
+    backupSub: "Збереження та відновлення даних",
+    caiTitle: "Імпорт персонажа з Character.AI / Картки",
+    caiPlaceholder: "Вставте посилання c.ai (https://character.ai/chat/...)",
+    caiBtn: "Імпорт",
+    caiFileBtn: "📁 Завантажити файл картки (.json)",
+    scenarioModalTitle: "Оберіть ваш світ",
+    startCustomBtn: "Почати свій світ",
+    customPromptPlaceholder: "Ви прокидаєтеся у тихій таверні і не пам'ятаєте, як тут опинилися...",
+    aiGenerating: "ШІ створює продовження...",
+    realismChecking: "Арбітр перевіряє реалізм...",
+    testConnection: "Перевірити з'єднання",
+    noMessages: "Чатів поки немає. Натисніть +, щоб почати!",
+    messagesCount: "повідомл.",
+    lastMsg: "Ост:"
   },
   ru: {
     appTitle: "OdAI",
@@ -2176,23 +2286,147 @@ function sanitizeAIResponseText(text) {
 }
 
 function constructAIPrompt() {
-  let prompt = `Вы — ведущий мастер (Dungeon Master) для интерактивной текстовой игры на русском языке.\n`;
-  prompt += `Сценарий мира: ${state.currentScenarioKey}\n`;
-  if (state.memory) prompt += `Память мира (Remember): ${state.memory}\n`;
-  if (state.authorNote) prompt += `Стиль написания: ${state.authorNote}\n`;
-  prompt += `Инвентарь игрока: ${state.inventory.join(', ')}\n\n`;
-  prompt += `История до этого момента:\n`;
+  const lang = state.language || 'en';
+  let prompt = "";
 
-  const recentHistory = state.history.slice(-10);
-  recentHistory.forEach(b => {
-    if (b.diceVal && b.diceLabel) {
-      prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} из 20 — ${b.diceLabel.toUpperCase()}])\n`;
-    } else {
-      prompt += `${b.text}\n`;
-    }
-  });
+  if (lang === 'es') {
+    prompt = `Eres un Dungeon Master y narrador para un juego interactivo de rol en español.
+`;
+    prompt += `Escenario del Mundo: ${state.currentScenarioKey}
+`;
+    if (state.memory) prompt += `Memoria del Mundo (Recordar): ${state.memory}
+`;
+    if (state.authorNote) prompt += `Estilo de Escritura: ${state.authorNote}
+`;
+    prompt += `Inventario del Jugador: ${state.inventory.join(', ')}
 
-  prompt += `\nВНИМАНИЕ: Если в последнем действии выпал ПРОВАЛ (1-5), СТРОГО опишите неудачу действия! Если УСПЕХ (12-20), опишите удачу. Продолжите историю естественно на русском языке в 2-4 законченных предложениях. ВАЖНО: Обязательно ставьте точку в конце и НИКОГДА не обрывайте текст на полуслове!`;
+`;
+    prompt += `Historia hasta ahora:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [Resultado d20: ${b.diceVal} de 20 — ${b.diceLabel.toUpperCase()}])
+`;
+      } else {
+        prompt += `${b.text}
+`;
+      }
+    });
+
+    prompt += `
+SINTAXIS DEL JUGADOR:
+- *texto en asteriscos* — acción del jugador y narración.
+- (texto en paréntesis) — aclaración OOC.
+- texto plano / "entre comillas" — diálogo del personaje.
+`;
+    prompt += `
+IMPORTANTE: Continúa la historia naturalmente en español con 2-4 oraciones completas. ¡Termina siempre las oraciones con puntuación!`;
+  } else if (lang === 'uk') {
+    prompt = `Ви — ведучий майстер (Dungeon Master) та оповідач для інтерактивної рольової гри українською мовою.
+`;
+    prompt += `Сценарій Світу: ${state.currentScenarioKey}
+`;
+    if (state.memory) prompt += `Пам'ять Світу (Пам'ятати): ${state.memory}
+`;
+    if (state.authorNote) prompt += `Стиль Написання: ${state.authorNote}
+`;
+    prompt += `Інвентар Гравця: ${state.inventory.join(', ')}
+
+`;
+    prompt += `Історія до цього моменту:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} з 20 — ${b.diceLabel.toUpperCase()}])
+`;
+      } else {
+        prompt += `${b.text}
+`;
+      }
+    });
+
+    prompt += `
+СИНТАКСИС ГРАВЦЯ:
+- *текст у зірочках* — дія гравця та опис.
+- (текст у дужках) — позарольове (OOC) уточнення.
+- звичайний текст / "у лапках" — репліка персонажа.
+`;
+    prompt += `
+ВАЖЛИВО: Продовжуйте історію природно українською мовою у 2-4 закінчених реченнях. Обов'язково ставте крапку в кінці!`;
+  } else if (lang === 'ru') {
+    prompt = `Вы — ведущий мастер (Dungeon Master) и персонаж для интерактивного ролевого отыгрыша (Roleplay) на русском языке.
+`;
+    prompt += `Сценарий мира: ${state.currentScenarioKey}
+`;
+    if (state.memory) prompt += `Память мира (Remember): ${state.memory}
+`;
+    if (state.authorNote) prompt += `Стиль написания: ${state.authorNote}
+`;
+    prompt += `Инвентарь игрока: ${state.inventory.join(', ')}
+
+`;
+    prompt += `История до этого момента:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} из 20 — ${b.diceLabel.toUpperCase()}])
+`;
+      } else {
+        prompt += `${b.text}
+`;
+      }
+    });
+
+    prompt += `
+ФОРМАТИРОВАНИЕ СООБЩЕНИЙ ИГРОКА:
+- *текст в звездочках* — действия и описание персонажа игрока.
+- (текст в скобках) — внеролевое (OOC) уточнение.
+- обычный текст или "текст в кавычках" — реплика персонажа.
+`;
+    prompt += `
+ВАЖНО: Продолжите историю естественно на русском языке в 2-4 законченных предложениях. Обязательно ставьте точку в конце!`;
+  } else {
+    prompt = `You are a Dungeon Master and storyteller for an interactive roleplay game in English.
+`;
+    prompt += `Setting Scenario: ${state.currentScenarioKey}
+`;
+    if (state.memory) prompt += `World Memory (Remember): ${state.memory}
+`;
+    if (state.authorNote) prompt += `Writing Style: ${state.authorNote}
+`;
+    prompt += `Player Inventory: ${state.inventory.join(', ')}
+
+`;
+    prompt += `Story History so far:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [d20 Roll Result: ${b.diceVal} of 20 — ${b.diceLabel.toUpperCase()}])
+`;
+      } else {
+        prompt += `${b.text}
+`;
+      }
+    });
+
+    prompt += `
+PLAYER SYNTAX:
+- *text in asterisks* — player action and character narration.
+- (text in parentheses) — OOC clarification or instruction.
+- plain text / "in quotes" — character dialogue and speech.
+`;
+    prompt += `
+IMPORTANT: Continue the story naturally in English with 2-4 complete sentences. Always end sentences with punctuation!`;
+  }
+
   return prompt;
 }
 
