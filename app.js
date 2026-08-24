@@ -449,6 +449,7 @@ const elements = {
   geminiModelSelect: document.getElementById('gemini-model-select'),
   openrouterKeyInput: document.getElementById('openrouter-key-input'),
   openrouterModelInput: document.getElementById('openrouter-model-input'),
+  openrouterPresetSelect: document.getElementById('openrouter-preset-select'),
   serverUrlInput: document.getElementById('server-url-input'),
   openaiBaseUrlInput: document.getElementById('openai-baseurl-input'),
   apiKeyInput: document.getElementById('api-key-input'),
@@ -1009,6 +1010,12 @@ function setupEventListeners() {
       if (elements.contextVal) elements.contextVal.textContent = `${e.target.value} сообщ.`;
     });
   }
+
+  elements.openrouterPresetSelect?.addEventListener('change', (e) => {
+    if (e.target.value !== 'custom' && elements.openrouterModelInput) {
+      elements.openrouterModelInput.value = e.target.value;
+    }
+  });
 
   elements.saveSettingsBtn?.addEventListener('click', () => {
     if (elements.geminiKeyInput) state.engineConfig.geminiKey = elements.geminiKeyInput.value.trim();
@@ -2608,7 +2615,11 @@ function updateUIState() {
   if (elements.geminiKeyInput) elements.geminiKeyInput.value = state.engineConfig.geminiKey || state.engineConfig.apiKey || '';
   if (elements.geminiModelSelect) elements.geminiModelSelect.value = state.engineConfig.geminiModel || 'auto';
   if (elements.openrouterKeyInput) elements.openrouterKeyInput.value = state.engineConfig.openrouterKey || '';
-  if (elements.openrouterModelInput) elements.openrouterModelInput.value = state.engineConfig.openrouterModel || 'meta-llama/llama-3-70b-instruct';
+  if (elements.openrouterModelInput) elements.openrouterModelInput.value = state.engineConfig.openrouterModel || 'meta-llama/llama-3.3-70b-instruct:free';
+  if (elements.openrouterPresetSelect && elements.openrouterModelInput) {
+    elements.openrouterPresetSelect.value = state.engineConfig.openrouterModel || 'meta-llama/llama-3.3-70b-instruct:free';
+    if (!elements.openrouterPresetSelect.value) elements.openrouterPresetSelect.value = 'custom';
+  }
   if (elements.serverUrlInput) elements.serverUrlInput.value = state.engineConfig.serverUrl || '';
   if (elements.openaiBaseUrlInput) elements.openaiBaseUrlInput.value = state.engineConfig.openaiBaseUrl || 'https://api.openai.com/v1';
   if (elements.apiKeyInput) elements.apiKeyInput.value = state.engineConfig.apiKey || '';
