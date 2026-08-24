@@ -20,3 +20,6 @@ make_*.py
 process_*.py
 cleanup_*.py
 test_*.js
+gemini_test_report.json
+gemini_test_screenshots/
+run_full_gemini_test.js

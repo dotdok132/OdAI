@@ -19,6 +19,18 @@ const SCENARIOS = {
       es: "Te encuentras ante las antiguas puertas de piedra de Fortaleza del Roble, perdida en las brumas de los Picos Susurrantes. El viento trae el olor a pino húmedo y lluvia vieja. La espada en tu mano se siente pesada. La leyenda dice que un oscuro artefacto se oculta bajo la ciudadela.",
       uk: "Ви стоїте біля стародавніх кам'яних воріт Дубової Фортеці, загубленої у туманах Шепочущих Піків. Вітер доносить запах сирої сосни та старого дощу. Меч у вашій руці здається важким. Легенда говорить, що під цитаделлю схований темний артефакт.",
       ru: "Вы стоите у древних каменных ворот Дубовой Крепости, затерянной в туманах Шепчущих Пиков. Ветер доносит запах сырой сосны и старого дождя. Меч в вашей руке кажется тяжелым. Легенда гласит, что под цитаделью скрыт темный артефакт."
+    },
+    defaultMemory: {
+      en: "You are an adventurer exploring ancient ruins in search of artifacts.",
+      es: "Eres un aventurero explorando ruinas antiguas en busca de artefactos.",
+      uk: "Ви — мандрівник, що досліджує стародавні руїни в пошуках артефактів.",
+      ru: "Вы — искатель приключений, исследующий древние руины в поисках артефактов."
+    },
+    defaultAuthorNote: {
+      en: "Dark fantasy setting, immersive atmospheric prose, detailed world descriptions.",
+      es: "Entorno de fantasía oscura, prosa atmosférica inmersiva, descripciones detalladas del mundo.",
+      uk: "Похмуре фентезі, занурювальна атмосферна проза, детальні описи світу.",
+      ru: "Мрачное фэнтези, глубокая атмосфера, подробные описания мира."
     }
   },
   cyberpunk: {
@@ -35,6 +47,18 @@ const SCENARIOS = {
       es: "La lluvia de neón brilla en el asfalto mojado del Sector 7, mientras los anuncios holográficos parpadean. Subes tu cuello para protegerte del smog químico. Tu cibercubierta sonó hace 5 minutos: un cliente anónimo subió un contrato para hackear una base de datos corporativa.",
       uk: "Неоновий дощ блищить на мокрому асфальті Сектора 7, а над головою мерехтять голографічні вивіски. Ви піднімаєте комір, захищаючись від хімічного смогу. Ваша кібердека дзенкнула 5 хвилин тому — анонімний замовник завантажив контракт на злам корпоративної бази.",
       ru: "Неоновый дождь блестит на мокром асфальте Сектора 7, а над головой мерцают голографические вывески. Вы поднимаете воротник, защищаясь от химозного смога. Ваша кибердека звякнула 5 минут назад — анонимный заказчик загрузил контракт на взлом корпоративной базы."
+    },
+    defaultMemory: {
+      en: "You are a skilled netrunner operating in the criminal underworld of a megacity.",
+      es: "Eres un hábil netrunner operando en el submundo criminal de una megaciudad.",
+      uk: "Ви — досвідчений нетранер, що діє у кримінальному підпіллі мегаполісу.",
+      ru: "Вы — опытный нетраннер, действующий в криминальном подбрюшье мегаполиса."
+    },
+    defaultAuthorNote: {
+      en: "Gritty cyberpunk noir, neon-lit streets, corporate conspiracies, hacking culture.",
+      es: "Cyberpunk noir oscuro, calles iluminadas de neón, conspiraciones corporativas, cultura hacker.",
+      uk: "Похмурий кіберпанк-нуар, вулиці в неоновому світлі, корпоративні змови, хакерська культура.",
+      ru: "Грязный киберпанк-нуар, улицы в неоновом свете, корпоративные заговоры, хакерская культура."
     }
   },
   zombie: {
@@ -51,6 +75,18 @@ const SCENARIOS = {
       es: "Las sirenas se силиaron hace meses. Te agachas detrás de una minivan oxidada en la Quinta Avenida, mirando a través de escaparates rotos. Dos caminantes vagan cerca de una tienda abandonada al otro lado de la calle. Los suministros se agotan.",
       uk: "Сирени затихли кілька місяців тому. Ви сидите на карточках за заржавілим мінівеном на 5-й авеню, вдивляючись у розбиті вітрини. Два ходока блукають біля покинутого гастроному через дорогу. Припаси на межі.",
       ru: "Сирены затихли несколько месяцев назад. Вы сидите на корточках за заржавевшим минивэном на 5-й авеню, всматриваясь в выбитые витрины. Два ходока бродят возле заброшенного гастронома через дорогу. Припасы на исходе."
+    },
+    defaultMemory: {
+      en: "You are a survivor in a zombie-infected city, scavenging for food, medicine, and safe shelter.",
+      es: "Eres un superviviente en una ciudad infectada de zombis, buscando comida, medicinas y refugio seguro.",
+      uk: "Ви — вижилий у місті, захопленому зомбі, що шукає їжу, ліки та безпечне укриття.",
+      ru: "Вы — выживший в заражённом зомби городе, ищете еду, лекарства и безопасное укрытие."
+    },
+    defaultAuthorNote: {
+      en: "Tense survival horror, realistic scarcity, moral dilemmas, visceral danger.",
+      es: "Horror de supervivencia tenso, escasez realista, dilemas morales, peligro visceral.",
+      uk: "Напружений survival horror, реалістична нестача ресурсів, моральні дилеми, відчутна небезпека.",
+      ru: "Напряжённый survival horror, реалистичная нехватка ресурсов, моральные дилеммы, ощутимая опасность."
     }
   },
   detective: {
@@ -67,6 +103,18 @@ const SCENARIOS = {
       es: "La lluvia golpea un ritmo constante contra la ventana de tu oficina. El reloj marca las dos de la mañana. Sirves un vaso de bourbon barato cuando la silueta de un hombre con sombrero aparece en la puerta de cristal esmerilado.",
       uk: "Дощ відбиває чіткий ритм по склу вашого кабінету. Годинник на стіні показує другу годину ночі. Ви наливаєте склянку дешевого бурбону, коли на матовому склі дверей з'являється силует чоловіка в капелюсі.",
       ru: "Дождь отбивает четкий ритм по стеклу вашего кабинета. Часы на стене показывают два часа ночи. Вы наливаете стакан дешевого бурбона, когда на матовом стекле двери появляется силуэт человека в шляпе."
+    },
+    defaultMemory: {
+      en: "You are a hard-boiled private detective in 1940s noir city, investigating crimes and conspiracies.",
+      es: "Eres un duro detective privado en la ciudad noir de los años 40, investigando crímenes y conspiraciones.",
+      uk: "Ви — жорсткий приватний детектив у нуарному місті 1940-х, що розслідує злочини та змови.",
+      ru: "Вы — жёсткий частный детектив в нуарном городе 1940-х, расследующий преступления и заговоры."
+    },
+    defaultAuthorNote: {
+      en: "Classic 1940s noir atmosphere, cynical inner monologue, rain-soaked streets, moral ambiguity.",
+      es: "Atmósfera noir clásica de los años 40, monólogo interior cínico, calles empapadas de lluvia, ambigüedad moral.",
+      uk: "Класична нуарна атмосфера 1940-х, цинічний внутрішній монолог, промоклі вулиці, моральна неоднозначність.",
+      ru: "Классическая нуарная атмосфера 1940-х, циничный внутренний монолог, промокшие улицы, моральная неоднозначность."
     }
   }
 };
@@ -274,9 +322,9 @@ const state = {
   currentChatId: null,
   currentScenarioKey: 'fantasy',
   history: [], // Текущая активная история
-  inventory: ["Железный длинный меч", "Кожаный доспех", "Целебный бальзам (x2)"],
-  memory: "Вы — искатель приключений, исследующий древние руины в поисках артефактов.",
-  authorNote: "Мрачное фэнтези, глубокая атмосфера, подробные описания мира.",
+  inventory: [],
+  memory: "",
+  authorNote: "",
   realismMode: true,
   casualMode: false, // Casual Mode (Always Succeed on d20 rolls)
   forceD20: false, // Флаг принудительного броска d20 на следующее действие
@@ -479,6 +527,8 @@ function setupNativeAndroidBackButton() {
       // 2. Закрыть боковое меню инвентаря
       if (elements.sidebarDrawer && !elements.sidebarDrawer.classList.contains('collapsed')) {
         elements.sidebarDrawer.classList.add('collapsed');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (backdrop) backdrop.classList.remove('active');
         return;
       }
 
@@ -507,8 +557,7 @@ window.addEventListener('popstate', (e) => {
   const activeModals = document.querySelectorAll('.modal-overlay.active, .fullscreen-page.active');
   if (activeModals.length > 0) {
     activeModals.forEach(m => m.classList.remove('active'));
-    // Добавляем фиктивный state чтобы следующий back снова сработал
-    history.pushState({ view: elements.viewChat.classList.contains('active') ? 'chat' : 'list' }, '');
+    // Do NOT pushState here — it creates an infinite back-button loop
     return;
   }
   
@@ -716,6 +765,8 @@ function setupEventListeners() {
     elements.dropdownInventoryBtn?.addEventListener('click', () => {
       elements.chatDropdownMenu.classList.remove('active');
       elements.sidebarDrawer.classList.remove('collapsed');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (backdrop) backdrop.classList.add('active');
     });
   }
   if (elements.dropdownRealismToggle) {
@@ -754,13 +805,25 @@ function setupEventListeners() {
     saveStateToStorage();
   });
 
-  // Управление боковой панелью
+  // Sidebar drawer open/close with backdrop
+  const getSidebarBackdrop = () => document.getElementById('sidebar-backdrop');
   elements.toggleInventoryBtn?.addEventListener('click', () => {
-    elements.sidebarDrawer.classList.toggle('collapsed');
+    const isCollapsed = elements.sidebarDrawer.classList.toggle('collapsed');
+    const backdrop = getSidebarBackdrop();
+    if (backdrop) backdrop.classList.toggle('active', !isCollapsed);
   });
   elements.closeDrawerBtn?.addEventListener('click', () => {
     elements.sidebarDrawer.classList.add('collapsed');
+    const backdrop = getSidebarBackdrop();
+    if (backdrop) backdrop.classList.remove('active');
   });
+
+  // Global function for backdrop onclick
+  window.closeSidebarDrawer = function() {
+    elements.sidebarDrawer.classList.add('collapsed');
+    const backdrop = getSidebarBackdrop();
+    if (backdrop) backdrop.classList.remove('active');
+  };
 
   // Добавление предмета в инвентарь
   elements.addItemBtn?.addEventListener('click', addInventoryItemFromInput);
@@ -999,8 +1062,8 @@ function loadScenario(scenarioKey) {
       timestamp: new Date().toLocaleTimeString()
     }],
     inventory: [...invList],
-    memory: state.memory || "Вы — искатель приключений, исследующий древние руины в поисках артефактов.",
-    authorNote: state.authorNote || "Мрачное фэнтези, глубокая атмосфера, подробные описания мира.",
+    memory: scen.defaultMemory ? (typeof scen.defaultMemory === 'object' ? (scen.defaultMemory[lang] || scen.defaultMemory.en || '') : scen.defaultMemory) : '',
+    authorNote: scen.defaultAuthorNote ? (typeof scen.defaultAuthorNote === 'object' ? (scen.defaultAuthorNote[lang] || scen.defaultAuthorNote.en || '') : scen.defaultAuthorNote) : '',
     updatedAt: new Date().toISOString()
   };
 
@@ -1395,9 +1458,14 @@ function renderInventory() {
 }
 
 function getItemWordForm(count) {
-  if (count % 10 === 1 && count % 100 !== 11) return 'предмет';
-  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'предмета';
-  return 'предметов';
+  const lang = state.language || 'en';
+  if (lang === 'ru' || lang === 'uk') {
+    if (count % 10 === 1 && count % 100 !== 11) return lang === 'uk' ? 'предмет' : 'предмет';
+    if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return lang === 'uk' ? 'предмети' : 'предмета';
+    return lang === 'uk' ? 'предметів' : 'предметов';
+  }
+  if (lang === 'es') return count === 1 ? 'objeto' : 'objetos';
+  return count === 1 ? 'item' : 'items';
 }
 
 function addInventoryItemFromInput() {
@@ -1863,7 +1931,6 @@ async function handleSendAction() {
   const validation = await validatePlayerAction(rawInput, state.currentMode);
   if (!validation.allowed) {
     state.isGenerating = false; updateUIState();
-    updateUIState();
     elements.typingIndicator.style.display = 'none';
     state.history.push({
       id: Date.now(),
@@ -1871,7 +1938,7 @@ async function handleSendAction() {
       text: validation.reason,
       timestamp: new Date().toLocaleTimeString()
     });
-    elements.promptInput.value = '';
+    // Do NOT clear the input — the user's text is preserved so they can edit and retry
     renderStoryFeed();
     saveStateToStorage();
     return;
@@ -1892,6 +1959,9 @@ async function handleSendAction() {
   }
 
   elements.promptInput.value = '';
+
+  // Lock UI immediately before d20 animation to prevent double-submit
+  state.isGenerating = true; updateUIState();
 
   if (isRiskyAction) {
     // Анимация броска происходит ПОСЛЕ нажатия кнопки Отправить!
@@ -2471,6 +2541,15 @@ function updateUIState() {
 // Проверка подключения к ИИ
 async function testAIConnection() {
   if (!elements.connectionStatusBadge) return;
+
+  if (elements.geminiKeyInput) state.engineConfig.geminiKey = elements.geminiKeyInput.value.trim();
+  if (elements.geminiModelSelect) state.engineConfig.geminiModel = elements.geminiModelSelect.value;
+  if (elements.openrouterKeyInput) state.engineConfig.openrouterKey = elements.openrouterKeyInput.value.trim();
+  if (elements.openrouterModelInput) state.engineConfig.openrouterModel = elements.openrouterModelInput.value.trim();
+  if (elements.serverUrlInput) state.engineConfig.serverUrl = elements.serverUrlInput.value.trim();
+  if (elements.openaiBaseUrlInput) state.engineConfig.openaiBaseUrl = elements.openaiBaseUrlInput.value.trim();
+  if (elements.apiKeyInput) state.engineConfig.apiKey = elements.apiKeyInput.value.trim();
+  if (elements.openaiModelInput) state.engineConfig.openaiModel = elements.openaiModelInput.value.trim();
 
   elements.connectionStatusBadge.style.display = 'inline-flex';
   elements.connectionStatusBadge.className = 'connection-status-badge loading';
