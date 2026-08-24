@@ -167,7 +167,15 @@ const I18N = {
     testConnection: "Test Connection",
     noMessages: "No chats yet. Tap + to start a new adventure!",
     messagesCount: "msgs",
-    lastMsg: "Last:"
+    lastMsg: "Last:",
+    scenFantasyTitle: "Medieval Fantasy",
+    scenFantasyDesc: "Knights, ancient ruins, magic, and dark dungeons.",
+    scenCyberpunkTitle: "Cyberpunk Netrunner",
+    scenCyberpunkDesc: "Neon alleys, neural implants, and megacorporations.",
+    scenZombieTitle: "Zombie Apocalypse",
+    scenZombieDesc: "Scavenge supplies and fight off hordes of infected.",
+    scenDetectiveTitle: "Noir Detective",
+    scenDetectiveDesc: "Rainy streets, dark secrets, and investigations."
   },
   es: {
     appTitle: "OdAI",
@@ -215,7 +223,15 @@ const I18N = {
     testConnection: "Probar Conexión",
     noMessages: "¡No hay chats aún. Toca + para empezar!",
     messagesCount: "mensajes",
-    lastMsg: "Último:"
+    lastMsg: "Último:",
+    scenFantasyTitle: "Fantasía Medieval",
+    scenFantasyDesc: "Caballeros, ruinas antiguas, magia y mazmorras oscuras.",
+    scenCyberpunkTitle: "Cyberpunk Netrunner",
+    scenCyberpunkDesc: "Callejones de neón, implantes neurales y megacorporaciones.",
+    scenZombieTitle: "Apocalipsis Zombi",
+    scenZombieDesc: "Busca suministros y lucha contra hordas de infectados.",
+    scenDetectiveTitle: "Detective Noir",
+    scenDetectiveDesc: "Calles lluviosas, secretos oscuros e investigaciones."
   },
   uk: {
     appTitle: "OdAI",
@@ -263,7 +279,15 @@ const I18N = {
     testConnection: "Перевірити з'єднання",
     noMessages: "Чатів поки немає. Натисніть +, щоб почати!",
     messagesCount: "повідомл.",
-    lastMsg: "Ост:"
+    lastMsg: "Ост:",
+    scenFantasyTitle: "Середньовічне Фентезі",
+    scenFantasyDesc: "Лицарі, стародавні руини, магія та похмурі підземелля.",
+    scenCyberpunkTitle: "Кіберпанк Нетранер",
+    scenCyberpunkDesc: "Неонові провулки, нейроімпланти та мегакорпорації.",
+    scenZombieTitle: "Зомбі Апокаліпсис",
+    scenZombieDesc: "Шукайте припаси та боріться з ордами заражених.",
+    scenDetectiveTitle: "Нуарний Детектив",
+    scenDetectiveDesc: "Дощові вулиці, темні таємниці та розслідування."
   },
   ru: {
     appTitle: "OdAI",
@@ -310,7 +334,15 @@ const I18N = {
     testConnection: "Проверить соединение",
     noMessages: "Чатов пока нет. Нажмите +, чтобы начать!",
     messagesCount: "сообщ.",
-    lastMsg: "Посл:"
+    lastMsg: "Посл:",
+    scenFantasyTitle: "Средневековое Фэнтези",
+    scenFantasyDesc: "Рыцари, древние руины, магия и мрачные подземелья.",
+    scenCyberpunkTitle: "Киберпанк Нетраннер",
+    scenCyberpunkDesc: "Неоновые переулки, нейроимпланты и мегакорпорации.",
+    scenZombieTitle: "Зомби Апокалипсис",
+    scenZombieDesc: "Добывайте припасы и сражайтесь с ордами зараженных.",
+    scenDetectiveTitle: "Нуарный Детектив",
+    scenDetectiveDesc: "Дождливые улицы, тёмные тайны и расследования."
   }
 };
 
@@ -402,8 +434,13 @@ const elements = {
   caiFileInput: document.getElementById('cai-file-input'),
   caiFileBtn: document.getElementById('cai-file-btn'),
 
+  // Элементы шапки и полноэкранного режима
+  fullscreenToggleBtn: document.getElementById('fullscreen-toggle-btn'),
+  mainSettingsBtn: document.getElementById('main-settings-btn'),
+  languageSelect: document.getElementById('language-select'),
+  saveSettingsBtn: document.getElementById('save-settings-btn'),
+  
   // Настройки ИИ и подключений
-  settingsBtn: document.getElementById('settings-btn'),
   settingsModal: document.getElementById('settings-modal'),
   closeSettingsModal: document.getElementById('close-settings-modal'),
   providerCards: document.querySelectorAll('.provider-card'),
@@ -671,6 +708,8 @@ function loadStateFromStorage() {
     try {
       const parsed = JSON.parse(saved);
       state.realismMode = parsed.realismMode !== undefined ? parsed.realismMode : true;
+      state.casualMode = parsed.casualMode !== undefined ? parsed.casualMode : false;
+      if (parsed.language) state.language = parsed.language;
       state.engineConfig = parsed.engineConfig || state.engineConfig;
 
       if (parsed.chats && Array.isArray(parsed.chats) && parsed.chats.length > 0) {
@@ -728,6 +767,8 @@ function saveStateToStorage() {
     chats: state.chats,
     currentChatId: state.currentChatId,
     realismMode: state.realismMode,
+    casualMode: state.casualMode,
+    language: state.language,
     engineConfig: state.engineConfig
   };
   localStorage.setItem('odai_app_state', JSON.stringify(dataToSave));
@@ -913,20 +954,33 @@ function setupEventListeners() {
     elements.caiFileInput?.addEventListener('change', handleCAIFileImport);
   }
 
+  // Fullscreen toggle
+  elements.fullscreenToggleBtn?.addEventListener('click', toggleAppFullscreen);
+
   // Настройки
-  elements.settingsBtn?.addEventListener('click', () => openModal(elements.settingsModal));
+  elements.mainSettingsBtn?.addEventListener('click', () => openModal(elements.settingsModal));
   elements.closeSettingsModal?.addEventListener('click', () => closeModal(elements.settingsModal));
+
+  // Язык интерфейса
+  elements.languageSelect?.addEventListener('change', (e) => {
+    state.language = e.target.value;
+    applyI18nLanguage(state.language);
+    saveStateToStorage();
+  });
   
-  // Accordion Items in Fullscreen Settings
-  const accordionItems = document.querySelectorAll('.accordion-item[data-provider]');
+  // Accordion Items in Fullscreen Settings (Providers & Settings Sections)
+  const accordionItems = document.querySelectorAll('.accordion-item[data-provider], .settings-accordion-item');
   accordionItems.forEach(item => {
-    const header = item.querySelector('.accordion-header');
+    const header = item.querySelector('.accordion-header, .settings-accordion-header');
     if (header) {
       header.addEventListener('click', () => {
-        accordionItems.forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        const provider = item.dataset.provider;
-        state.engineConfig.mode = provider;
+        if (item.dataset.provider) {
+          document.querySelectorAll('.accordion-item[data-provider]').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          state.engineConfig.mode = item.dataset.provider;
+        } else {
+          item.classList.toggle('active');
+        }
       });
     }
   });
@@ -1277,10 +1331,11 @@ function handleCAIFileImport(event) {
   reader.onload = (e) => {
     try {
       const parsed = JSON.parse(e.target.result);
-      const name = parsed.name || parsed.char_name || "Импортированный персонаж";
-      const greeting = parsed.greeting || parsed.first_mes || `Вы встречаете ${name}.`;
-      const description = parsed.description || parsed.char_persona || "";
-      const personality = parsed.personality || parsed.mes_example || "";
+      const dataObj = parsed.data || parsed;
+      const name = dataObj.name || dataObj.char_name || parsed.name || "Импортированный персонаж";
+      const greeting = dataObj.greeting || dataObj.first_mes || parsed.greeting || `Вы встречаете ${name}.`;
+      const description = dataObj.description || dataObj.char_persona || parsed.description || "";
+      const personality = dataObj.personality || dataObj.mes_example || parsed.personality || "";
 
       const newChat = {
         id: 'chat_' + Date.now(),
@@ -1657,7 +1712,13 @@ function renderStoryFeed() {
       };
       toolbar.appendChild(copyBtn);
 
-      // Swipes Counter & Navigation (‹ 1/3 ›)
+      // Edit button (✏️) for touch/mobile
+      const editBtn = document.createElement('button');
+      editBtn.className = 'msg-action-btn';
+      editBtn.title = 'Редактировать';
+      editBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+      editBtn.onclick = (e) => { e.stopPropagation(); enableInlineEdit(content, index); };
+      toolbar.appendChild(editBtn);
       if (swipes.length > 1) {
         const swipeNav = document.createElement('div');
         swipeNav.className = 'msg-swipe-nav';
@@ -2521,7 +2582,7 @@ function updateUIState() {
   });
 
   if (elements.geminiKeyInput) elements.geminiKeyInput.value = state.engineConfig.geminiKey || state.engineConfig.apiKey || '';
-  if (elements.geminiModelSelect) elements.geminiModelSelect.value = state.engineConfig.geminiModel || 'gemini-1.5-flash';
+  if (elements.geminiModelSelect) elements.geminiModelSelect.value = state.engineConfig.geminiModel || 'auto';
   if (elements.openrouterKeyInput) elements.openrouterKeyInput.value = state.engineConfig.openrouterKey || '';
   if (elements.openrouterModelInput) elements.openrouterModelInput.value = state.engineConfig.openrouterModel || 'meta-llama/llama-3-70b-instruct';
   if (elements.serverUrlInput) elements.serverUrlInput.value = state.engineConfig.serverUrl || '';

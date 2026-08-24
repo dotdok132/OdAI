@@ -186,21 +186,26 @@ def generate_story():
 
         print(f"[OdAI Server] Generating AI story response via g4f ({lang})...")
         
+        candidate_models = ["gpt-4o-mini", "gpt-4o", "llama-3.1-70b", "gpt-3.5-turbo"]
         output_text = None
         last_err = None
 
-        try:
-            response = g4f.ChatCompletion.create(
-                model="gpt-4o-mini",
-                messages=messages
-            )
-            output_text = str(response).strip()
-        except Exception as e:
-            last_err = str(e)
-            print(f"[OdAI Server] g4f default model exception: {e}")
+        for model_name in candidate_models:
+            try:
+                response = g4f.ChatCompletion.create(
+                    model=model_name,
+                    messages=messages
+                )
+                res_str = str(response).strip()
+                if res_str and len(res_str) >= 5 and "NoValidHarFileError" not in res_str:
+                    output_text = res_str
+                    break
+            except Exception as e:
+                last_err = str(e)
+                print(f"[OdAI Server] g4f model '{model_name}' exception: {e}")
 
-        if not output_text or len(output_text) < 5 or "NoValidHarFileError" in output_text:
-            raise ValueError(f"g4f error: {last_err or 'Empty response'}")
+        if not output_text:
+            raise ValueError(f"g4f error: {last_err or 'Empty response from all models'}")
 
         print(f"[OdAI Server] Generation SUCCESS: {output_text[:80]}...")
 

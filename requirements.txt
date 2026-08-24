@@ -3,3 +3,4 @@ flask-cors>=4.0.0
 g4f>=8.1.7
 gunicorn>=21.2.0
 requests>=2.31.0
+curl_cffi>=0.6.0

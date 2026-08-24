@@ -12,7 +12,7 @@
       "fabClickSuccess": true,
       "cardClickSuccess": true,
       "characterName": "Medieval Fantasy #3",
-      "introSnippet": "M\nМАСТЕР ИГРЫ\n4:02:24 PM\nYou stand at the ancient stone gates of Oak Keep, lost in the mists of the Whispering Peaks. Th..."
+      "introSnippet": "M\nМАСТЕР ИГРЫ\n9:39:50 PM\nYou stand at the ancient stone gates of Oak Keep, lost in the mists of the Whispering Peaks. Th..."
     }
   },
   "test2_chat_header": {
@@ -22,7 +22,7 @@
       "Клик по Меню (3 точки) -> Выпадающее меню открыто (active): true",
       "Повторный клик по Меню -> Выпадающее меню закрыто: true",
       "Клик по 'Inventory & Memory' -> Свайп-панель открыта (collapsed: false): true",
-      "Секция Инвентаря (\"Предметы с собой\"): verified (3 ПРЕДМЕТА)",
+      "Секция Инвентаря (\"Предметы с собой\"): verified (3 ITEMS)",
       "Секция Памяти (\"Память мира\"): verified",
       "Секция Стиля (\"Стиль написания\"): verified",
       "Клик по крестику закрытия -> Свайп-панель закрыта (collapsed: true): true"
@@ -30,7 +30,7 @@
     "details": {
       "dropdownOpenCloseSuccess": true,
       "drawerOpenCloseSuccess": true,
-      "inventoryItemLabel": "3 ПРЕДМЕТА"
+      "inventoryItemLabel": "3 ITEMS"
     }
   },
   "test3_main_settings": {
