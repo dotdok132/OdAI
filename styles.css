@@ -1938,7 +1938,7 @@ body {
   }
 }
 
-/* ---- TRUE FULLSCREEN LANDSCAPE PHONE MODE ---- */
+/* ---- TRUE FULLSCREEN LANDSCAPE PHONE & TABLET MODE ---- */
 @media (orientation: landscape) and (max-height: 599px) {
   html, body {
     width: 100vw !important;
@@ -1957,30 +1957,29 @@ body {
     margin: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: row !important;
   }
 
   .view-screen {
-    width: 100vw !important;
+    position: relative !important;
     height: 100dvh !important;
-    position: absolute !important;
-    inset: 0 !important;
   }
 
   .app-header {
-    height: 40px !important;
-    min-height: 40px !important;
+    height: 38px !important;
+    min-height: 38px !important;
     padding: 0.15rem max(0.85rem, env(safe-area-inset-right)) 0.15rem max(0.85rem, env(safe-area-inset-left)) !important;
     background: rgba(6, 14, 10, 0.95) !important;
   }
 
   .cai-avatar-wrapper {
-    width: 28px !important;
-    height: 28px !important;
+    width: 26px !important;
+    height: 26px !important;
   }
 
   .cai-character-name {
-    font-size: 0.85rem !important;
+    font-size: 0.82rem !important;
   }
 
   .cai-character-sub {
@@ -1993,19 +1992,19 @@ body {
   }
 
   .chat-bubble {
-    padding: 0.45rem 0.7rem !important;
+    padding: 0.4rem 0.65rem !important;
   }
 
   .chat-bubble-content {
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     line-height: 1.4 !important;
   }
 
   .action-dock {
-    padding: 0.25rem max(0.85rem, env(safe-area-inset-right)) max(0.25rem, env(safe-area-inset-bottom)) max(0.85rem, env(safe-area-inset-left)) !important;
+    padding: 0.2rem max(0.85rem, env(safe-area-inset-right)) max(0.2rem, env(safe-area-inset-bottom)) max(0.85rem, env(safe-area-inset-left)) !important;
     background: rgba(6, 14, 10, 0.98) !important;
     border-top: 1px solid var(--border-subtle) !important;
-    gap: 0.25rem !important;
+    gap: 0.2rem !important;
   }
 
   .action-input-row {
@@ -2013,45 +2012,48 @@ body {
   }
 
   .prompt-textarea {
-    max-height: 52px !important;
-    min-height: 36px !important;
-    padding: 0.3rem 0.6rem !important;
-    font-size: 0.85rem !important;
+    max-height: 48px !important;
+    min-height: 34px !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.82rem !important;
     border-radius: 8px !important;
   }
 
   .send-btn {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
   }
 
   .action-toolbar {
     display: flex !important;
     justify-content: flex-end !important;
-    gap: 0.3rem !important;
+    gap: 0.25rem !important;
     padding: 0 !important;
     margin-top: 0 !important;
   }
 
   .btn-tool {
-    padding: 0.2rem 0.45rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.18rem 0.4rem !important;
+    font-size: 0.7rem !important;
     border-radius: 6px !important;
   }
 
-  .modal-box {
-    max-height: 94vh !important;
-    padding: 0.85rem !important;
+  .modal-box, .archive-modal-box, .settings-modal-box, .scenarios-modal-box {
+    max-height: 92vh !important;
+    max-height: 92dvh !important;
+    padding: 0.75rem !important;
+    overflow-y: auto !important;
   }
 }
 
-/* ---- TABLET & DESKTOP WIDESCREEN DUAL-COLUMN LAYOUT ---- */
-@media (min-width: 960px) and (min-height: 600px) {
+/* ---- TABLET & LANDSCAPE DUAL-COLUMN SPLIT LAYOUT ---- */
+@media (min-width: 760px) and (orientation: landscape), (min-width: 960px) {
   body {
     display: flex;
     justify-content: center;
     background: #040806;
+    overflow: hidden;
   }
 
   #view-chat-list.active,
@@ -2061,36 +2063,53 @@ body {
 
   .tablet-layout {
     display: flex !important;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    flex-direction: row !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     max-width: 1440px;
     margin: 0 auto;
     background: var(--bg-base);
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
   }
 
   .tablet-layout #view-chat-list {
-    width: 340px;
-    min-width: 340px;
-    max-width: 340px;
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 340px !important;
+    height: 100dvh !important;
     border-right: 1px solid var(--border-subtle);
     display: flex !important;
-    flex-direction: column;
+    flex-direction: column !important;
+    position: relative !important;
+    z-index: 10;
   }
 
   .tablet-layout #view-chat {
-    flex: 1;
+    flex: 1 !important;
+    height: 100dvh !important;
     display: flex !important;
-    flex-direction: column;
+    flex-direction: column !important;
+    position: relative !important;
   }
 
   .tablet-layout #back-to-list-btn {
     display: none !important;
   }
+
+  #view-chat-list .chats-archive-list,
+  .tablet-layout .chats-archive-list {
+    max-height: none !important;
+    flex: 1 !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    padding-bottom: 5rem !important;
+  }
 }
 
-/* ---- Safe areas for notched devices ---- */
+/* Safe areas for notched devices */
 @supports (padding: env(safe-area-inset-bottom)) {
   .action-dock {
     padding-bottom: calc(0.85rem + env(safe-area-inset-bottom));
@@ -2106,9 +2125,7 @@ body {
   }
 }
 
-/* ===========================
-   CHAT ARCHIVE MODAL — c.ai Style
-   =========================== */
+/* CHAT ARCHIVE MODAL & SIDEBAR LIST */
 .archive-modal-box {
   max-width: 620px;
 }
@@ -2121,6 +2138,14 @@ body {
   max-height: 62vh;
   overflow-y: auto;
   padding-right: 4px;
+}
+
+#view-chat-list .chats-archive-list {
+  max-height: none !important;
+  flex: 1 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  padding-bottom: 5rem !important;
 }
 
 .chats-archive-list::-webkit-scrollbar {
