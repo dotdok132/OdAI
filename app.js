@@ -382,9 +382,9 @@ function getApiEndpoint(path) {
   if (customUrl) {
     return `${customUrl.replace(/\/$/, '')}${path}`;
   }
-  // В мобильном приложении Android (Capacitor/file:)
+  // В мобильном приложении Android и веб-версии по умолчанию используется онлайн Cloudflare ИИ-сервер
   if (window.location.protocol === 'file:' || window.location.protocol === 'capacitor:') {
-    return `http://127.0.0.1:8080${path}`;
+    return `https://notices-comparing-confident-restoration.trycloudflare.com${path}`;
   }
   return path;
 }
