@@ -454,6 +454,10 @@ const elements = {
   openaiBaseUrlInput: document.getElementById('openai-baseurl-input'),
   apiKeyInput: document.getElementById('api-key-input'),
   openaiModelInput: document.getElementById('openai-model-input'),
+  groqKeyInput: document.getElementById('groq-key-input'),
+  groqModelSelect: document.getElementById('groq-model-select'),
+  anthropicKeyInput: document.getElementById('anthropic-key-input'),
+  anthropicModelSelect: document.getElementById('anthropic-model-select'),
   tempSlider: document.getElementById('temp-slider'),
   tempVal: document.getElementById('temp-val'),
   contextSlider: document.getElementById('context-slider'),
@@ -1026,8 +1030,10 @@ function setupEventListeners() {
     if (elements.openaiBaseUrlInput) state.engineConfig.openaiBaseUrl = elements.openaiBaseUrlInput.value.trim();
     if (elements.apiKeyInput) state.engineConfig.apiKey = elements.apiKeyInput.value.trim();
     if (elements.openaiModelInput) state.engineConfig.openaiModel = elements.openaiModelInput.value.trim();
-    if (elements.tempSlider) state.engineConfig.temperature = parseFloat(elements.tempSlider.value);
-    if (elements.contextSlider) state.engineConfig.contextLength = parseInt(elements.contextSlider.value);
+    if (elements.groqKeyInput) state.engineConfig.groqKey = elements.groqKeyInput.value.trim();
+    if (elements.groqModelSelect) state.engineConfig.groqModel = elements.groqModelSelect.value;
+    if (elements.anthropicKeyInput) state.engineConfig.anthropicKey = elements.anthropicKeyInput.value.trim();
+    if (elements.anthropicModelSelect) state.engineConfig.anthropicModel = elements.anthropicModelSelect.value;
 
     saveStateToStorage();
     closeModal(elements.settingsModal);
@@ -1801,18 +1807,7 @@ async function generateNewSwipeVariant(msgIndex) {
   if (labelEl) labelEl.textContent = "Генерирует вариант (Swipe)...";
 
   try {
-    let newText = "";
-    if (state.engineConfig.mode === 'gemini') {
-      newText = await fetchGeminiContinuation();
-    } else if (state.engineConfig.mode === 'openrouter') {
-      newText = await fetchOpenRouterContinuation();
-    } else if (state.engineConfig.mode === 'openai') {
-      newText = await fetchOpenAIContinuation();
-    } else if (state.engineConfig.mode === 'g4f' || !state.engineConfig.mode) {
-      newText = await fetchG4FContinuation();
-    } else {
-      throw new Error(state.language === 'ru' ? 'Ошибка генерации варианта. Проверьте конфигурацию API.' : 'Swipe generation error. Check API configuration.');
-    }
+    const newText = await fetchUniversalAIContinuation();
 
     const block = state.history[msgIndex];
     if (block) {
@@ -2086,18 +2081,7 @@ async function generateAIResponse() {
   elements.storyFeed.scrollTop = elements.storyFeed.scrollHeight;
 
   try {
-    let aiResponseText = "";
-
-    if (state.engineConfig.mode === 'gemini') {
-      aiResponseText = await fetchGeminiContinuation();
-    } else if (state.engineConfig.mode === 'openrouter') {
-      aiResponseText = await fetchOpenRouterContinuation();
-    } else if (state.engineConfig.mode === 'openai') {
-      aiResponseText = await fetchOpenAIContinuation();
-    } else {
-      // Default to g4f Backend API
-      aiResponseText = await fetchG4FContinuation();
-    }
+    let aiResponseText = await fetchUniversalAIContinuation();
 
     aiResponseText = sanitizeAIResponseText(aiResponseText);
     parseItemsFromAIText(aiResponseText);
@@ -2427,6 +2411,119 @@ async function fetchOpenAIContinuation() {
   throw new Error("Неверный ответ от API сервера");
 }
 
+// Запрос к Groq API
+async function fetchGroqContinuation() {
+  const apiKey = state.engineConfig.groqKey;
+  if (!apiKey) throw new Error("Укажите API Ключ Groq в Настройках.");
+
+  const model = state.engineConfig.groqModel || "llama-3.3-70b-versatile";
+  const promptContext = constructAIPrompt();
+
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [{ role: "user", content: promptContext }],
+      temperature: state.engineConfig.temperature || 0.8,
+      max_tokens: 2048
+    })
+  });
+
+  const data = await response.json();
+  if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+    return data.choices[0].message.content.trim();
+  }
+  if (data.error) throw new Error(`Groq API: ${data.error.message || JSON.stringify(data.error)}`);
+  throw new Error("Неверный ответ от Groq API");
+}
+
+// Запрос к Anthropic Claude API
+async function fetchAnthropicContinuation() {
+  const apiKey = state.engineConfig.anthropicKey;
+  if (!apiKey) throw new Error("Укажите API Ключ Anthropic Claude в Настройках.");
+
+  const model = state.engineConfig.anthropicModel || "claude-3-5-sonnet-20241022";
+  const promptContext = constructAIPrompt();
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'dangerously-allow-browser': 'true'
+    },
+    body: JSON.stringify({
+      model: model,
+      max_tokens: 2048,
+      temperature: state.engineConfig.temperature || 0.8,
+      messages: [{ role: "user", content: promptContext }]
+    })
+  });
+
+  const data = await response.json();
+  if (response.ok && data.content && data.content[0] && data.content[0].text) {
+    return data.content[0].text.trim();
+  }
+  if (data.error) throw new Error(`Anthropic Claude: ${data.error.message || JSON.stringify(data.error)}`);
+  throw new Error("Неверный ответ от Anthropic Claude API");
+}
+
+// Сквозной движок с авто-переключением (Cross-Provider Fallback Engine)
+async function fetchUniversalAIContinuation() {
+  const primaryProvider = state.engineConfig.mode || 'gemini';
+  const providerOrder = [primaryProvider, 'gemini', 'openrouter', 'groq', 'anthropic', 'openai', 'g4f', 'built-in'];
+  const candidates = [...new Set(providerOrder)];
+
+  let lastError = null;
+
+  for (const provider of candidates) {
+    try {
+      if (provider === 'gemini') {
+        const key = state.engineConfig.geminiKey || state.engineConfig.apiKey;
+        if (!key && primaryProvider !== 'gemini') continue;
+        console.log("[Universal AI Engine] Attempting Gemini...");
+        return await fetchGeminiContinuation();
+      } else if (provider === 'openrouter') {
+        const key = state.engineConfig.openrouterKey;
+        if (!key && primaryProvider !== 'openrouter') continue;
+        console.log("[Universal AI Engine] Attempting OpenRouter...");
+        return await fetchOpenRouterContinuation();
+      } else if (provider === 'groq') {
+        const key = state.engineConfig.groqKey;
+        if (!key && primaryProvider !== 'groq') continue;
+        console.log("[Universal AI Engine] Attempting Groq...");
+        return await fetchGroqContinuation();
+      } else if (provider === 'anthropic') {
+        const key = state.engineConfig.anthropicKey;
+        if (!key && primaryProvider !== 'anthropic') continue;
+        console.log("[Universal AI Engine] Attempting Anthropic...");
+        return await fetchAnthropicContinuation();
+      } else if (provider === 'openai') {
+        const key = state.engineConfig.apiKey;
+        if (!key && primaryProvider !== 'openai') continue;
+        console.log("[Universal AI Engine] Attempting OpenAI...");
+        return await fetchOpenAIContinuation();
+      } else if (provider === 'g4f' || provider === 'built-in') {
+        console.log("[Universal AI Engine] Attempting G4F / Offline fallback...");
+        return await fetchG4FContinuation();
+      }
+    } catch (err) {
+      console.warn(`[Universal AI Engine] Failover from ${provider}:`, err.message);
+      lastError = err.message || String(err);
+      if (provider === primaryProvider && (err.message.includes("API Ключ") || err.message.includes("Укажите API Ключ"))) {
+        throw err;
+      }
+    }
+  }
+
+  throw new Error(lastError || "Все ИИ-провайдеры недоступны. Проверьте подключение и ключи API в Настройках.");
+}
+
 // Формирование промпта для внешних ИИ
 
 // Гарантия законченности текста ответа ИИ (без обрывов на полуслове)
@@ -2656,7 +2753,11 @@ function updateUIState() {
   if (elements.openaiBaseUrlInput) elements.openaiBaseUrlInput.value = state.engineConfig.openaiBaseUrl || 'https://api.openai.com/v1';
   if (elements.apiKeyInput) elements.apiKeyInput.value = state.engineConfig.apiKey || '';
   if (elements.openaiModelInput) elements.openaiModelInput.value = state.engineConfig.openaiModel || 'gpt-4o';
-  
+  if (elements.groqKeyInput) elements.groqKeyInput.value = state.engineConfig.groqKey || '';
+  if (elements.groqModelSelect) elements.groqModelSelect.value = state.engineConfig.groqModel || 'llama-3.3-70b-versatile';
+  if (elements.anthropicKeyInput) elements.anthropicKeyInput.value = state.engineConfig.anthropicKey || '';
+  if (elements.anthropicModelSelect) elements.anthropicModelSelect.value = state.engineConfig.anthropicModel || 'claude-3-5-sonnet-20241022';
+
   if (elements.tempSlider) {
     elements.tempSlider.value = state.engineConfig.temperature || 0.8;
     if (elements.tempVal) elements.tempVal.textContent = state.engineConfig.temperature || 0.8;
@@ -2691,6 +2792,10 @@ async function testAIConnection() {
   if (elements.openaiBaseUrlInput) state.engineConfig.openaiBaseUrl = elements.openaiBaseUrlInput.value.trim();
   if (elements.apiKeyInput) state.engineConfig.apiKey = elements.apiKeyInput.value.trim();
   if (elements.openaiModelInput) state.engineConfig.openaiModel = elements.openaiModelInput.value.trim();
+  if (elements.groqKeyInput) state.engineConfig.groqKey = elements.groqKeyInput.value.trim();
+  if (elements.groqModelSelect) state.engineConfig.groqModel = elements.groqModelSelect.value;
+  if (elements.anthropicKeyInput) state.engineConfig.anthropicKey = elements.anthropicKeyInput.value.trim();
+  if (elements.anthropicModelSelect) state.engineConfig.anthropicModel = elements.anthropicModelSelect.value;
 
   elements.connectionStatusBadge.style.display = 'inline-flex';
   elements.connectionStatusBadge.className = 'connection-status-badge loading';
@@ -2699,21 +2804,7 @@ async function testAIConnection() {
   const startTime = Date.now();
 
   try {
-    const provider = state.engineConfig.mode || 'gemini';
-    let resText = '';
-
-    if (provider === 'gemini') {
-      resText = await fetchGeminiContinuation();
-    } else if (provider === 'openrouter') {
-      resText = await fetchOpenRouterContinuation();
-    } else if (provider === 'openai') {
-      resText = await fetchOpenAIContinuation();
-    } else if (provider === 'g4f') {
-      resText = await fetchG4FContinuation();
-    } else {
-      resText = "Встроенный офлайн-движок готов к работе.";
-    }
-
+    const resText = await fetchUniversalAIContinuation();
     const elapsed = Date.now() - startTime;
     elements.connectionStatusBadge.className = 'connection-status-badge success';
     elements.connectionStatusBadge.textContent = `✅ Успешно (${elapsed}ms)`;

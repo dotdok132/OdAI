@@ -483,6 +483,75 @@
         </div>
       </div>
 
+      <!-- Accordion Item 5: Groq API -->
+      <div class="accordion-item" data-provider="groq">
+        <div class="accordion-header">
+          <div class="accordion-title-row">
+            <span class="accordion-icon">⚡</span>
+            <div class="accordion-text">
+              <div class="accordion-title">Groq API (Супер-быстрый)</div>
+              <div class="accordion-sub">500+ токенов/сек, бесплатный тир (Llama 3.3, DeepSeek R1)</div>
+            </div>
+          </div>
+          <div class="accordion-radio"></div>
+        </div>
+        <div class="accordion-body">
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label">API Ключ Groq</label>
+              <a href="https://console.groq.com/keys" target="_blank" class="link-hint">🔑 Получить ключ Groq</a>
+            </div>
+            <div class="input-with-icon">
+              <input type="password" class="input-sm custom-dark-input" id="groq-key-input" placeholder="gsk_...">
+              <button class="btn-icon toggle-pass-btn" type="button">👁️</button>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 0.75rem;">
+            <label class="form-label">Модель Groq</label>
+            <select class="input-sm custom-dark-select" id="groq-model-select">
+              <option value="llama-3.3-70b-versatile" selected>🦙 Llama 3.3 70B Versatile (Умная & Быстрая)</option>
+              <option value="llama-3.1-8b-instant">⚡ Llama 3.1 8B Instant (Мгновенный ответ)</option>
+              <option value="deepseek-r1-distill-llama-70b">🧠 DeepSeek R1 Distill 70B (Рассуждающая)</option>
+              <option value="mixtral-8x7b-32768">🌪️ Mixtral 8x7B (Большой контекст)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion Item 6: Anthropic Claude API -->
+      <div class="accordion-item" data-provider="anthropic">
+        <div class="accordion-header">
+          <div class="accordion-title-row">
+            <span class="accordion-icon">🎭</span>
+            <div class="accordion-text">
+              <div class="accordion-title">Anthropic Claude API</div>
+              <div class="accordion-sub">Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus</div>
+            </div>
+          </div>
+          <div class="accordion-radio"></div>
+        </div>
+        <div class="accordion-body">
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label">API Ключ Anthropic</label>
+              <a href="https://console.anthropic.com/settings/keys" target="_blank" class="link-hint">🔑 Ключи Anthropic</a>
+            </div>
+            <div class="input-with-icon">
+              <input type="password" class="input-sm custom-dark-input" id="anthropic-key-input" placeholder="sk-ant-api03-...">
+              <button class="btn-icon toggle-pass-btn" type="button">👁️</button>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 0.75rem;">
+            <label class="form-label">Модель Claude</label>
+            <select class="input-sm custom-dark-select" id="anthropic-model-select">
+              <option value="claude-3-5-sonnet-20241022" selected>🎭 Claude 3.5 Sonnet (Лучшая для отыгрыша)</option>
+              <option value="claude-3-5-haiku-20241022">⚡ Claude 3.5 Haiku (Очень быстрая)</option>
+              <option value="claude-3-opus-20240229">👑 Claude 3 Opus (Максимальный интеллект)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <!-- Accordion Item 5: Offline Engine -->
       <div class="accordion-item" data-provider="built-in">
         <div class="accordion-header">
