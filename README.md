@@ -6,7 +6,26 @@
 
 **OdAI** is an interactive AI roleplay and text adventure game mobile application for Android and Web browsers, inspired by Character.AI, JanitorAI, and AI Dungeon.
 
+
 ---
+
+## ☁️ 1-Click Free Cloud Server Deployment (No PC needed!)
+
+You can deploy `server.py` with `g4f` to a free 24/7 cloud server in 1 click:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/dotdok132/OdAI)
+
+### Free Cloud Providers Options:
+1. **Render.com (1-Click Deployment)**:
+   - Click the **Deploy to Render** button above or log into [Render.com](https://render.com) with GitHub.
+   - Select `dotdok132/OdAI` ➔ Environment: `Python 3` ➔ Build Command: `pip install -r requirements.txt` ➔ Start Command: `gunicorn server:app`.
+   - Render gives you a free HTTPS URL (e.g., `https://odai-server.onrender.com`). Enter this URL in OdAI Settings!
+
+2. **Hugging Face Spaces (24/7 Docker)**:
+   - Go to [Hugging Face Spaces](https://huggingface.co/new-space).
+   - Select **Docker** ➔ Link repository `dotdok132/OdAI`.
+   - Get permanent free URL: `https://dotdok132-odai.hf.space`.
+
 
 ## 🌿 Features
 
