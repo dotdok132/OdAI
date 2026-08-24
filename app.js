@@ -2333,36 +2333,68 @@ async function fetchGeminiContinuation() {
 }
 
 
-// Запрос к OpenRouter API
+// Запрос к OpenRouter API с авто-фоллбэком по бесплатным моделям
 async function fetchOpenRouterContinuation() {
   const apiKey = state.engineConfig.openrouterKey;
   if (!apiKey) throw new Error("Укажите API Ключ OpenRouter в Настройках.");
 
-  const model = state.engineConfig.openrouterModel || "meta-llama/llama-3-70b-instruct";
+  const userModel = state.engineConfig.openrouterModel || "openrouter/free";
   const promptContext = constructAIPrompt();
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://odai.app',
-      'X-Title': 'OdAI RPG App'
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [{ role: "user", content: promptContext }],
-      temperature: state.engineConfig.temperature || 0.8,
-      max_tokens: 2048
-    })
-  });
+  const candidates = [
+    userModel,
+    "openrouter/free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "meta-llama/llama-3.1-8b-instruct:free",
+    "qwen/qwen-2.5-72b-instruct:free",
+    "google/gemma-2-9b-it:free",
+    "mistralai/mistral-small-24b-instruct-2501:free"
+  ];
 
-  const data = await response.json();
-  if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-    return data.choices[0].message.content.trim();
+  const candidateChain = [...new Set(candidates.filter(Boolean))];
+  let lastError = null;
+
+  for (const modelCandidate of candidateChain) {
+    try {
+      console.log(`[OpenRouter API] Trying model: ${modelCandidate}`);
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://github.com/dotdok132/OdAI',
+          'X-Title': 'OdAI RPG App'
+        },
+        body: JSON.stringify({
+          model: modelCandidate,
+          messages: [{ role: "user", content: promptContext }],
+          temperature: state.engineConfig.temperature || 0.8,
+          max_tokens: 2048
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+        return data.choices[0].message.content.trim();
+      }
+
+      if (data.error) {
+        const msg = data.error.message || JSON.stringify(data.error);
+        console.warn(`[OpenRouter Fallback] Model ${modelCandidate} failed: ${msg}`);
+        if (response.status === 401 || msg.includes("API key") || msg.includes("Invalid key")) {
+          throw new Error(`API Ключ OpenRouter недействителен: ${msg}`);
+        }
+        lastError = msg;
+      } else {
+        lastError = `HTTP ${response.status}: ${response.statusText}`;
+      }
+    } catch (err) {
+      if (err.message && err.message.includes("API Ключ")) throw err;
+      lastError = err.message || String(err);
+    }
   }
-  if (data.error) throw new Error(`OpenRouter: ${data.error.message || JSON.stringify(data.error)}`);
-  throw new Error("Неверный ответ от OpenRouter API");
+
+  throw new Error(`OpenRouter: ${lastError || "Выбранная модель недоступна. Попробуйте выбрать 'openrouter/free' в Настройках."}`);
 }
 
 // Запрос к OpenAI / Custom API (Ollama, LM Studio)
