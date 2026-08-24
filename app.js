@@ -2194,7 +2194,7 @@ async function getValidGeminiModelsFromAPI(apiKey) {
       for (const m of (data.models || [])) {
         const name = (m.name || '').replace('models/', '');
         const methods = m.supportedGenerationMethods || [];
-        const bad = ['-tts', 'embedding', 'imagen', 'bison', 'aqa', 'realtime', 'interactions', 'audio', 'live'];
+        const bad = ['-tts', 'embedding', 'imagen', 'bison', 'aqa', 'realtime', 'interactions', 'audio', 'live', 'gemma', 'veo', 'lyria', 'nano', 'robotics', 'deep-research', 'antigravity', 'computer-use', 'image'];
         if (methods.includes('generateContent') && !bad.some(b => name.toLowerCase().includes(b))) {
           valid.push(name);
         }
@@ -2223,7 +2223,7 @@ async function fetchGeminiContinuation() {
 
   // 2. Формирование цепочки моделей (Пользовательская -> Динамические -> Резервные)
   const candidateModels = [];
-  if (userModel && userModel !== 'auto' && !['-tts', 'embedding', 'imagen', 'interactions', 'realtime'].some(bad => userModel.toLowerCase().includes(bad))) {
+  if (userModel && userModel !== 'auto' && !['-tts', 'embedding', 'imagen', 'interactions', 'realtime', 'image'].some(bad => userModel.toLowerCase().includes(bad))) {
     candidateModels.push(userModel);
   }
 
@@ -2232,12 +2232,12 @@ async function fetchGeminiContinuation() {
   }
 
   const fallbackDefaults = [
-    'gemini-2.0-flash',
-    'gemini-2.5-flash',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro',
-    'gemini-2.5-pro',
-    'gemini-1.5-flash-latest'
+    'gemini-3.6-flash',
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+    'gemini-flash-latest',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite'
   ];
   candidateModels.push(...fallbackDefaults);
 
