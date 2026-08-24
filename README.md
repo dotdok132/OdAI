@@ -46,16 +46,19 @@
 
 ---
 
-## ☁️ 1-Click Free Cloud Server Deployment (For g4f Backend)
+## ⚡ Free AI Setup (No Credit Cards & No Server Required)
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/dotdok132/OdAI)
+OdAI connects directly to high-speed AI providers out of the box with zero credit cards and zero hosting costs:
 
-### Free Cloud Deployment Options:
-1. **Render.com (1-Click Deployment)**:
-   - Click the **Deploy to Render** button above or log into [Render.com](https://render.com).
-   - Select `dotdok132/OdAI` ➔ Environment: `Python 3` ➔ Render auto-builds `server.py` 24/7!
-2. **Hugging Face Spaces (24/7 Docker)**:
-   - Create Space on [Hugging Face](https://huggingface.co/new-space) ➔ Select **Docker** ➔ Link `dotdok132/OdAI`.
+1. **Google Gemini API (Recommended - 100% Free, Zero Cards, Zero Server Setup)**:
+   - Get a 100% free API key from [aistudio.google.com](https://aistudio.google.com/) using any Google account (**no credit card required**).
+   - Enter your key in OdAI Settings on your smartphone for instant access to `gemini-2.5-flash`, `gemini-2.0-flash`, `gemini-1.5-flash`, and `gemini-1.5-pro` with zero servers!
+
+2. **OpenRouter API (Free Tier - Zero Cards)**:
+   - Access free AI models via [OpenRouter.ai](https://openrouter.ai/) without entering credit cards.
+
+3. **Hugging Face Spaces (Optional 24/7 Free Docker Server)**:
+   - Create a free Space on [Hugging Face](https://huggingface.co/new-space) ➔ Select **Docker** ➔ Link `dotdok132/OdAI` for free 24/7 `g4f` Python hosting (**no credit card required**).
 
 ---
 
