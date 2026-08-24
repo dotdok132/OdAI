@@ -8,7 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>OdAI - Интерактивное AI Приключение</title>
   <meta name="description" content="Интерактивный текстовый AI-квест с Защитой Реализма и Системой Инвентаря.">
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css?v=25">
 </head>
 <body>
   <div class="tablet-layout">
@@ -16,7 +17,8 @@
   <!-- View: Chat List (Main Screen) -->
   <div id="view-chat-list" class="view-screen active">
     <header class="app-header">
-      <div class="logo-container">
+      <div class="logo-container" style="display:flex; align-items:center; gap:0.5rem;">
+        <img src="logo.png" class="header-logo-icon" alt="OdAI Logo">
         <span class="logo-title">OdAI</span>
       </div>
       <div class="header-actions">
@@ -530,6 +532,6 @@
     <div class="dice-label-text" id="dice-overlay-label">Бросок кубика d20...</div>
   </div>
 
-  <script src="app.js?v=24"></script>
+  <script src="app.js?v=25"></script>
 </body>
 </html>

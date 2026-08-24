@@ -579,8 +579,11 @@ function syncActiveChatToState() {
       subEl.textContent = `@${scenTitle}`;
     }
     if (avatarEl) {
-      const initial = (activeSession.title || 'AI').charAt(0).toUpperCase();
-      avatarEl.textContent = initial;
+      if (activeSession.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${activeSession.avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+      } else {
+        avatarEl.innerHTML = `<img src="logo.png" style="width:100%; height:100%; border-radius:50%; object-fit:cover; box-shadow: 0 0 8px rgba(106,154,85,0.4);">`;
+      }
     }
   }
 }
