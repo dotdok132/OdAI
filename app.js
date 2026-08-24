@@ -1657,7 +1657,7 @@ async function generateNewSwipeVariant(msgIndex) {
     } else if (state.engineConfig.mode === 'openai') {
       newText = await fetchOpenAIContinuation();
     } else {
-      newText = await generateProceduralAIResponse();
+      throw new Error(state.language === 'ru' ? 'Ошибка генерации варианта. Проверьте API ключ.' : 'Swipe generation error. Check API configuration.');
     }
 
     const block = state.history[msgIndex];
@@ -1920,12 +1920,13 @@ async function handleSendAction() {
 }
 
 // Генерация ответа ИИ
+// Генерация ответа ИИ (БЕЗ офлайн-генератора! Если API недоступен — выводится только ошибка)
 async function generateAIResponse() {
-  state.isGenerating = true; updateUIState();
+  state.isGenerating = true; 
   updateUIState();
   elements.typingIndicator.style.display = 'flex';
   const labelEl = elements.typingStatusText || elements.typingIndicator;
-  if (labelEl) labelEl.textContent = "Создает продолжение...";
+  if (labelEl) labelEl.textContent = state.language === 'ru' ? "ИИ генерирует ответ..." : (state.language === 'uk' ? "ШІ генерує відповідь..." : (state.language === 'es' ? "La IA está generando respuesta..." : "AI is generating response..."));
   elements.storyFeed.scrollTop = elements.storyFeed.scrollHeight;
 
   try {
@@ -1937,15 +1938,9 @@ async function generateAIResponse() {
       aiResponseText = await fetchOpenRouterContinuation();
     } else if (state.engineConfig.mode === 'openai') {
       aiResponseText = await fetchOpenAIContinuation();
-    } else if (state.engineConfig.mode === 'g4f') {
-      try {
-        aiResponseText = await fetchG4FContinuation();
-      } catch (g4fErr) {
-        console.warn("g4f server on PC not reachable, auto-switching to standalone DM engine:", g4fErr);
-        aiResponseText = await generateProceduralAIResponse();
-      }
     } else {
-      aiResponseText = await generateProceduralAIResponse();
+      // Default to g4f Backend API
+      aiResponseText = await fetchG4FContinuation();
     }
 
     aiResponseText = sanitizeAIResponseText(aiResponseText);
@@ -1960,24 +1955,16 @@ async function generateAIResponse() {
     });
 
   } catch (err) {
-    console.error("Ошибка ИИ:", err);
+    console.error("[OdAI Error]:", err);
+    const errPrefix = state.language === 'ru' ? '[Ошибка подключения к ИИ]' : (state.language === 'uk' ? '[Помилка з’єднання з ШІ]' : (state.language === 'es' ? '[Error de conexión con IA]' : '[AI Connection Error]'));
     state.history.push({
       id: Date.now(),
       type: 'system',
-      text: "[Системное предупреждение]: Не удалось получить ответ от g4f/внешней модели. Переключение на встроенный локальный движок.",
-      timestamp: new Date().toLocaleTimeString()
-    });
-    let fallbackText = await generateProceduralAIResponse();
-    fallbackText = sanitizeAIResponseText(fallbackText);
-    state.history.push({
-      id: Date.now(),
-      type: 'ai',
-      text: fallbackText,
-      animateTypewriter: true,
+      text: `${errPrefix}: ${err.message || err}`,
       timestamp: new Date().toLocaleTimeString()
     });
   } finally {
-    state.isGenerating = false; updateUIState();
+    state.isGenerating = false; 
     updateUIState();
     elements.typingIndicator.style.display = 'none';
     renderStoryFeed();
@@ -2029,62 +2016,7 @@ async function fetchG4FContinuation() {
   }
 }
 
-// Встроенный процедурный генератор историй (Русскоязычный)
-async function generateProceduralAIResponse() {
-  await new Promise(res => setTimeout(res, 800 + Math.random() * 600));
 
-  const lastActionBlock = [...state.history].reverse().find(b => b.type === 'do' || b.type === 'say' || b.type === 'story');
-  const actionText = lastActionBlock ? lastActionBlock.text.replace('>', '').trim().toLowerCase() : "";
-
-  // Учет результата прикрепленного d20 в процедурном генераторе
-  if (lastActionBlock && lastActionBlock.diceVal) {
-    const val = lastActionBlock.diceVal;
-    if (val === 20) {
-      return "Нереальный триумфальный успех! Ваш маневр выходит безупречным и невероятно эффектным. Препятствие мгновенно преодолено, а окружающие смотрят на вас с нескрываемым восхищением.";
-    } else if (val >= 12) {
-      return "Успех! Вы ловко справляетесь с задуманным, добиваясь желаемого результата без лишних помех.";
-    } else if (val >= 6) {
-      return "С трудом, но действие удается совершить. Однако в процессе вы слегка теряете равновесие или привлекаете лишнее внимание.";
-    } else {
-      return "Провал! Нога соскальзывает в самый ответственный момент, и задуманный трюк обращается неловким падением. Маневр не удался, и ситуация усложняется.";
-    }
-  }
-
-  const scenKey = state.currentScenarioKey;
-  
-  if (actionText.includes('осмотреть') || actionText.includes('посмотреть') || actionText.includes('искать') || actionText.includes('проверить')) {
-    if (scenKey === 'fantasy') {
-      return "Вы внимательно осматриваете место. Руны, высеченные на холодном граните, мерцают слабым лазурным светом. Под каменным алтарем вы замечаете небольшой деревянный тайник, остававшийся неприкосновенным столетиями.";
-    } else if (scenKey === 'cyberpunk') {
-      return "Ваши оптические импланты приближают изображение, подсвечивая скрытые узлы данных и разъем за терминалом. Тихий гул вибрирует под полом — рядом зафиксирован зашифрованный сигнал.";
-    } else if (scenKey === 'detective') {
-      return "Вы наклоняетесь над столом из красного дерева, разбирая бумаги. Под бронзовой пепельницей удается разглядеть полуобгоревшую телеграмму, адресованную высокопоставленному чиновнику.";
-    } else {
-      return "Вы пристально осматриваетесь. Среди обломков привлекает внимание металлический отблеск — нетронутый контейнер рядом с запертой дверью.";
-    }
-  }
-
-  if (actionText.includes('открыть') || actionText.includes('зайти') || actionText.includes('войти') || actionText.includes('подняться')) {
-    return "С тяжелым скрипом проход открывается. Прохладный воздух вырывается наружу, донося запах древней пыли и забытых тайн. Впереди царит мрак, но где-то в глубине эхом отзываются тихие шаги.";
-  }
-
-  if (actionText.includes('сказать') || actionText.includes('спросить') || actionText.includes('поговорить')) {
-    return "Фигура замирает и медленно поворачивается к вам. Тени скрывают лицо, но тон собеседника становится задумчивым: 'Слова мало стоят в такие времена,' — звучит спокойный ответ. 'Скажи лучше, за чем ты на самом деле пришел.'";
-  }
-
-  if (actionText.includes('ударить') || actionText.includes('атаковать') || actionText.includes('выстрелить') || actionText.includes('рубить')) {
-    return "Ваш удар достигают цели! Отдача отзывается в руке, когда противник оступается назад, тяжело дыша и выставляя защиту перед следующим выпадом.";
-  }
-
-  // Общие варианты продолжения
-  const generalContinuations = [
-    "Тени сгущаются вдоль стен, когда вокруг воцаряется тишина. Вы чувствуете, что каждый последующий выбор будет иметь решающее значение.",
-    "Далекий звук нарушает молчание, заставляя насторожиться. Атмосфера накаляется, пока вы делаете следующий шаг вперед.",
-    "Окружающий мир откликается на ваше присутствие. Впереди путь раздваивается, уводя все глубже в неизвестность."
-  ];
-
-  return generalContinuations[Math.floor(Math.random() * generalContinuations.length)];
-}
 
 
 // =============================================================================
