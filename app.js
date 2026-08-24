@@ -2194,7 +2194,7 @@ async function getValidGeminiModelsFromAPI(apiKey) {
       for (const m of (data.models || [])) {
         const name = (m.name || '').replace('models/', '');
         const methods = m.supportedGenerationMethods || [];
-        const bad = ['-tts', 'embedding', 'imagen', 'bison', 'aqa'];
+        const bad = ['-tts', 'embedding', 'imagen', 'bison', 'aqa', 'realtime', 'interactions', 'audio', 'live'];
         if (methods.includes('generateContent') && !bad.some(b => name.toLowerCase().includes(b))) {
           valid.push(name);
         }
@@ -2223,7 +2223,7 @@ async function fetchGeminiContinuation() {
 
   // 2. Формирование цепочки моделей (Пользовательская -> Динамические -> Резервные)
   const candidateModels = [];
-  if (userModel && userModel !== 'auto' && !['-tts', 'embedding', 'imagen'].some(bad => userModel.toLowerCase().includes(bad))) {
+  if (userModel && userModel !== 'auto' && !['-tts', 'embedding', 'imagen', 'interactions', 'realtime'].some(bad => userModel.toLowerCase().includes(bad))) {
     candidateModels.push(userModel);
   }
 
@@ -2232,12 +2232,12 @@ async function fetchGeminiContinuation() {
   }
 
   const fallbackDefaults = [
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-latest',
-    'gemini-2.0-flash-exp',
     'gemini-2.0-flash',
+    'gemini-2.5-flash',
+    'gemini-1.5-flash',
     'gemini-1.5-pro',
-    'gemini-1.5-pro-latest'
+    'gemini-2.5-pro',
+    'gemini-1.5-flash-latest'
   ];
   candidateModels.push(...fallbackDefaults);
 
@@ -2269,16 +2269,32 @@ async function fetchGeminiContinuation() {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-          console.log(`[Gemini API Success] Model: ${model}`);
-          return data.candidates[0].content.parts[0].text.trim();
+        if (data.candidates && data.candidates.length > 0) {
+          const cand = data.candidates[0];
+          if (cand.content && cand.content.parts) {
+            const textParts = cand.content.parts.map(p => p.text || '').join('').trim();
+            if (textParts) {
+              console.log(`[Gemini API Success] Model: ${model}`);
+              return textParts;
+            }
+          }
+          if (cand.finishReason && cand.finishReason !== 'STOP') {
+            lastError = `Generation stopped by Gemini (${cand.finishReason})`;
+          }
         }
       } else {
         const errData = await response.json().catch(() => ({}));
         lastError = errData.error?.message || response.statusText;
         
-        // Если ошибка говорит о невалидном API ключе — прерываем цикл немедленно!
-        if (response.status === 400 || response.status === 403 || (lastError && (lastError.includes('API key') || lastError.includes('INVALID_ARGUMENT') || lastError.includes('PERMISSION_DENIED')))) {
+        // Прерываем цикл ТЕЛЬКО при явной ошибке недействительного API ключа:
+        const isKeyErr = lastError && (
+          lastError.includes('API key not valid') ||
+          lastError.includes('API_KEY_INVALID') ||
+          lastError.includes('API_KEY_SERVICE_BLOCKED') ||
+          (lastError.toLowerCase().includes('api key') && (response.status === 400 || response.status === 403))
+        );
+
+        if (isKeyErr) {
           fatalError = new Error(state.language === 'ru' 
             ? `Недействительный API Ключ Gemini (${lastError}). Проверьте или получите новый ключ на aistudio.google.com` 
             : `Invalid Gemini API Key (${lastError}). Please check your key at aistudio.google.com`);
