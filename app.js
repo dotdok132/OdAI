@@ -415,8 +415,21 @@ function applyI18nLanguage(lang) {
   saveStateToStorage();
 }
 
+
+function toggleAppFullscreen() {
+  if (!document.fullscreenElement) {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(err => console.warn("Fullscreen request error:", err));
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(err => console.warn("Exit fullscreen error:", err));
+    }
+  }
+}
+
 function showView(viewId, skipHistory = false) {
-  const isTabletSplit = window.innerWidth >= 960;
+  const isTabletSplit = window.innerWidth >= 960 && window.innerHeight >= 600;
 
   if (isTabletSplit) {
     elements.viewChatList.classList.add('active');

@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>OdAI - Интерактивное AI Приключение</title>
   <meta name="description" content="Интерактивный текстовый AI-квест с Защитой Реализма и Системой Инвентаря.">
-  <link rel="stylesheet" href="styles.css?v=22">
+  <link rel="stylesheet" href="styles.css?v=23">
 </head>
 <body>
   <div class="tablet-layout">
@@ -59,6 +59,11 @@
       </div>
 
       <div class="header-actions">
+        <!-- Fullscreen Toggle Button -->
+        <button class="btn-icon" id="fullscreen-toggle-btn" title="True Fullscreen Mode">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+
         <!-- 3-Dots Menu Button -->
         <button class="btn-icon" id="chat-menu-btn" title="Меню чата">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/></svg>
@@ -525,6 +530,6 @@
     <div class="dice-label-text" id="dice-overlay-label">Бросок кубика d20...</div>
   </div>
 
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=23"></script>
 </body>
 </html>
