@@ -34,6 +34,10 @@ def serve_index():
 
 @app.route('/<path:filename>')
 def serve_static(filename):
+    safe_extensions = {'.html', '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.json', '.webmanifest'}
+    if not any(filename.endswith(ext) for ext in safe_extensions) or '..' in filename:
+        from flask import abort
+        abort(403)
     return send_from_directory('.', filename)
 
 @app.route('/api/status', methods=['GET'])
@@ -89,7 +93,7 @@ def validate_realism_ai():
             )
 
         response = g4f.ChatCompletion.create(
-            model=g4f.models.default,
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": guard_prompt}]
         )
 
@@ -168,7 +172,13 @@ def generate_story():
         messages = [{"role": "system", "content": system_prompt}]
 
         for h in history[-8:]:
-            role = "user" if h.get('type') in ['do', 'say', 'story'] else "assistant"
+            h_type = h.get('type')
+            if h_type in ['do', 'say', 'story']:
+                role = "user"
+            elif h_type == 'system':
+                role = "system" # Map realism guard and system notices to system context
+            else:
+                role = "assistant"
             messages.append({"role": role, "content": h.get('text', '')})
 
         if prompt and (not history or history[-1].get('text') != prompt):
@@ -181,7 +191,7 @@ def generate_story():
 
         try:
             response = g4f.ChatCompletion.create(
-                model=g4f.models.default,
+                model="gpt-4o-mini",
                 messages=messages
             )
             output_text = str(response).strip()
@@ -273,6 +283,10 @@ def import_character():
                 og_desc = re.search(r'<meta\s+property="og:description"\s+content="([^"]*)"', html_text)
                 if og_desc:
                     description = og_desc.group(1).replace('Chat with :', '').strip()
+
+            if not name:
+                name = "Неизвестный Персонаж (C.AI Защищен)"
+                description = "Character.AI включил защиту от парсинга (Cloudflare). Описание не может быть загружено по ссылке автоматически."
 
         if not name:
             name = f"Character {char_id[:8]}"

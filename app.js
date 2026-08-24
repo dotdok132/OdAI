@@ -350,6 +350,7 @@ const elements = {
   dropdownInventoryBtn: document.getElementById('dropdown-inventory-btn'),
   dropdownRealismToggle: document.getElementById('dropdown-realism-toggle'),
   dropdownScenariosBtn: document.getElementById('dropdown-scenarios-btn'),
+  dropdownCasualToggle: document.getElementById('dropdown-casual-toggle'),
 
   storyFeed: document.getElementById('story-feed'),
   promptInput: document.getElementById('prompt-input'),
@@ -781,6 +782,17 @@ function setupEventListeners() {
       openModal(elements.scenarioModal);
     });
   }
+  if (elements.dropdownCasualToggle) {
+    elements.dropdownCasualToggle?.addEventListener('click', (e) => {
+      if (e.target.closest('.toggle-switch')) return; 
+      const tgl = elements.dropdownCasualToggle.querySelector('.toggle-switch');
+      if (tgl) {
+        state.casualMode = !state.casualMode;
+        tgl.classList.toggle('active', state.casualMode);
+        saveStateToStorage();
+      }
+    });
+  }
 
 
 
@@ -993,7 +1005,7 @@ function animateD20Roll(reason, callback) {
 
   setTimeout(() => {
     clearInterval(interval);
-    const finalVal = Math.floor(Math.random() * 20) + 1;
+    let finalVal = Math.floor(Math.random() * 20) + 1;
     dieFace.textContent = finalVal;
     dieFace.classList.remove('rolling');
     dieFace.classList.add('landed');
@@ -1498,6 +1510,7 @@ function animateTypewriter(containerEl, fullText, speedMs = 10) {
   containerEl.appendChild(cursorSpan);
 
   let isSkipped = false;
+  let timer;
   const skipHandler = (e) => {
     if (!isSkipped) {
       isSkipped = true;
@@ -1512,7 +1525,7 @@ function animateTypewriter(containerEl, fullText, speedMs = 10) {
 
   containerEl.addEventListener('click', skipHandler, { once: true });
 
-  const timer = setInterval(() => {
+  timer = setInterval(() => {
     if (isSkipped) return;
 
     // Выводим по 2 символа за такт для плавной и быстрой печати
@@ -1727,8 +1740,10 @@ async function generateNewSwipeVariant(msgIndex) {
       newText = await fetchOpenRouterContinuation();
     } else if (state.engineConfig.mode === 'openai') {
       newText = await fetchOpenAIContinuation();
+    } else if (state.engineConfig.mode === 'g4f' || !state.engineConfig.mode) {
+      newText = await fetchG4FContinuation();
     } else {
-      throw new Error(state.language === 'ru' ? 'Ошибка генерации варианта. Проверьте API ключ.' : 'Swipe generation error. Check API configuration.');
+      throw new Error(state.language === 'ru' ? 'Ошибка генерации варианта. Проверьте конфигурацию API.' : 'Swipe generation error. Check API configuration.');
     }
 
     const block = state.history[msgIndex];
@@ -2161,9 +2176,7 @@ async function fetchGeminiContinuation() {
     'gemini-2.0-flash-exp',
     'gemini-2.0-flash',
     'gemini-1.5-pro',
-    'gemini-1.5-pro-latest',
-    'gemini-1.0-pro',
-    'gemini-pro'
+    'gemini-1.5-pro-latest'
   ];
   candidateModels.push(...fallbackDefaults);
 
