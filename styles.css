@@ -811,6 +811,7 @@ body {
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: all 0.2s ease;
+  flex-shrink: 0 !important;
 }
 
 .accordion-item.active, .settings-accordion-item.active {
@@ -826,6 +827,8 @@ body {
   cursor: pointer;
   background: #18181e;
   user-select: none;
+  flex-shrink: 0 !important;
+  min-height: 44px;
 }
 
 .accordion-item.active .accordion-header, .settings-accordion-item.active .settings-accordion-header {
@@ -2039,11 +2042,32 @@ body {
     border-radius: 6px !important;
   }
 
-  .modal-box, .archive-modal-box, .settings-modal-box, .scenarios-modal-box {
+  .modal-box, .archive-modal-box, .scenarios-modal-box {
     max-height: 92vh !important;
     max-height: 92dvh !important;
     padding: 0.75rem !important;
     overflow-y: auto !important;
+  }
+
+  .settings-modal-box {
+    max-height: 94vh !important;
+    max-height: 94dvh !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .settings-modal-box .modal-header {
+    padding: 0.6rem 1rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .settings-body {
+    padding: 0.75rem 1rem !important;
+    gap: 0.6rem !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
   }
 }
 
