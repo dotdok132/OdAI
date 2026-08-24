@@ -20,6 +20,14 @@ except Exception as e:
     g4f_available = False
     print(f"[OdAI Server] Warning: g4f not available ({e})")
 
+# Safe import for curl_cffi
+try:
+    from curl_cffi import requests as cffi_requests
+    cffi_available = True
+except Exception:
+    cffi_available = False
+    import urllib.request
+
 @app.route('/')
 def serve_index():
     return send_from_directory('.', 'index.html')
@@ -32,7 +40,8 @@ def serve_static(filename):
 def get_status():
     return jsonify({
         "status": "ok",
-        "g4f_available": g4f_available
+        "g4f_available": g4f_available,
+        "cffi_available": cffi_available
     })
 
 # Deep AI Realism Judge Endpoint: Evaluates player actions semantically without any hardcoded word lists
@@ -42,34 +51,49 @@ def validate_realism_ai():
     action = data.get('action', '')
     scenario = data.get('scenario', 'fantasy')
     inventory = data.get('inventory', [])
+    lang = data.get('lang', 'en')
 
     if not action or not g4f_available:
         return jsonify({"allowed": True})
 
     try:
-        guard_prompt = (
-            "Вы — ИИ-Арбитр реализма и физики в текстовой ролевой игре (RPG).\n"
-            f"Текущий сеттинг мира: {scenario}.\n"
-            f"Инвентарь игрока: {json.dumps(inventory, ensure_ascii=False)}.\n\n"
-            f"Игрок пытается совершить действие: \"{action}\"\n\n"
-            "ЗАДАЧА:\n"
-            "Проанализируйте действие глубоко и контекстуально на основе логики выбранного мира и здравого смысла.\n"
-            "1. Запрещены невозможные вещи (например: достать, создать или использовать предмет/оружие, которого нет в инвентаре; применять современное огнестрельное оружие или взрывчатку в средневековье; нарушать законы мира).\n"
-            "2. Разрешены логичные действия (осмотреться, заговорить, применить имеющееся оружие/предмет из инвентаря, обычные бытовые и физические действия).\n\n"
-            "ОТВЕТЬТЕ ИСКЛЮЧИТЕЛЬНО В ФОРМАТЕ JSON:\n"
-            "{\"allowed\": false, \"reason\": \"Подробное разумное объяснение ИИ, почему данное действие невозможно\"}\n"
-            "ИЛИ\n"
-            "{\"allowed\": true, \"reason\": \"\"}"
-        )
+        if lang == 'en':
+            guard_prompt = (
+                "You are an AI Arbiter of realism and physics for an interactive RPG game in English.\n"
+                f"World Setting: {scenario}.\n"
+                f"Player Inventory: {json.dumps(inventory, ensure_ascii=False)}.\n\n"
+                f"Player attempts the action: \"{action}\"\n\n"
+                "TASK:\n"
+                "Analyze the action deeply based on world logic and common sense.\n"
+                "1. Disallow impossible actions (e.g. using an item not in inventory, using modern weapons in fantasy, violating world laws).\n"
+                "2. Allow logical actions (looking around, speaking, using inventory items).\n\n"
+                "RESPOND STRICTLY IN JSON:\n"
+                "{\"allowed\": false, \"reason\": \"Detailed explanation why this action is impossible\"}\n"
+                "OR\n"
+                "{\"allowed\": true, \"reason\": \"\"}"
+            )
+        else:
+            guard_prompt = (
+                "Вы — ИИ-Арбитр реализма и физики в текстовой ролевой игре (RPG).\n"
+                f"Текущий сеттинг мира: {scenario}.\n"
+                f"Инвентарь игрока: {json.dumps(inventory, ensure_ascii=False)}.\n\n"
+                f"Игрок пытается совершить действие: \"{action}\"\n\n"
+                "ЗАДАЧА:\n"
+                "Проанализируйте действие глубоко и контекстуально на основе логики выбранного мира и здравого смысла.\n"
+                "1. Запрещены невозможные вещи (например: достать, создать или использовать предмет/оружие, которого нет в инвентаре).\n"
+                "2. Разрешены логичные действия.\n\n"
+                "ОТВЕТЬТЕ ИСКЛЮЧИТЕЛЬНО В ФОРМАТЕ JSON:\n"
+                "{\"allowed\": false, \"reason\": \"Подробное объяснение ИИ\"}\n"
+                "ИЛИ\n"
+                "{\"allowed\": true, \"reason\": \"\"}"
+            )
 
         response = g4f.ChatCompletion.create(
             model=g4f.models.default,
-            provider=g4f.Provider.AnyProvider,
             messages=[{"role": "user", "content": guard_prompt}]
         )
 
         res_text = str(response).strip()
-        print(f"[AI Realism Judge Raw Output]: {res_text}")
 
         # Extract JSON from AI response
         if "{" in res_text and "}" in res_text:
@@ -90,29 +114,37 @@ def generate_story():
     memory = data.get('memory', '')
     author_note = data.get('authorNote', '')
     history = data.get('history', [])
+    lang = data.get('lang', 'en')
 
     if not g4f_available:
         return jsonify({"error": "g4f library not loaded on server"}), 500
 
     try:
-        # Build system & conversation messages for g4f
-        system_prompt = (
-            "Вы — ведущий мастер (Dungeon Master) для интерактивной текстовой игры в стиле AI Dungeon и D&D.\n"
-            f"Сценарий мира: {scenario}.\n"
-            f"Память мира (Remember): {memory}.\n"
-            f"Заметка автора (Стиль): {author_note}.\n"
-            "СТРОГОЕ ПРАВИЛО КУБИКА d20 И РЕАЛИЗМА:\n"
-            "1. Внимательно смотрите на прикрепленный результат кубика в действии игрока: '[🎲 d20: X — Результат]'!\n"
-            "   - Если выпал ПРОВАЛ или КРИТИЧЕСКИЙ ПРОВАЛ (результат 1, 2, 3, 4 или 5): Персонаж СТРОГО ТЕРПИТ НЕУДАЧУ! Категорически ЗАПРЕЩЕНО писать, что действие прошло успешно. Опишите падение, промах, потерю равновесия или провал!\n"
-            "   - Если выпал ЧАСТИЧНЫЙ УСПЕХ (6-11): Действие удается с трудом, ушибом или осложнением.\n"
-            "   - Если выпал УСПЕХ (12-19): Действие удается хорошо.\n"
-            "   - Если выпал КРИТИЧЕСКИЙ УСПЕХ (20): Триумфальный успех!\n"
-            "2. Вы ОБЯЗАНЫ строить продолжение СТРОГО исходя из броска! Отвечайте на русском языке, красиво, живо, атмосферно (2-4 предложения)."
-        )
+        if lang == 'en':
+            system_prompt = (
+                "You are a Dungeon Master and storyteller for an interactive roleplay game in English.\n"
+                f"Scenario Setting: {scenario}.\n"
+                f"World Memory (Remember): {memory}.\n"
+                f"Writing Style: {author_note}.\n"
+                "RULE OF D20 AND REALISM:\n"
+                "1. Look at the dice roll in the player action: '[🎲 d20: X]'!\n"
+                "   - FAIL (1-5): Character MUST fail!\n"
+                "   - SUCCESS (12-20): Character succeeds!\n"
+                "2. Respond naturally in English with 2-4 complete sentences. Always finish complete sentences!"
+            )
+        else:
+            system_prompt = (
+                "Вы — ведущий мастер (Dungeon Master) для интерактивной текстовой игры в стиле AI Dungeon и D&D.\n"
+                f"Сценарий мира: {scenario}.\n"
+                f"Память мира (Remember): {memory}.\n"
+                f"Заметка автора (Стиль): {author_note}.\n"
+                "СТРОГОЕ ПРАВИЛО КУБИКА d20 И РЕАЛИЗМА:\n"
+                "1. Внимательно смотрите на прикрепленный результат кубика: '[🎲 d20: X]'!\n"
+                "2. Отвечайте на русском языке в 2-4 законченных предложениях."
+            )
 
         messages = [{"role": "system", "content": system_prompt}]
 
-        # Append history context
         for h in history[-8:]:
             role = "user" if h.get('type') in ['do', 'say', 'story'] else "assistant"
             messages.append({"role": role, "content": h.get('text', '')})
@@ -120,12 +152,11 @@ def generate_story():
         if prompt and (not history or history[-1].get('text') != prompt):
             messages.append({"role": "user", "content": prompt})
 
-        print(f"[OdAI Server] Generating AI story response via g4f...")
+        print(f"[OdAI Server] Generating AI story response via g4f ({lang})...")
         
         output_text = None
         last_err = None
 
-        # Try g4f ChatCompletion
         try:
             response = g4f.ChatCompletion.create(
                 model=g4f.models.default,
@@ -137,8 +168,6 @@ def generate_story():
             print(f"[OdAI Server] g4f default model exception: {e}")
 
         if not output_text or len(output_text) < 5 or "NoValidHarFileError" in output_text:
-            # Fallback to direct urllib request if g4f provider requires auth
-            print("[OdAI Server] Retrying with secondary g4f fallback...")
             raise ValueError(f"g4f error: {last_err or 'Empty response'}")
 
         print(f"[OdAI Server] Generation SUCCESS: {output_text[:80]}...")
@@ -160,7 +189,6 @@ def import_character():
         return jsonify({"error": "Укажите ссылку или ID персонажа"}), 400
 
     try:
-        from curl_cffi import requests as cffi_requests
         import re
 
         url_or_id = url_or_id.strip()
@@ -173,7 +201,15 @@ def import_character():
 
         print(f"[OdAI Parser] Fetching Character.AI URL: {target_url}")
 
-        r = cffi_requests.get(target_url, impersonate='chrome120', allow_redirects=True, timeout=15)
+        html_text = ""
+        if cffi_available:
+            r = cffi_requests.get(target_url, impersonate='chrome120', allow_redirects=True, timeout=15)
+            if r.status_code == 200:
+                html_text = r.text
+        else:
+            req = urllib.request.Request(target_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                html_text = resp.read().decode('utf-8', errors='ignore')
 
         name = ""
         title = ""
@@ -181,8 +217,8 @@ def import_character():
         description = ""
         definition = ""
 
-        if r.status_code == 200:
-            match_data = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', r.text)
+        if html_text:
+            match_data = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', html_text)
             if match_data:
                 try:
                     next_data = json.loads(match_data.group(1))
@@ -199,19 +235,11 @@ def import_character():
                                 description = c.get('description', '')
                                 definition = c.get('definition', '')
                                 break
-                            elif isinstance(c, list) and len(c) > 0 and isinstance(c[0], dict):
-                                c0 = c[0]
-                                name = c0.get('name', '')
-                                title = c0.get('title', '')
-                                greeting = c0.get('greeting', '')
-                                description = c0.get('description', '')
-                                definition = c0.get('definition', '')
-                                break
                 except Exception as ex:
                     print(f"[OdAI Parser] JSON parse error: {ex}")
 
             if not name:
-                og_title = re.search(r'<meta\s+property="og:title"\s+content="([^"]*)"', r.text)
+                og_title = re.search(r'<meta\s+property="og:title"\s+content="([^"]*)"', html_text)
                 if og_title:
                     t = og_title.group(1)
                     if 'Chat with' in t:
@@ -220,23 +248,23 @@ def import_character():
                         name = t.split('|')[0].strip()
 
             if not description:
-                og_desc = re.search(r'<meta\s+property="og:description"\s+content="([^"]*)"', r.text)
+                og_desc = re.search(r'<meta\s+property="og:description"\s+content="([^"]*)"', html_text)
                 if og_desc:
                     description = og_desc.group(1).replace('Chat with :', '').strip()
 
         if not name:
-            name = f"Персонаж {char_id[:8]}"
+            name = f"Character {char_id[:8]}"
 
-        memory_text = f"Персонаж: {name}.\n"
+        memory_text = f"Character: {name}.\n"
         if title:
-            memory_text += f"Заголовок: {title}.\n"
+            memory_text += f"Title: {title}.\n"
         if description:
-            memory_text += f"Описание: {description}.\n"
+            memory_text += f"Description: {description}.\n"
         if definition:
-            memory_text += f"Характер и детали: {definition}.\n"
+            memory_text += f"Details: {definition}.\n"
 
-        author_note = f"Ролевая игра с персонажем {name}. Сохраняйте характер, стиль общения и манеры речи персонажа."
-        intro_text = greeting or f"Вы встречаете персонажа по имени {name}. Он(а) смотрит на вас, ожидая ваших действий."
+        author_note = f"Roleplay with {name}. Keep character personality and tone."
+        intro_text = greeting or f"You meet {name}. They look at you, waiting for your move."
 
         return jsonify({
             "success": True,
@@ -252,9 +280,9 @@ def import_character():
 
     except Exception as e:
         print(f"[OdAI Parser Error]: {e}")
-        return jsonify({"error": f"Не удалось распарсить персонажа: {str(e)}"}), 500
+        return jsonify({"error": f"Failed to parse character: {str(e)}"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     print(f"[OdAI Server] Running OdAI Server on http://localhost:{port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)

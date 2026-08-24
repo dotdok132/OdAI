@@ -1850,7 +1850,7 @@ async function fetchG4FContinuation() {
 
   const endpoint = getApiEndpoint('/api/generate');
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     const response = await fetch(endpoint, {
@@ -1862,7 +1862,8 @@ async function fetchG4FContinuation() {
         scenario: state.currentScenarioKey,
         memory: state.memory,
         authorNote: state.authorNote,
-        history: state.history
+        history: state.history,
+        lang: state.language || 'en'
       })
     });
     clearTimeout(timeoutId);
@@ -2020,17 +2021,26 @@ async function fetchGeminiContinuation() {
 
   // 3. Последовательная попытка генерации через каждую модель
   let lastError = null;
+  let fatalError = null;
+
   for (const model of uniqueCandidates) {
+    if (fatalError) break;
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const encodedKey = encodeURIComponent(apiKey);
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodedKey}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           contents: [{ parts: [{ text: promptContext }] }],
           generationConfig: { temperature: state.engineConfig.temperature || 0.8, maxOutputTokens: 2048 }
         })
       });
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const data = await response.json();
@@ -2042,20 +2052,28 @@ async function fetchGeminiContinuation() {
         const errData = await response.json().catch(() => ({}));
         lastError = errData.error?.message || response.statusText;
         
-        // Если ошибка говорит о невалидном API ключе — прерываем цикл и сообщаем пользователю
+        // Если ошибка говорит о невалидном API ключе — прерываем цикл немедленно!
         if (response.status === 400 || response.status === 403 || (lastError && (lastError.includes('API key') || lastError.includes('INVALID_ARGUMENT') || lastError.includes('PERMISSION_DENIED')))) {
-          throw new Error(`Недействительный API Ключ Gemini (${lastError}). Проверьте или получите новый ключ на aistudio.google.com`);
+          fatalError = new Error(state.language === 'ru' 
+            ? `Недействительный API Ключ Gemini (${lastError}). Проверьте или получите новый ключ на aistudio.google.com` 
+            : `Invalid Gemini API Key (${lastError}). Please check your key at aistudio.google.com`);
+          break;
         }
         
         console.warn(`[Gemini API Warning] Model ${model} returned ${response.status}: ${lastError}`);
       }
     } catch (e) {
-      lastError = e.message;
+      if (e.name === 'AbortError') {
+        lastError = "Timeout (15s)";
+      } else {
+        lastError = e.message;
+      }
       console.warn(`[Gemini API Warning] Model ${model} failed with exception:`, e);
     }
   }
 
-  throw new Error(`Gemini API: Не удалось подобрать работающую модель. Ошибка: ${lastError}`);
+  if (fatalError) throw fatalError;
+  throw new Error(`Gemini API: ${lastError}`);
 }
 
 

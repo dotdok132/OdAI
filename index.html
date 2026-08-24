@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>OdAI - Интерактивное AI Приключение</title>
   <meta name="description" content="Интерактивный текстовый AI-квест с Защитой Реализма и Системой Инвентаря.">
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=19">
 </head>
 <body>
   <div class="tablet-layout">
@@ -68,15 +68,15 @@
         <div class="chat-dropdown-menu" id="chat-dropdown-menu">
           <button class="dropdown-item" id="dropdown-inventory-btn">
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-             Инвентарь и Память
+             <span data-i18n="inventoryTitle">Inventory & Memory</span>
           </button>
           <div class="dropdown-item" id="dropdown-realism-toggle" style="justify-content: space-between;">
-            <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Защита</span>
+            <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span data-i18n="realismGuard">Realism Guard</span></span>
             <div class="toggle-wrapper active" id="realism-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
           </div>
           <button class="dropdown-item" id="dropdown-scenarios-btn">
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-             Сменить мир
+             <span data-i18n="changeScenario">Change World</span>
           </button>
         </div>
       </div>
@@ -90,7 +90,7 @@
       <div class="drawer-header">
         <span class="drawer-title">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          Инвентарь и Память
+          <span data-i18n="inventoryTitle">Inventory & Memory</span>
         </span>
         <button class="btn-icon" id="close-drawer-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -519,6 +519,6 @@
     <div class="dice-label-text" id="dice-overlay-label">Бросок кубика d20...</div>
   </div>
 
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 </body>
 </html>
