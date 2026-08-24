@@ -2194,7 +2194,7 @@ async function getValidGeminiModelsFromAPI(apiKey) {
       for (const m of (data.models || [])) {
         const name = (m.name || '').replace('models/', '');
         const methods = m.supportedGenerationMethods || [];
-        const bad = ['-tts', 'embedding', 'imagen', 'bison', 'aqa', 'realtime', 'interactions', 'audio', 'live', 'gemma', 'veo', 'lyria', 'nano', 'robotics', 'deep-research', 'antigravity', 'computer-use', 'image'];
+        const bad = ['-tts', 'embedding', 'imagen', 'bison', 'aqa', 'realtime', 'interactions', 'audio', 'live', 'gemma', 'veo', 'lyria', 'nano', 'robotics', 'deep-research', 'antigravity', 'computer-use', 'image', 'omni'];
         if (methods.includes('generateContent') && !bad.some(b => name.toLowerCase().includes(b))) {
           valid.push(name);
         }
@@ -2223,7 +2223,7 @@ async function fetchGeminiContinuation() {
 
   // 2. Формирование цепочки моделей (Пользовательская -> Динамические -> Резервные)
   const candidateModels = [];
-  if (userModel && userModel !== 'auto' && !['-tts', 'embedding', 'imagen', 'interactions', 'realtime', 'image'].some(bad => userModel.toLowerCase().includes(bad))) {
+  if (userModel && userModel !== 'auto' && !['-tts', 'embedding', 'imagen', 'interactions', 'realtime', 'image', 'omni'].some(bad => userModel.toLowerCase().includes(bad))) {
     candidateModels.push(userModel);
   }
 
@@ -2233,11 +2233,12 @@ async function fetchGeminiContinuation() {
 
   const fallbackDefaults = [
     'gemini-3.6-flash',
-    'gemini-3.7-flash',
     'gemini-3.5-flash',
-    'gemini-flash-latest',
     'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite'
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-3.7-flash',
+    'gemini-flash-latest'
   ];
   candidateModels.push(...fallbackDefaults);
 
@@ -2314,6 +2315,13 @@ async function fetchGeminiContinuation() {
   }
 
   if (fatalError) throw fatalError;
+  
+  if (lastError && (lastError.includes('Quota exceeded') || lastError.includes('quota') || lastError.includes('429'))) {
+    throw new Error(state.language === 'ru' 
+      ? `Превышен лимит запросов Gemini API (429 Rate Limit). Подождите ~30 секунд или смените ключ в Настройках.` 
+      : `Gemini API quota exceeded (429 Rate Limit). Please wait 30 seconds or change your API key.`);
+  }
+
   throw new Error(`Gemini API: ${lastError}`);
 }
 
