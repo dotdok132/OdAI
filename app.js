@@ -98,6 +98,7 @@ const I18N = {
     retryBtn: "Retry",
     eraseBtn: "Erase",
     realismGuard: "Realism Guard",
+    casualModeLabel: "Casual Mode (Always Succeed)",
     changeScenario: "Change World",
     masterName: "Dungeon Master",
     youName: "You",
@@ -145,6 +146,7 @@ const I18N = {
     retryBtn: "Reintentar",
     eraseBtn: "Borrar",
     realismGuard: "Guardia Realismo",
+    casualModeLabel: "Modo Casual (Siempre Éxito)",
     changeScenario: "Cambiar Mundo",
     masterName: "Dungeon Master",
     youName: "Tú",
@@ -192,6 +194,7 @@ const I18N = {
     retryBtn: "Повторити",
     eraseBtn: "Стерти",
     realismGuard: "Захист Реалізму",
+    casualModeLabel: "Казуальний Режим (Завжди Успіх)",
     changeScenario: "Змінити Світ",
     masterName: "Майстер Гри",
     youName: "Ви",
@@ -275,6 +278,7 @@ const state = {
   memory: "Вы — искатель приключений, исследующий древние руины в поисках артефактов.",
   authorNote: "Мрачное фэнтези, глубокая атмосфера, подробные описания мира.",
   realismMode: true,
+  casualMode: false, // Casual Mode (Always Succeed on d20 rolls)
   forceD20: false, // Флаг принудительного броска d20 на следующее действие
   currentMode: 'do', // 'do' | 'say' | 'story'
   isGenerating: false,
@@ -915,9 +919,19 @@ function animateD20Roll(reason, callback) {
     dieFace.classList.remove('rolling');
     dieFace.classList.add('landed');
 
+    if (state.casualMode) {
+      finalVal = Math.floor(Math.random() * 6) + 15; // Force 15..20 guaranteed success!
+      dieFace.textContent = finalVal;
+    }
+
     let category = "success";
     let statusText = "Успех";
-    if (finalVal === 20) { category = "crit-success"; statusText = "Критический Успех (20)!"; }
+    if (state.casualMode) {
+      category = "crit-success";
+      const lang = state.language || 'en';
+      const pref = lang === 'ru' ? 'Казуальный Успех (' : (lang === 'uk' ? 'Казуальний Успіх (' : (lang === 'es' ? 'Éxito Casual (' : 'Casual Success ('));
+      statusText = `✨ ${pref}${finalVal})!`;
+    } else if (finalVal === 20) { category = "crit-success"; statusText = "Критический Успех (20)!"; }
     else if (finalVal >= 12) { category = "success"; statusText = `Успех (${finalVal})`; }
     else if (finalVal >= 6) { category = "partial"; statusText = `Частичный успех (${finalVal})`; }
     else { category = "failure"; statusText = finalVal === 1 ? "Критический провал (1)!" : `Провал (${finalVal})`; }
@@ -1753,7 +1767,7 @@ function enableInlineEdit(blockEl, index) {
 
 // 100% ИИ Защита Реализма (С тайм-аутом 2.2с и мгновенным визуальным статусом!)
 async function validatePlayerAction(actionText, mode) {
-  if (!state.realismMode) return { allowed: true };
+  if (state.casualMode || !state.realismMode) return { allowed: true };
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 2200); // 2.2s cap for smooth UX

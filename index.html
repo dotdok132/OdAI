@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>OdAI - Интерактивное AI Приключение</title>
   <meta name="description" content="Интерактивный текстовый AI-квест с Защитой Реализма и Системой Инвентаря.">
-  <link rel="stylesheet" href="styles.css?v=21">
+  <link rel="stylesheet" href="styles.css?v=22">
 </head>
 <body>
   <div class="tablet-layout">
@@ -70,7 +70,11 @@
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
              <span data-i18n="inventoryTitle">Inventory & Memory</span>
           </button>
-          <div class="dropdown-item" id="dropdown-realism-toggle" style="justify-content: space-between;">
+                    <div class="dropdown-item" id="dropdown-casual-toggle" style="justify-content: space-between;">
+            <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span data-i18n="casualModeLabel">Casual Mode (Always Succeed)</span></span>
+            <div class="toggle-wrapper" id="casual-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
+          </div>
+<div class="dropdown-item" id="dropdown-realism-toggle" style="justify-content: space-between;">
             <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span data-i18n="realismGuard">Realism Guard</span></span>
             <div class="toggle-wrapper active" id="realism-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
           </div>
@@ -521,6 +525,6 @@
     <div class="dice-label-text" id="dice-overlay-label">Бросок кубика d20...</div>
   </div>
 
-  <script src="app.js?v=21"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
