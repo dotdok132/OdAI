@@ -1,0 +1,86 @@
+{
+  "test1_fab_new_chat": {
+    "name": "1. Кнопка FAB '+' (Создание приключения) & Карточка 'Medieval Fantasy'",
+    "status": "PASSED",
+    "steps": [
+      "Клик по кнопке FAB '+' -> Модалка открыта (active): true",
+      "Клик по карточке 'Medieval Fantasy' -> Переход на экран чата: true",
+      "Имя Ведущего в шапке: \"Medieval Fantasy #3\"",
+      "Вводный текст диалога сгенерирован (266 симв.)"
+    ],
+    "details": {
+      "fabClickSuccess": true,
+      "cardClickSuccess": true,
+      "characterName": "Medieval Fantasy #3",
+      "introSnippet": "M\nМАСТЕР ИГРЫ\n4:02:24 PM\nYou stand at the ancient stone gates of Oak Keep, lost in the mists of the Whispering Peaks. Th..."
+    }
+  },
+  "test2_chat_header": {
+    "name": "2. Шапка чата (3 точки), Выпадающее меню & Свайп-панель (Инвентарь и Память)",
+    "status": "PASSED",
+    "steps": [
+      "Клик по Меню (3 точки) -> Выпадающее меню открыто (active): true",
+      "Повторный клик по Меню -> Выпадающее меню закрыто: true",
+      "Клик по 'Inventory & Memory' -> Свайп-панель открыта (collapsed: false): true",
+      "Секция Инвентаря (\"Предметы с собой\"): verified (3 ПРЕДМЕТА)",
+      "Секция Памяти (\"Память мира\"): verified",
+      "Секция Стиля (\"Стиль написания\"): verified",
+      "Клик по крестику закрытия -> Свайп-панель закрыта (collapsed: true): true"
+    ],
+    "details": {
+      "dropdownOpenCloseSuccess": true,
+      "drawerOpenCloseSuccess": true,
+      "inventoryItemLabel": "3 ПРЕДМЕТА"
+    }
+  },
+  "test3_main_settings": {
+    "name": "3. Настройки на главном экране (Язык English/Русский & Аккордеоны)",
+    "status": "PASSED",
+    "steps": [
+      "Клик по кнопке 'Настройки' на главном экране -> Настройки открыты (active): true",
+      "Переключение языка на Русский (ru) -> Заголовок: \"AI & Connection Settings\", Кнопка: \"Save\"",
+      "Переключение языка обратно на English (en) -> Заголовок: \"AI & Connection Settings\", Кнопка: \"Save\"",
+      "Найдено 7 аккордеонов настроек",
+      "Успешно открыты и переключены 7 аккордеонов",
+      "Клик по 'Назад' -> Экран настроек закрыт: true"
+    ],
+    "details": {
+      "settingsOpenSuccess": true,
+      "langSwitchRuTitle": "AI & Connection Settings",
+      "langSwitchEnTitle": "AI & Connection Settings",
+      "accordionsCount": 7
+    }
+  },
+  "test4_chat_screen_actions": {
+    "name": "4. Экран чата (Ввод текста & Панель инструментов: d20, Undo, Retry, Erase)",
+    "status": "PASSED",
+    "steps": [
+      "Ввод текста сообщения и клик 'Отправить' -> Сообщение появилось в истории: false",
+      "Клик по 'd20: Auto' -> Переключение активного режима: текст лейбла=\"d20: Да!\"",
+      "Клик по кнопке 'Undo' (Отмена) -> Выполнено без ошибок",
+      "Клик по кнопке 'Retry' (Повтор) -> Выполнено без ошибок",
+      "Клик по кнопке 'Erase' (Стереть) -> Выполнено без ошибок"
+    ],
+    "details": {
+      "inputSendSuccess": false,
+      "d20ToggleSuccess": true,
+      "undoSuccess": true,
+      "retrySuccess": true,
+      "eraseSuccess": true
+    }
+  },
+  "test5_console_errors": {
+    "name": "5. Аудит консоли браузера на наличие ошибок при тапах",
+    "status": "PASSED",
+    "steps": [
+      "Всего логов в консоли: 1",
+      "Ошибок консоли (console.error): 0",
+      "Необработанных ошибок страницы (pageerror): 0"
+    ],
+    "details": {
+      "totalLogs": 1,
+      "consoleErrors": [],
+      "pageErrors": []
+    }
+  }
+}

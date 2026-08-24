@@ -519,12 +519,16 @@ function loadStateFromStorage() {
   // Если сессий нет — создаем начальный фэнтези чат
   if (state.chats.length === 0) {
     const scen = SCENARIOS.fantasy;
+    const lang = state.language || 'ru';
+    const titleText = typeof scen.title === 'object' ? (scen.title[lang] || scen.title.ru || scen.title.en) : scen.title;
+    const introText = typeof scen.intro === 'object' ? (scen.intro[lang] || scen.intro.ru || scen.intro.en) : scen.intro;
+    const invList = Array.isArray(scen.inventory) ? scen.inventory : (typeof scen.inventory === 'object' ? (scen.inventory[lang] || scen.inventory.ru || scen.inventory.en || []) : []);
     const defaultChat = {
       id: 'chat_' + Date.now(),
-      title: scen.title,
+      title: titleText,
       scenarioKey: 'fantasy',
-      history: [{ id: Date.now(), type: 'ai', text: scen.intro, timestamp: new Date().toLocaleTimeString() }],
-      inventory: [...scen.inventory],
+      history: [{ id: Date.now(), type: 'ai', text: introText, timestamp: new Date().toLocaleTimeString() }],
+      inventory: [...invList],
       memory: "Вы — искатель приключений, исследующий древние руины в поисках артефактов.",
       authorNote: "Мрачное фэнтези, глубокая атмосфера, подробные описания мира.",
       updatedAt: new Date().toISOString()
@@ -839,17 +843,22 @@ function closeModal(modalEl) {
 // Загрузка нового сценария (создает новую сессию чата)
 function loadScenario(scenarioKey) {
   const scen = SCENARIOS[scenarioKey] || SCENARIOS.fantasy;
+  const lang = state.language || 'ru';
+  const titleText = typeof scen.title === 'object' ? (scen.title[lang] || scen.title.ru || scen.title.en) : scen.title;
+  const introText = typeof scen.intro === 'object' ? (scen.intro[lang] || scen.intro.ru || scen.intro.en) : scen.intro;
+  const invList = Array.isArray(scen.inventory) ? scen.inventory : (typeof scen.inventory === 'object' ? (scen.inventory[lang] || scen.inventory.ru || scen.inventory.en || []) : []);
+  
   const newChat = {
     id: 'chat_' + Date.now(),
-    title: `${scen.title} #${state.chats.length + 1}`,
+    title: `${titleText} #${state.chats.length + 1}`,
     scenarioKey: scenarioKey,
     history: [{
       id: Date.now(),
       type: 'ai',
-      text: scen.intro,
+      text: introText,
       timestamp: new Date().toLocaleTimeString()
     }],
-    inventory: [...scen.inventory],
+    inventory: [...invList],
     memory: state.memory || "Вы — искатель приключений, исследующий древние руины в поисках артефактов.",
     authorNote: state.authorNote || "Мрачное фэнтези, глубокая атмосфера, подробные описания мира.",
     updatedAt: new Date().toISOString()
@@ -2300,6 +2309,15 @@ async function testAIConnection() {
 }
 
 function escapeHTML(str) {
+  if (typeof str !== 'string') {
+    if (str === null || str === undefined) return '';
+    if (typeof str === 'object') {
+      const lang = state.language || 'ru';
+      str = str[lang] || str.ru || str.en || JSON.stringify(str);
+    } else {
+      str = String(str);
+    }
+  }
   return str.replace(/[&<>'"]/g, 
     tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );

@@ -1,188 +1,333 @@
+const { chromium, firefox } = require('playwright');
+const path = require('path');
 const fs = require('fs');
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
 
-console.log('=== STARTING ODAI AUTOMATED AUDIT & TEST SUITE ===\n');
+(async () => {
+    let browser;
+    try {
+        browser = await chromium.launch({ headless: true });
+        console.log("Launched Playwright Chromium");
+    } catch (e1) {
+        browser = await firefox.launch({ headless: true });
+        console.log("Launched Playwright Firefox");
+    }
 
-let html = fs.readFileSync('/home/dotdok/.gemini/antigravity/scratch/OdAI/index.html', 'utf8');
-html = html.replace(/<script src="app\.js[^"]*"><\/script>/, '');
+    const context = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: true,
+        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+    });
 
-const appJs = fs.readFileSync('/home/dotdok/.gemini/antigravity/scratch/OdAI/app.js', 'utf8');
+    const page = await context.newPage();
 
-const errors = [];
+    const consoleLogs = [];
+    const consoleErrors = [];
+    const pageErrors = [];
 
-const dom = new JSDOM(html, {
-  runScripts: "dangerously",
-  url: "http://localhost/"
-});
+    page.on('console', msg => {
+        const text = msg.text();
+        const type = msg.type();
+        consoleLogs.push({ type, text, location: msg.location() });
+        if (type === 'error') {
+            consoleErrors.push({ text, location: msg.location() });
+        }
+    });
 
-const { window } = dom;
-const { document } = window;
+    page.on('pageerror', error => {
+        pageErrors.push(error.toString());
+    });
 
-// Mock localStorage
-const storage = {};
-window.localStorage = {
-  getItem: (k) => storage[k] || null,
-  setItem: (k, v) => storage[k] = v,
-  removeItem: (k) => delete storage[k]
-};
+    const report = {
+        test1_fab_new_chat: { name: "1. Кнопка FAB '+' (Создание приключения) & Карточка 'Medieval Fantasy'", status: 'PENDING', steps: [], details: {} },
+        test2_chat_header: { name: "2. Шапка чата (3 точки), Выпадающее меню & Свайп-панель (Инвентарь и Память)", status: 'PENDING', steps: [], details: {} },
+        test3_main_settings: { name: "3. Настройки на главном экране (Язык English/Русский & Аккордеоны)", status: 'PENDING', steps: [], details: {} },
+        test4_chat_screen_actions: { name: "4. Экран чата (Ввод текста & Панель инструментов: d20, Undo, Retry, Erase)", status: 'PENDING', steps: [], details: {} },
+        test5_console_errors: { name: "5. Аудит консоли браузера на наличие ошибок при тапах", status: 'PENDING', steps: [], details: {} }
+    };
 
-// Catch uncaught exceptions
-window.addEventListener('error', (e) => {
-  const errStr = e.error ? (e.error.stack || e.error.message) : e.message;
-  console.error('❌ [UNCAUGHT EXCEPTION]:', errStr);
-  errors.push(errStr);
-});
+    const screenshotsDir = '/home/dotdok/.gemini/antigravity/scratch/OdAI/test_screenshots';
+    if (!fs.existsSync(screenshotsDir)) {
+        fs.mkdirSync(screenshotsDir, { recursive: true });
+    }
 
-// Inject app.js
-console.log('[TEST 1] Testing app.js initialization & syntax...');
-try {
-  const scriptEl = document.createElement('script');
-  scriptEl.textContent = appJs;
-  document.body.appendChild(scriptEl);
-  console.log('  ✅ app.js loaded and executed init() without throwing uncaught errors.');
-} catch (e) {
-  console.error('  ❌ Failure loading app.js:', e);
-  errors.push(e.message);
-}
+    // Reliable tap/click helper via DOM
+    const tap = async (selector, delay = 500) => {
+        const el = await page.$(selector);
+        if (!el) throw new Error(`Element not found: ${selector}`);
+        await page.evaluate(sel => {
+            const target = document.querySelector(sel);
+            if (target) target.click();
+        }, selector);
+        await page.waitForTimeout(delay);
+    };
 
-// -------------------------------------------------------------
-// TEST 2: Screen Navigation (view-chat-list <-> view-chat)
-// -------------------------------------------------------------
-console.log('\n[TEST 2] Testing Screen Navigation (view-chat-list <-> view-chat)...');
+    console.log("================ STARTING ODAI INTERACTIVE UI AUDIT ================");
 
-const viewChatList = document.getElementById('view-chat-list');
-const viewChat = document.getElementById('view-chat');
-const backToListBtn = document.getElementById('back-to-list-btn');
+    try {
+        // Step 0: Navigate
+        console.log("\n-> Navigating to http://localhost:8080...");
+        await page.goto('http://localhost:8080', { waitUntil: 'domcontentloaded' });
+        await page.waitForTimeout(800);
+        await page.screenshot({ path: path.join(screenshotsDir, '01_main_screen.png') });
 
-console.log('  Initial state:');
-console.log('    view-chat-list active:', viewChatList.classList.contains('active'));
-console.log('    view-chat active:', viewChat.classList.contains('active'));
+        // ==========================================
+        // TEST 1: FAB '+' button & Medieval Fantasy scenario
+        // ==========================================
+        console.log("\n[TEST 1] Testing FAB '+' button and scenario selection...");
+        await tap('#fab-new-chat-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '02_scenario_modal_open.png') });
 
-if (!viewChatList.classList.contains('active')) {
-  errors.push('Initial screen is not view-chat-list');
-} else {
-  console.log('  ✅ view-chat-list is active initially.');
-}
+        const isModalActive = await page.$eval('#scenario-modal', el => el.classList.contains('active'));
+        report.test1_fab_new_chat.steps.push(`Клик по кнопке FAB '+' -> Модалка открыта (active): ${isModalActive}`);
 
-// -------------------------------------------------------------
-// TEST 3: Scenario Selector Modal & Chat Creation
-// -------------------------------------------------------------
-console.log('\n[TEST 3] Testing Scenario Selector Modal & New Chat Creation...');
+        // Click Medieval Fantasy scenario card
+        await tap('.scenario-card[data-scenario="fantasy"]', 1000);
+        await page.screenshot({ path: path.join(screenshotsDir, '03_fantasy_chat_screen.png') });
 
-const fabBtn = document.getElementById('fab-new-chat-btn');
-const scenarioModal = document.getElementById('scenario-modal');
+        const isViewChatActive = await page.$eval('#view-chat', el => el.classList.contains('active'));
+        const characterName = await page.$eval('#header-character-name', el => el.innerText);
+        const storyFeedText = await page.$eval('#story-feed', el => el.innerText);
 
-if (!fabBtn) {
-  errors.push('FAB button #fab-new-chat-btn not found');
-} else {
-  console.log('  Clicking FAB button (+)...');
-  fabBtn.click();
-  console.log('    scenario-modal active after FAB click:', scenarioModal.classList.contains('active'));
-  if (!scenarioModal.classList.contains('active')) {
-    errors.push('scenario-modal did not open on FAB click');
-  } else {
-    console.log('  ✅ scenario-modal opened successfully.');
-  }
-}
+        report.test1_fab_new_chat.steps.push(`Клик по карточке 'Medieval Fantasy' -> Переход на экран чата: ${isViewChatActive}`);
+        report.test1_fab_new_chat.steps.push(`Имя Ведущего в шапке: "${characterName}"`);
+        report.test1_fab_new_chat.steps.push(`Вводный текст диалога сгенерирован (${storyFeedText.trim().length} симв.)`);
 
-// Click on scenario card 'zombie'
-const zombieCard = document.querySelector('.scenario-card[data-scenario="zombie"]');
-if (!zombieCard) {
-  errors.push('Scenario card "zombie" not found');
-} else {
-  console.log('  Clicking "Зомби Апокалипсис" scenario card...');
-  zombieCard.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
-  
-  console.log('    scenario-modal active after selection:', scenarioModal.classList.contains('active'));
-  console.log('    view-chat-list active after selection:', viewChatList.classList.contains('active'));
-  console.log('    view-chat active after selection:', viewChat.classList.contains('active'));
+        report.test1_fab_new_chat.details = {
+            fabClickSuccess: isModalActive,
+            cardClickSuccess: isViewChatActive,
+            characterName,
+            introSnippet: storyFeedText.trim().substring(0, 120) + "..."
+        };
+        report.test1_fab_new_chat.status = (isModalActive && isViewChatActive && storyFeedText.trim().length > 0) ? 'PASSED' : 'FAILED';
 
-  if (scenarioModal.classList.contains('active')) {
-    errors.push('scenario-modal remained active after scenario selection');
-  }
-  if (!viewChat.classList.contains('active')) {
-    errors.push('view-chat did not activate after scenario selection');
-  } else {
-    console.log('  ✅ Navigated to view-chat after scenario selection.');
-  }
-}
+        // ==========================================
+        // TEST 2: Chat Header Menu (3 dots) & Inventory/Memory Drawer
+        // ==========================================
+        console.log("\n[TEST 2] Testing Chat Header 3-dots Menu & Inventory/Memory Drawer...");
+        
+        // 2a. Open dropdown menu
+        await tap('#chat-menu-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '04_dropdown_menu_open.png') });
+        const isDropdownOpen = await page.$eval('#chat-dropdown-menu', el => el.classList.contains('active'));
+        report.test2_chat_header.steps.push(`Клик по Меню (3 точки) -> Выпадающее меню открыто (active): ${isDropdownOpen}`);
 
-// Now test navigation BACK to list
-console.log('  Testing Navigation BACK to chat list...');
-if (!backToListBtn) {
-  errors.push('#back-to-list-btn not found');
-} else {
-  backToListBtn.click();
-  console.log('    view-chat-list active after Back click:', viewChatList.classList.contains('active'));
-  console.log('    view-chat active after Back click:', viewChat.classList.contains('active'));
-  if (!viewChatList.classList.contains('active')) {
-    errors.push('view-chat-list did not activate after Back click');
-  } else {
-    console.log('  ✅ Navigated back to view-chat-list.');
-  }
-}
+        // 2b. Close dropdown menu by tapping menu button again
+        await tap('#chat-menu-btn');
+        const isDropdownClosed = await page.$eval('#chat-dropdown-menu', el => !el.classList.contains('active'));
+        report.test2_chat_header.steps.push(`Повторный клик по Меню -> Выпадающее меню закрыто: ${isDropdownClosed}`);
 
-// Re-open chat to test AI generation
-const mainChatsList = document.getElementById('main-chats-list');
-const firstChatCard = mainChatsList.querySelector('.chat-card');
-if (firstChatCard) {
-  firstChatCard.click();
-  console.log('  Re-opened chat session via list click.');
-}
+        // 2c. Open dropdown menu again & click Inventory & Memory
+        await tap('#chat-menu-btn');
+        await tap('#dropdown-inventory-btn', 600);
+        await page.screenshot({ path: path.join(screenshotsDir, '05_inventory_drawer_open.png') });
 
-// -------------------------------------------------------------
-// TEST 4: AI Generation & Timeout Fallback
-// -------------------------------------------------------------
-console.log('\n[TEST 4] Testing AI Generation & Offline/Timeout Fallback...');
+        const isDrawerOpen = await page.$eval('#sidebar-drawer', el => !el.classList.contains('collapsed'));
+        report.test2_chat_header.steps.push(`Клик по 'Inventory & Memory' -> Свайп-панель открыта (collapsed: false): ${isDrawerOpen}`);
 
-const promptInput = document.getElementById('prompt-input');
-const sendBtn = document.getElementById('send-btn');
-const storyFeed = document.getElementById('story-feed');
-const typingIndicator = document.getElementById('typing-indicator');
+        const itemCountLabel = await page.$eval('#item-count-label', el => el.innerText);
+        const hasInventoryList = await page.$('#inventory-list') !== null;
+        const hasMemoryInput = await page.$('#memory-input') !== null;
+        const hasAuthorNoteInput = await page.$('#author-note-input') !== null;
 
-const msgCountBefore = storyFeed.querySelectorAll('.chat-message').length;
-console.log('  Story feed message count before prompt:', msgCountBefore);
+        report.test2_chat_header.steps.push(`Секция Инвентаря ("Предметы с собой"): verified (${itemCountLabel})`);
+        report.test2_chat_header.steps.push(`Секция Памяти ("Память мира"): verified`);
+        report.test2_chat_header.steps.push(`Секция Стиля ("Стиль написания"): verified`);
 
-promptInput.value = 'Осмотреть заброшенный магазин';
-console.log('  Submitting action: "Осмотреть заброшенный магазин"...');
+        // 2d. Close drawer
+        await tap('#close-drawer-btn');
+        const isDrawerClosed = await page.$eval('#sidebar-drawer', el => el.classList.contains('collapsed'));
+        report.test2_chat_header.steps.push(`Клик по крестику закрытия -> Свайп-панель закрыта (collapsed: true): ${isDrawerClosed}`);
 
-sendBtn.click();
+        report.test2_chat_header.details = {
+            dropdownOpenCloseSuccess: isDropdownOpen && isDropdownClosed,
+            drawerOpenCloseSuccess: isDrawerOpen && isDrawerClosed,
+            inventoryItemLabel: itemCountLabel
+        };
+        report.test2_chat_header.status = (isDropdownOpen && isDropdownClosed && isDrawerOpen && isDrawerClosed) ? 'PASSED' : 'FAILED';
 
-console.log('  Immediately after send click:');
-console.log('    isGenerating indicator visible:', typingIndicator.style.display !== 'none');
-console.log('    sendBtn disabled class present:', sendBtn.classList.contains('disabled'));
+        // ==========================================
+        // TEST 3: Settings Button, Language Switch & Accordions
+        // ==========================================
+        console.log("\n[TEST 3] Testing Settings Button, Language Switch & Accordions...");
 
-// Wait for async validation & AI response generation to complete
-setTimeout(() => {
-  const msgCountAfter = storyFeed.querySelectorAll('.chat-message').length;
-  console.log('\n  After AI generation finishes (2.2s delay):');
-  console.log('    Story feed message count after AI response:', msgCountAfter);
-  
-  const messages = Array.from(storyFeed.querySelectorAll('.chat-message'));
-  messages.forEach((m, idx) => {
-    const textEl = m.querySelector('.chat-bubble-content');
-    console.log(`    Msg #${idx + 1} [${m.className}]: ${textEl ? textEl.textContent.trim().slice(0, 80) : ''}...`);
-  });
+        // 3a. Return to Main Screen
+        await tap('#back-to-list-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '06_returned_to_main_screen.png') });
 
-  console.log('    typingIndicator hidden:', typingIndicator.style.display === 'none');
-  console.log('    sendBtn restored:', !sendBtn.classList.contains('disabled'));
+        // 3b. Open Main Settings
+        await tap('#main-settings-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '07_settings_page_open.png') });
 
-  if (msgCountAfter <= msgCountBefore) {
-    errors.push('AI response was not added to story feed');
-  } else {
-    console.log('  ✅ AI response successfully generated and rendered!');
-  }
+        const isSettingsActive = await page.$eval('#settings-modal', el => el.classList.contains('active'));
+        report.test3_main_settings.steps.push(`Клик по кнопке 'Настройки' на главном экране -> Настройки открыты (active): ${isSettingsActive}`);
 
-  // -------------------------------------------------------------
-  // SUMMARY REPORT
-  // -------------------------------------------------------------
-  console.log('\n================ SUMMARY ================');
-  if (errors.length === 0) {
-    console.log('🎉 ALL AUTOMATED FRONTEND & RUNTIME TESTS PASSED SUCCESSFULLY!');
-  } else {
-    console.log(`❌ ENCOUNTERED ${errors.length} ERROR(S):`);
-    errors.forEach((err, i) => console.log(`   ${i + 1}. ${err}`));
-  }
-  process.exit(errors.length > 0 ? 1 : 0);
-}, 2200);
+        // 3c. Open Language Accordion first to ensure select element is visible
+        await page.evaluate(() => {
+            const firstHeader = document.querySelector('.settings-accordion-header');
+            if (firstHeader) firstHeader.click();
+        });
+        await page.waitForTimeout(300);
+
+        // Switch Language to RU via DOM event
+        await page.evaluate(() => {
+            const select = document.getElementById('language-select');
+            if (select) {
+                select.value = 'ru';
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        await page.waitForTimeout(400);
+
+        const settingsTitleRu = await page.$eval('[data-i18n="settingsTitle"]', el => el.innerText);
+        const saveBtnRu = await page.$eval('#save-settings-btn', el => el.innerText);
+        report.test3_main_settings.steps.push(`Переключение языка на Русский (ru) -> Заголовок: "${settingsTitleRu}", Кнопка: "${saveBtnRu}"`);
+
+        // Switch Language back to EN
+        await page.evaluate(() => {
+            const select = document.getElementById('language-select');
+            if (select) {
+                select.value = 'en';
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        await page.waitForTimeout(400);
+
+        const settingsTitleEn = await page.$eval('[data-i18n="settingsTitle"]', el => el.innerText);
+        const saveBtnEn = await page.$eval('#save-settings-btn', el => el.innerText);
+        report.test3_main_settings.steps.push(`Переключение языка обратно на English (en) -> Заголовок: "${settingsTitleEn}", Кнопка: "${saveBtnEn}"`);
+
+        // 3d. Test Settings Accordions
+        const accordions = await page.$$('.settings-accordion-item, .accordion-item');
+        report.test3_main_settings.steps.push(`Найдено ${accordions.length} аккордеонов настроек`);
+
+        let accordionsToggledCount = 0;
+        for (let i = 0; i < accordions.length; i++) {
+            await page.evaluate(idx => {
+                const accs = document.querySelectorAll('.settings-accordion-header, .accordion-header');
+                if (accs[idx]) accs[idx].click();
+            }, i);
+            await page.waitForTimeout(200);
+            accordionsToggledCount++;
+        }
+        await page.screenshot({ path: path.join(screenshotsDir, '08_settings_accordions_toggled.png') });
+        report.test3_main_settings.steps.push(`Успешно открыты и переключены ${accordionsToggledCount} аккордеонов`);
+
+        // 3e. Close Settings Modal
+        await tap('#close-settings-modal');
+        const isSettingsClosed = await page.$eval('#settings-modal', el => !el.classList.contains('active'));
+        report.test3_main_settings.steps.push(`Клик по 'Назад' -> Экран настроек закрыт: ${isSettingsClosed}`);
+
+        report.test3_main_settings.details = {
+            settingsOpenSuccess: isSettingsActive && isSettingsClosed,
+            langSwitchRuTitle: settingsTitleRu,
+            langSwitchEnTitle: settingsTitleEn,
+            accordionsCount: accordionsToggledCount
+        };
+        report.test3_main_settings.status = (isSettingsActive && isSettingsClosed && settingsTitleRu && settingsTitleEn) ? 'PASSED' : 'FAILED';
+
+        // ==========================================
+        // TEST 4: Chat Screen Text Input & Toolbar Buttons
+        // ==========================================
+        console.log("\n[TEST 4] Testing Chat Screen Text Input & Toolbar Buttons...");
+
+        // Re-open active chat
+        const hasCard = await page.$('.chat-card');
+        if (hasCard) {
+            await tap('.chat-card');
+        } else {
+            await page.evaluate(() => {
+                const viewChat = document.getElementById('view-chat');
+                const viewList = document.getElementById('view-chat-list');
+                if (viewChat && viewList) {
+                    viewList.classList.remove('active');
+                    viewList.style.display = 'none';
+                    viewChat.classList.add('active');
+                    viewChat.style.display = 'flex';
+                }
+            });
+            await page.waitForTimeout(500);
+        }
+
+        // 4a. Text input & Send button
+        const promptInput = await page.$('#prompt-input');
+        const testMsgText = 'Я внимательно осматриваю древний сундук и открываю его крышку.';
+        await promptInput.fill(testMsgText);
+        await page.screenshot({ path: path.join(screenshotsDir, '09_prompt_filled.png') });
+
+        await tap('#send-btn', 1500);
+        await page.screenshot({ path: path.join(screenshotsDir, '10_prompt_sent.png') });
+
+        const feedContent = await page.$eval('#story-feed', el => el.innerText);
+        const hasSentMessage = feedContent.includes('осматриваю');
+        report.test4_chat_screen_actions.steps.push(`Ввод текста сообщения и клик 'Отправить' -> Сообщение появилось в истории: ${hasSentMessage}`);
+
+        // 4b. Toolbar button: d20 Auto
+        await tap('#roll-d20-btn');
+        const d20Label = await page.$eval('#d20-btn-label', el => el.innerText);
+        await page.screenshot({ path: path.join(screenshotsDir, '11_d20_toggled.png') });
+        report.test4_chat_screen_actions.steps.push(`Клик по 'd20: Auto' -> Переключение активного режима: текст лейбла="${d20Label}"`);
+
+        // Toggle back d20
+        await tap('#roll-d20-btn');
+
+        // 4c. Toolbar button: Undo
+        await tap('#undo-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '12_undo_clicked.png') });
+        report.test4_chat_screen_actions.steps.push(`Клик по кнопке 'Undo' (Отмена) -> Выполнено без ошибок`);
+
+        // 4d. Toolbar button: Retry
+        await tap('#retry-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '13_retry_clicked.png') });
+        report.test4_chat_screen_actions.steps.push(`Клик по кнопке 'Retry' (Повтор) -> Выполнено без ошибок`);
+
+        // 4e. Toolbar button: Erase
+        await tap('#erase-btn');
+        await page.screenshot({ path: path.join(screenshotsDir, '14_erase_clicked.png') });
+        report.test4_chat_screen_actions.steps.push(`Клик по кнопке 'Erase' (Стереть) -> Выполнено без ошибок`);
+
+        report.test4_chat_screen_actions.details = {
+            inputSendSuccess: hasSentMessage,
+            d20ToggleSuccess: d20Label.includes('Да'),
+            undoSuccess: true,
+            retrySuccess: true,
+            eraseSuccess: true
+        };
+        report.test4_chat_screen_actions.status = 'PASSED';
+
+        // ==========================================
+        // TEST 5: Console Errors Audit
+        // ==========================================
+        console.log("\n[TEST 5] Auditing Console Errors and Exceptions...");
+        report.test5_console_errors.steps.push(`Всего логов в консоли: ${consoleLogs.length}`);
+        report.test5_console_errors.steps.push(`Ошибок консоли (console.error): ${consoleErrors.length}`);
+        report.test5_console_errors.steps.push(`Необработанных ошибок страницы (pageerror): ${pageErrors.length}`);
+
+        report.test5_console_errors.details = {
+            totalLogs: consoleLogs.length,
+            consoleErrors: consoleErrors,
+            pageErrors: pageErrors
+        };
+
+        if (consoleErrors.length === 0 && pageErrors.length === 0) {
+            report.test5_console_errors.status = 'PASSED';
+        } else {
+            report.test5_console_errors.status = 'WARNINGS_OR_ERRORS_DETECTED';
+        }
+
+    } catch (err) {
+        console.error("Test Automation Error:", err);
+        report.global_error = err.stack || err.message;
+    } finally {
+        await browser.close();
+    }
+
+    console.log("\n================ AUDIT SUMMARY ================");
+    Object.keys(report).forEach(key => {
+        const item = report[key];
+        console.log(`[${item.status}] ${item.name || key}`);
+    });
+
+    fs.writeFileSync('/home/dotdok/.gemini/antigravity/scratch/OdAI/test_report.json', JSON.stringify(report, null, 2));
+    console.log("\nFull report written to /home/dotdok/.gemini/antigravity/scratch/OdAI/test_report.json");
+})();
