@@ -253,6 +253,14 @@ const I18N = {
     startCustomBtn: "Start Custom World",
     customPromptLabel: "Or enter custom starting prompt:",
     customPromptPlaceholder: "You wake up in a quiet tavern with no memory of how you got here...",
+    aiCreatorTitle: "✨ Auto-Generate AI Bot by Title & Character",
+    aiCreatorSub: "Enter franchise title and character name — AI will load plot lore, personality, and start an interactive story!",
+    franchiseTitleLabel: "Franchise / Title:",
+    charNameLabel: "Character Name:",
+    starterScenarioLabel: "Starting Situation (Optional):",
+    aiCreatorBtn: "✨ Generate & Start Bot",
+    aiCreatorGenerating: "⚡ AI is studying franchise lore and building character personality...",
+    aiCreatorError: "Please enter franchise title and character name!",
     aiGenerating: "AI is creating continuation...",
     realismChecking: "Arbiter checking realism...",
     testConnectionBtn: "Test Connection",
@@ -367,6 +375,14 @@ const I18N = {
     startCustomBtn: "Iniciar Mundo Personalizado",
     customPromptLabel: "O escribe un mensaje de inicio personalizado:",
     customPromptPlaceholder: "Te despiertas en una taberna tranquila sin recordar cómo llegaste...",
+    aiCreatorTitle: "✨ Auto-Generar Bot de IA por Título y Personaje",
+    aiCreatorSub: "¡Ingresa el título de la franquicia y el nombre del personaje: la IA cargará el lore y comenzará la historia!",
+    franchiseTitleLabel: "Franquicia / Título:",
+    charNameLabel: "Nombre del Personaje:",
+    starterScenarioLabel: "Situación Inicial (Opcional):",
+    aiCreatorBtn: "✨ Generar y Empezar Bot",
+    aiCreatorGenerating: "⚡ La IA está estudiando el lore y creando la personalidad...",
+    aiCreatorError: "¡Ingresa el título y el nombre del personaje!",
     aiGenerating: "La IA está creando la continuación...",
     realismChecking: "El Árbitro está verificando el realismo...",
     testConnectionBtn: "🧪 Probar Conexión",
@@ -481,6 +497,14 @@ const I18N = {
     startCustomBtn: "Почати свій світ",
     customPromptLabel: "Або введіть свій стартовий промпт:",
     customPromptPlaceholder: "Ви прокидаєтеся у тихій таверні і не пам'ятаєте, як тут опинилися...",
+    aiCreatorTitle: "✨ Авто-створення бота за Тайтлом та Іменем",
+    aiCreatorSub: "Введіть назву франшизи та ім'я персонажа — ШІ підвантажить лор, сюжет, характер та запустить історію!",
+    franchiseTitleLabel: "Франшиза / Тайтл:",
+    charNameLabel: "Ім'я Персонажа:",
+    starterScenarioLabel: "Стартова ситуація (Опціонально):",
+    aiCreatorBtn: "✨ Згенерувати та Почати",
+    aiCreatorGenerating: "⚡ ШІ вивчає лор тайтлу та генерує особистість персонажа...",
+    aiCreatorError: "Вкажіть назву тайтлу та ім'я персонажа!",
     aiGenerating: "ШІ створює продовження...",
     realismChecking: "Арбітр перевіряє реалізм...",
     testConnectionBtn: "🧪 Перевірити з'єднання",
@@ -595,6 +619,14 @@ const I18N = {
     startCustomBtn: "Начать свой мир",
     customPromptLabel: "Или введите свой стартовый промпт:",
     customPromptPlaceholder: "Вы просыпаетесь в тихой таверне и не помните, как здесь оказались...",
+    aiCreatorTitle: "✨ Авто-создание бота по Тайтлу и Имени",
+    aiCreatorSub: "Введите название франшизы и имя персонажа — ИИ подгрузит лор, сюжет, характер и запустит историю!",
+    franchiseTitleLabel: "Франшиза / Тайтл:",
+    charNameLabel: "Имя Персонажа:",
+    starterScenarioLabel: "Стартовая ситуация (Опционально):",
+    aiCreatorBtn: "✨ Сгенерировать и Начать",
+    aiCreatorGenerating: "⚡ ИИ изучает лор тайтла и генерирует личность персонажа...",
+    aiCreatorError: "Укажите название тайтла и имя персонажа!",
     aiGenerating: "ИИ создает продолжение...",
     realismChecking: "Арбитр проверяет реализм...",
     testConnectionBtn: "🧪 Проверить подключение",
@@ -741,6 +773,11 @@ const elements = {
   scenarioCards: document.querySelectorAll('.scenario-card'),
   customPromptInput: document.getElementById('custom-prompt-input'),
   startCustomBtn: document.getElementById('start-custom-btn'),
+  aiCreatorTitle: document.getElementById('ai-creator-title'),
+  aiCreatorName: document.getElementById('ai-creator-name'),
+  aiCreatorSituation: document.getElementById('ai-creator-situation'),
+  aiCreatorSubmitBtn: document.getElementById('ai-creator-submit-btn'),
+  aiCreatorStatus: document.getElementById('ai-creator-status'),
   
   // Архив чатов (c.ai style)
   chatsArchiveBtn: document.getElementById('chats-archive-btn'),
@@ -1492,6 +1529,11 @@ function setupEventListeners() {
       closeModal(elements.scenarioModal);
     }
   });
+
+  // Авто-генератор бота по тайтлу и имени
+  if (elements.aiCreatorSubmitBtn) {
+    elements.aiCreatorSubmitBtn?.addEventListener('click', handleAICreatorSubmit);
+  }
 
   // Импорт из Character.AI и файлов
   if (elements.caiImportBtn) {
@@ -3340,6 +3382,123 @@ async function fetchUniversalAIContinuation() {
   }
 
   throw new Error(lastError || "Все ИИ-провайдеры недоступны. Проверьте подключение и ключи API в Настройках.");
+}
+
+async function callAIPromptDirect(promptText) {
+  const origHistory = state.chatHistory;
+  const origScenario = state.currentScenario;
+
+  try {
+    state.chatHistory = [{ sender: 'user', text: promptText }];
+    state.currentScenario = null;
+    const response = await fetchUniversalAIContinuation();
+    return sanitizeAIResponseText(response);
+  } finally {
+    state.chatHistory = origHistory;
+    state.currentScenario = origScenario;
+  }
+}
+
+async function handleAICreatorSubmit() {
+  const title = (elements.aiCreatorTitle?.value || '').trim();
+  const name = (elements.aiCreatorName?.value || '').trim();
+  const situation = (elements.aiCreatorSituation?.value || '').trim();
+  const statusEl = elements.aiCreatorStatus;
+  const submitBtn = elements.aiCreatorSubmitBtn;
+
+  if (!title || !name) {
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#ef4444';
+      statusEl.textContent = getI18nText('aiCreatorError', 'Укажите название тайтла и имя персонажа!');
+    }
+    return;
+  }
+
+  if (submitBtn) submitBtn.disabled = true;
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--accent-color)';
+    statusEl.textContent = getI18nText('aiCreatorGenerating', '⚡ ИИ изучает лор тайтла и генерирует личность персонажа...');
+  }
+
+  const prompt = `Ты — экспертный генератор ролевых карточек персонажей для интерактивных RPG историй.
+Создай глубокую, каноничную ролевую карточку бота на основе:
+- Франшиза / Тайтл: "${title}"
+- Имя Персонажа: "${name}"
+- Стартовая Сцена / Ситуация: "${situation || 'Первая встреча в их мире'}"
+
+Выдай ответ СТРОГО в формате валидного JSON объекта без любого лишнего текста и без тройных обратных кавычек:
+{
+  "name": "${name}",
+  "title": "${title}",
+  "personality": "Подробное описание характера персонажа, его речи, манеры общения, важных воспоминаний и ключевых черт.",
+  "worldLore": "Краткий сюжет тайтла ${title}, правила мира, фракции, текущая хронология и контекст.",
+  "scenario": "Обстановка сцены, дислокация, атмосфера и точка входа для игрока.",
+  "greeting": "Первое приветственное сообщение ОТ ЛИЦА ПЕРСОНАЖА (от первого лица), задающее завязку сцены, с мыслями и действиями в *звездочках*."
+}`;
+
+  try {
+    const rawResponse = await callAIPromptDirect(prompt);
+    let cleaned = rawResponse.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+    }
+
+    let parsed = null;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      console.warn("JSON parse failed for bot generator, constructing fallback:", e);
+      parsed = {
+        name: name,
+        title: title,
+        personality: `Персонаж ${name} из тайтла "${title}". Владеет всеми ключевыми навыками и каноничным характером своего мира.`,
+        worldLore: `Сюжет и лор мира "${title}".`,
+        scenario: situation || `Первая встреча с ${name} в мире ${title}.`,
+        greeting: `*Смотрит на вас, делая шаг навстречу в мире ${title}.*\n\n— Приветствую. Я ${name}. Что приводит тебя ко мне?`
+      };
+    }
+
+    const charName = parsed.name || name;
+    const charTitle = parsed.title || title;
+
+    const newChat = {
+      id: 'chat_' + Date.now(),
+      name: `${charName} (${charTitle})`,
+      title: charTitle,
+      characterName: charName,
+      avatarText: charName ? charName.charAt(0).toUpperCase() : '🤖',
+      scenarioKey: 'custom',
+      systemPrompt: `Ты играешь роль ${charName} из тайтла "${charTitle}".\n\nЛИЧНОСТЬ И ХАРАКТЕР:\n${parsed.personality || ''}\n\nСЮЖЕТ И ЛОР МИРА:\n${parsed.worldLore || ''}\n\nСИТУАЦИЯ И СЦЕНА:\n${parsed.scenario || ''}\n\nПРАВИЛА ИГРЫ:\n- Будь строго в образе ${charName}.\n- Форматируй действия в *звездочках*, а диалоги от первого лица.\n- Реагируй на реплики игрока живыми эмоциями.`,
+      history: [
+        { sender: 'ai', text: parsed.greeting || `*Приветствует вас в мире ${charTitle}.*\n\n— Я ${charName}. Рад встрече.` }
+      ],
+      created: new Date().toISOString()
+    };
+
+    state.chats.unshift(newChat);
+    saveStateToStorage();
+    renderChatsArchiveList();
+
+    if (statusEl) statusEl.style.display = 'none';
+    if (elements.scenarioModal) closeModal(elements.scenarioModal);
+
+    openChat(newChat.id);
+
+  } catch (err) {
+    console.error("Error generating bot:", err);
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#ef4444';
+      statusEl.textContent = `Ошибка генерации: ${err.message || 'Проверьте подключение и API ключ'}`;
+    }
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
 }
 
 // Формирование промпта для внешних ИИ

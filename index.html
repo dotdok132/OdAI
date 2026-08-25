@@ -281,6 +281,39 @@
         <button class="btn-primary" id="start-custom-btn" style="align-self: flex-end;" data-i18n="startCustomBtn">Start Custom World</button>
       </div>
 
+      <!-- AI Character Creator by Title & Name -->
+      <div class="ai-bot-creator-box" style="display: flex; flex-direction: column; gap: 0.65rem; padding: 0.85rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); margin-top: 0.5rem;">
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--accent-color); display: flex; align-items: center; gap: 6px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span data-i18n="aiCreatorTitle">✨ Auto-Generate AI Bot by Title & Character</span>
+        </label>
+        <div style="font-size: 0.78rem; color: var(--text-muted);" data-i18n="aiCreatorSub">
+          Enter franchise title and character name — AI will load plot lore, personality, and start an interactive story!
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="franchiseTitleLabel">Franchise / Title:</label>
+            <input type="text" class="input-sm" id="ai-creator-title" placeholder="Cyberpunk 2077, Naruto, Witcher 3..." style="width: 100%;">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="charNameLabel">Character Name:</label>
+            <input type="text" class="input-sm" id="ai-creator-name" placeholder="Judy Alvarez, Kakashi, Geralt..." style="width: 100%;">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-muted);" data-i18n="starterScenarioLabel">Starting Situation (Optional):</label>
+          <input type="text" class="input-sm" id="ai-creator-situation" placeholder="Meeting in Afterlife bar, Training ground 7..." style="width: 100%;">
+        </div>
+
+        <button class="btn-primary" id="ai-creator-submit-btn" style="width: 100%; justify-content: center; padding: 0.55rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; border-radius: var(--radius-sm);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span data-i18n="aiCreatorBtn">✨ Generate & Start Bot</span>
+        </button>
+        <div id="ai-creator-status" style="font-size: 0.78rem; color: var(--accent-color); display: none; text-align: center; font-weight: 600;"></div>
+      </div>
+
       <!-- Character.AI URL Importer & Standalone Card Import -->
       <div style="display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
         <label style="font-size: 0.85rem; font-weight: 600; color: var(--accent-secondary); display: flex; align-items: center; gap: 6px;">
