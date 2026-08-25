@@ -61,6 +61,8 @@
 
 html {
   scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
@@ -68,6 +70,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-ui);
   min-height: 100vh;
+  max-width: 100vw;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -126,13 +129,19 @@ body {
 .cai-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .cai-character-profile {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .cai-avatar-wrapper {
@@ -170,14 +179,30 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .cai-character-name {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-bright);
   line-height: 1.2;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.cai-character-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
 }
 
 .cai-character-sub {
@@ -331,6 +356,8 @@ body {
 .sidebar-drawer.collapsed {
   transform: translateX(100%);
   box-shadow: none;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .drawer-header {
@@ -1534,18 +1561,26 @@ body {
 
   /* Action dock — compact */
   .action-dock {
-    padding: 0.45rem 0.65rem 0.6rem;
-    padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
-    gap: 0.4rem;
-  }
-
-  .action-toolbar {
+    padding: 0.35rem 0.45rem 0.5rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
     gap: 0.35rem;
   }
 
+  .action-toolbar {
+    gap: 0.25rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mode-selector {
+    padding: 1px;
+    gap: 1px;
+  }
+
   .mode-btn {
-    padding: 0.3rem 0.65rem;
-    font-size: 0.75rem;
+    padding: 0.25rem 0.45rem;
+    font-size: 0.7rem;
+    min-height: 32px;
   }
 
   /* Tool buttons — icon only */
@@ -1554,18 +1589,22 @@ body {
   }
 
   .btn-tool {
-    padding: 0.35rem 0.45rem;
-    min-width: 32px;
-    min-height: 32px;
+    padding: 0.25rem 0.35rem !important;
+    min-width: 28px !important;
+    max-width: 38px !important;
+    min-height: 32px !important;
+    height: 32px !important;
     justify-content: center;
   }
 
   .btn-tool svg {
     margin-right: 0 !important;
+    width: 14px;
+    height: 14px;
   }
 
   .input-row {
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
 
   .prompt-textarea {
@@ -1901,12 +1940,18 @@ body {
 
 /* ---- Touch-friendly improvements ---- */
 @media (hover: none) and (pointer: coarse) {
-  /* Larger touch targets (48px minimum) */
+  /* Touch targets for icons and standalone buttons */
   .btn-icon,
-  .btn-tool,
   .close-btn {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 40px;
+    min-width: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-tool {
+    min-height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
