@@ -3010,23 +3010,35 @@ async function fetchUniversalAIContinuation() {
 
 // Формирование промпта для внешних ИИ
 
-// Гарантия законченности текста ответа ИИ (без обрывов на полуслове)
+// Очистка ответа ИИ от служебного мусора (User safety: safe, метеданных) и незавершенных предложений
 function sanitizeAIResponseText(text) {
   if (!text) return "";
   let cleaned = text.trim();
 
-  // Находим последнюю законченную пунктуацию
+  // 1. Очистка от системных флагов безопасности и статусных строчек бесплатниых провайдеров/зеркал
+  cleaned = cleaned.replace(/^(?:user\s*safety\s*:?\s*safe|safety\s*rating\s*:?\s*safe|safety\s*status\s*:?\s*safe|safety\s*:?\s*safe|status\s*:?\s*200\s*ok|\[safety\s*check\s*passed\])\s*/gi, '');
+  cleaned = cleaned.replace(/\n\s*(?:user\s*safety\s*:?\s*safe|safety\s*rating\s*:?\s*safe|safety\s*status\s*:?\s*safe)\s*$/gi, '');
+
+  cleaned = cleaned.trim();
+
+  // 2. Если ответ состоял ТОЛЬКО из системного статуса безопасности — генерируем ошибку для авто-переключения провайдера
+  if (!cleaned || /^(?:safe|user safety|user safety: safe|safety pass|ok)$/i.test(cleaned)) {
+    throw new Error("Провайдер вернул служебный статус безопасности вместо ответа. Переключение провайдера...");
+  }
+
+  // 3. Находим последнюю законченную пунктуацию (обрезаем оборванные фразы)
   const lastDot = Math.max(
     cleaned.lastIndexOf('.'),
     cleaned.lastIndexOf('!'),
     cleaned.lastIndexOf('?'),
     cleaned.lastIndexOf('»'),
-    cleaned.lastIndexOf('"')
+    cleaned.lastIndexOf('"'),
+    cleaned.lastIndexOf('*')
   );
 
   if (lastDot > 0 && lastDot < cleaned.length - 1) {
     const trailingFragment = cleaned.slice(lastDot + 1).trim();
-    if (trailingFragment && !/[.!?»"]$/.test(trailingFragment)) {
+    if (trailingFragment && !/[.!?»"*]$/.test(trailingFragment)) {
       console.log(`[Sanitizer] Trimming trailing incomplete sentence fragment: "${trailingFragment}"`);
       cleaned = cleaned.slice(0, lastDot + 1);
     }
