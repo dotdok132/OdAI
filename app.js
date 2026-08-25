@@ -2981,6 +2981,7 @@ REGLAS DE ROL Y ESTILO:
 - Interpreta el mundo, los personajes secundarios (PNJ) y las amenazas con prosa vívida, atmosférica y sensorial.
 - Responde directamente a las acciones del jugador, considerando el entorno, las consecuencias y los objetos de su inventario.
 - Nunca escribas ni fuerces los pensamientos internos o acciones del personaje del jugador ("Muestra, no cuentes").
+- ESTRICTAMENTE PROHIBIDO escribir meta-razonamientos o preámbulos OOC ("Ok, jugamos...", "Entendido, continuando..."). ¡Escribe EXCLUSIVAMENTE el texto del juego de rol!
 - Mantén tu respuesta entre 2 y 4 oraciones ricas e intensas. Termina siempre con una pausa narrativa natural o una reacción del mundo que invite al jugador a actuar.
 
 INTERPRETACIONAL DE DADOS D20 (CUANDO ESTÉ PRESENTE):
@@ -3018,6 +3019,7 @@ Historia de la aventura hasta ahora:
 - Описуйте світ, навколишніх персонажів (NPC) та небезпеки яскраво, емоційно та детально.
 - Реагуйте безпосередньо на дії гравця, враховуючи логіку локації, наслідки та предмети з інвентаря.
 - Заборонено писати думки гравця або вирішувати за його персонажа ("Показуй, а не розказуй").
+- КАТЕГОРИЧНО ЗАБОРОНЕНО писати мета-роздуми, службові вступи ("Ок, ми граємо...", "Зрозумів, продовжую..."), думки моделі чи коментарі Майстра. Пишіть ВИКЛЮЧНО сам рольовий текст та отыгрыш!
 - Відповідь повинна складатися з 2-4 насичених речень. Завжди завершуйте відповідь природною павзою або подією світу, на яку гравець може відповісти.
 
 МЕХАНІКА КУБИКА D20 (ЯКЩО ВКАЗАНА В ДІЇ):
@@ -3055,6 +3057,7 @@ ${state.memory ? `Пам'ять Світу (Пам'ятати): ${state.memory}\
 - Отыгрывай мир, окружающих персонажей (NPC) и опасности живо, атмосферно и кинематографично.
 - Реагируй строго на действия игрока, учитывай обстановку, физику локации и предметы в его инвентаре.
 - Запрещено писать внутренние мысли игрока или принимать решения за его персонажа ("Show, Don't Tell").
+- КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать мета-рассуждения, служебные вступления ("Ок, мы отыгрываем...", "Вступаем в роль...", "Понял, продолжаю сценарий..."), мысли модели или комментарии Мастера. Пиши ИСКЛЮЧИТЕЛЬНО сам ролевой текст и отыгрыш!
 - Ответ должен состоять из 2-4 глубоких, захватывающих предложений. Завершай ответ логической паузой или событием мира, на которое игрок может отреагировать.
 
 МЕХАНИКА КУБИКА d20 (ЕСЛИ ПРИСУТСТВУЕТ В ДЕЙСТВИИ):
@@ -3092,6 +3095,7 @@ ROLE & STYLE GUIDELINES:
 - Roleplay the world, non-player characters (NPCs), and hazards with vivid, sensory-rich prose and convincing dialogue.
 - Respond directly to player actions, taking into account the environment, consequences, and items in the player's inventory.
 - Never write internal thoughts or force decisions for the player's character ("Show, Don't Tell").
+- STRICTLY PROHIBITED to write meta-reasoning, OOC preambles ("Okay, we are roleplaying...", "Understood, continuing scenario..."), model thoughts, or Master commentary. Output ONLY the roleplay prose itself!
 - Keep your response to 2-4 atmospheric, captivating sentences. Always end with a natural narrative hook or environmental reaction that invites the player's next move.
 
 D20 DICE MECHANICS INTERPRETATION (WHEN PRESENT):
@@ -3511,6 +3515,11 @@ function sanitizeAIResponseText(text) {
   // 1. Очистка от системных флагов безопасности и статусных строчек бесплатниых провайдеров/зеркал
   cleaned = cleaned.replace(/^(?:user\s*safety\s*:?\s*safe|safety\s*rating\s*:?\s*safe|safety\s*status\s*:?\s*safe|safety\s*:?\s*safe|status\s*:?\s*200\s*ok|\[safety\s*check\s*passed\])\s*/gi, '');
   cleaned = cleaned.replace(/\n\s*(?:user\s*safety\s*:?\s*safe|safety\s*rating\s*:?\s*safe|safety\s*status\s*:?\s*safe)\s*$/gi, '');
+
+  // 1b. Авто-удаление мета-вступлений ("Ок, мы отыгрываем...", "Понял, вступаю в роль...", "Understood, roleplaying...") и блоков <think>...</think>
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+  cleaned = cleaned.replace(/^(?:ок|хорошо|понял|принято|понятно|подтверждаю|okay|ok|understood|got it|sure)\s*[,.:!\-—]?\s*(?:мы|я|отрегулируем|отыгрываем|продолжаем|вступаем|начинаем|ролевая|сценарий|roleplaying|starting|continuing)[\s\S]*?(?:\n+|\:\s*)/gi, '').trim();
+  cleaned = cleaned.replace(/^(?:\[(?:мысли|размышления|мета|meta|note|ooc|thinking)\]|\((?:мысли|размышления|мета|meta|note|ooc)\))[\s\S]*?\n+/gi, '').trim();
 
   cleaned = cleaned.trim();
 
