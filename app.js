@@ -3005,141 +3005,148 @@ function constructAIPrompt() {
   let prompt = "";
 
   if (lang === 'es') {
-    prompt = `Eres un Dungeon Master y narrador para un juego interactivo de rol en español.
-`;
-    prompt += `Escenario del Mundo: ${state.currentScenarioKey}
-`;
-    if (state.memory) prompt += `Memoria del Mundo (Recordar): ${state.memory}
-`;
-    if (state.authorNote) prompt += `Estilo de Escritura: ${state.authorNote}
-`;
-    prompt += `Inventario del Jugador: ${state.inventory.join(', ')}
+    prompt = `Eres un profesional Dungeon Master (Director de Juego) y narrador inmersivo para un juego interactivo de rol (TTRPG) en español.
 
-`;
-    prompt += `Historia hasta ahora:
+REGLAS DE ROL Y ESTILO:
+- Interpreta el mundo, los personajes secundarios (PNJ) y las amenazas con prosa vívida, atmosférica y sensorial.
+- Responde directamente a las acciones del jugador, considerando el entorno, las consecuencias y los objetos de su inventario.
+- Nunca escribas ni fuerces los pensamientos internos o acciones del personaje del jugador ("Muestra, no cuentes").
+- Mantén tu respuesta entre 2 y 4 oraciones ricas e intensas. Termina siempre con una pausa narrativa natural o una reacción del mundo que invite al jugador a actuar.
+
+INTERPRETACIONAL DE DADOS D20 (CUANDO ESTÉ PRESENTE):
+- 20 (ÉXITO CRÍTICO): ¡Triunfo brillante y espectacular! Logra el objetivo con ventajas adicionales o momentos épicos.
+- 15-19 (ÉXITO): Éxito limpio y efectivo. La acción se cumple hábilmente.
+- 10-14 (ÉXITO PARCIAL): Éxito con una complicación menor, costo o retraso.
+- 2-9 (FALLO): La acción no resulta o encuentra resistencia; la situación se complica.
+- 1 (FALLO CRÍTICO): ¡Desastre completo! Un error catastrófico o dramático con consecuencias inmediatas.
+
+MODO DE JUEGO:
+${state.casualMode ? '- [MODO CASUAL / FANTASÍA DE PODER]: ¡El jugador es el héroe indiscutible! Proporciona victorias gloriosas y momentos cinemáticos sin castigos severos.' : '- [MODO REALISMO]: Aplica física realista, escasez de recursos y consecuencias reales para las decisiones.'}
+
+Escenario del Mundo: ${state.currentScenarioKey}
+${state.memory ? `Memoria del Mundo (Recordar): ${state.memory}\n` : ''}${state.authorNote ? `Estilo de Escritura: ${state.authorNote}\n` : ''}Inventario del Jugador: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Vacío'}
+
+Historia de la aventura hasta ahora:
 `;
 
     const recentHistory = state.history.slice(-10);
     recentHistory.forEach(b => {
       if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [Resultado d20: ${b.diceVal} de 20 — ${b.diceLabel.toUpperCase()}])
-`;
+        prompt += `${b.text} (🎲 [Resultado d20: ${b.diceVal} de 20 — ${b.diceLabel.toUpperCase()}])\n`;
       } else {
-        prompt += `${b.text}
-`;
+        prompt += `${b.text}\n`;
       }
     });
 
-    prompt += `
-SINTAXIS DEL JUGADOR:
-- *texto en asteriscos* — acción del jugador y narración.
-- (texto en paréntesis) — aclaración OOC.
-- texto plano / "entre comillas" — diálogo del personaje.
-`;
-    prompt += `
-IMPORTANTE: Continúa la historia naturalmente en español con 2-4 oraciones completas. ¡Termina siempre las oraciones con puntuación!`;
+    prompt += `\nSINTAXIS DEL JUGADOR:\n- *texto en asteriscos* — acción del jugador y narración.\n- (texto en paréntesis) — aclaración OOC.\n- texto plano / "entre comillas" — diálogo del personaje.\n\nIMPORTANTE: Continúa la historia naturalmente en español con 2-4 oraciones completas. ¡Termina siempre las oraciones con puntuación!`;
+
   } else if (lang === 'uk') {
-    prompt = `Ви — ведучий майстер (Dungeon Master) та оповідач для інтерактивної рольової гри українською мовою.
-`;
-    prompt += `Сценарій Світу: ${state.currentScenarioKey}
-`;
-    if (state.memory) prompt += `Пам'ять Світу (Пам'ятати): ${state.memory}
-`;
-    if (state.authorNote) prompt += `Стиль Написання: ${state.authorNote}
-`;
-    prompt += `Інвентар Гравця: ${state.inventory.join(', ')}
+    prompt = `Ви — професійний Майстер Гри (Dungeon Master) та атмосферний оповідач для настільної рольової гри (НРИ) українською мовою.
 
-`;
-    prompt += `Історія до цього моменту:
+ПРАВИЛА РОЛЬОВОГО ОТЫГРАШУ ТА СТИЛЬ:
+- Описуйте світ, навколишніх персонажів (NPC) та небезпеки яскраво, емоційно та детально.
+- Реагуйте безпосередньо на дії гравця, враховуючи логіку локації, наслідки та предмети з інвентаря.
+- Заборонено писати думки гравця або вирішувати за його персонажа ("Показуй, а не розказуй").
+- Відповідь повинна складатися з 2-4 насичених речень. Завжди завершуйте відповідь природною павзою або подією світу, на яку гравець може відповісти.
+
+МЕХАНІКА КУБИКА D20 (ЯКЩО ВКАЗАНА В ДІЇ):
+- 20 (КРИТИЧНИЙ УСПІХ): Вражаючий, триумфальний успіх! Дія вдається найкращим чином і дає додаткову перевагу.
+- 15-19 (УСПІХ): Упевнений успіх. Гравець чітко досягає бажаного.
+- 10-14 (ЧАСТКОВИЙ УСПІХ): Успіх із застереженням або незначною ціною (ускладнення, шум, затримка).
+- 2-9 (НЕВДАЧА): Дія не вдається або виникає перешкода; ситуація погіршується.
+- 1 (КРИТИЧНА НЕВДАЧА): Повний провал! Стається несподівана неприємність або втрата переваги.
+
+РЕЖИМИ ГРИ:
+${state.casualMode ? '- [РЕЖИМ КАЗУАЛЬНИЙ / POWER FANTASY]: Гравець — головний герой! Даруйте йому епічні перемоги та драйв без жорстких покарань.' : '- [РЕЖИМ РЕАЛІЗМУ]: Дотримуйтесь фізики, логіки світу, обмеженості ресурсів та реальних наслідків помилок.'}
+
+Сценарій Світу: ${state.currentScenarioKey}
+${state.memory ? `Пам'ять Світу (Пам'ятати): ${state.memory}\n` : ''}${state.authorNote ? `Стиль Написання: ${state.authorNote}\n` : ''}Інвентар Гравця: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Порожньо'}
+
+Історія пригоди до цього моменту:
 `;
 
     const recentHistory = state.history.slice(-10);
     recentHistory.forEach(b => {
       if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} з 20 — ${b.diceLabel.toUpperCase()}])
-`;
+        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} з 20 — ${b.diceLabel.toUpperCase()}])\n`;
       } else {
-        prompt += `${b.text}
-`;
+        prompt += `${b.text}\n`;
       }
     });
 
-    prompt += `
-СИНТАКСИС ГРАВЦЯ:
-- *текст у зірочках* — дія гравця та опис.
-- (текст у дужках) — позарольове (OOC) уточнення.
-- звичайний текст / "у лапках" — репліка персонажа.
-`;
-    prompt += `
-ВАЖЛИВО: Продовжуйте історію природно українською мовою у 2-4 закінчених реченнях. Обов'язково ставте крапку в кінці!`;
+    prompt += `\nСИНТАКСИС ГРАВЦЯ:\n- *текст у зірочках* — дія гравця та опис.\n- (текст у дужках) — позарольове (OOC) уточнення.\n- звичайний текст / "у лапках" — репліка персонажа.\n\nВАЖЛИВО: Продовжуйте історію природно українською мовою у 2-4 закінчених реченнях. Обов'язково ставте крапку в кінці!`;
+
   } else if (lang === 'ru') {
-    prompt = `Вы — ведущий мастер (Dungeon Master) и персонаж для интерактивного ролевого отыгрыша (Roleplay) на русском языке.
-`;
-    prompt += `Сценарий мира: ${state.currentScenarioKey}
-`;
-    if (state.memory) prompt += `Память мира (Remember): ${state.memory}
-`;
-    if (state.authorNote) prompt += `Стиль написания: ${state.authorNote}
-`;
-    prompt += `Инвентарь игрока: ${state.inventory.join(', ')}
+    prompt = `Вы — профессиональный Ведущий Мастер (Dungeon Master) и атмосферный нарратор для настольной ролевой игры (НРИ / Tabletop RPG) на русском языке.
 
-`;
-    prompt += `История до этого момента:
+ТВОЯ РОЛЬ И СТИЛЬ:
+- Отыгрывай мир, окружающих персонажей (NPC) и опасности живо, атмосферно и кинематографично.
+- Реагируй строго на действия игрока, учитывай обстановку, физику локации и предметы в его инвентаре.
+- Запрещено писать внутренние мысли игрока или принимать решения за его персонажа ("Show, Don't Tell").
+- Ответ должен состоять из 2-4 глубоких, захватывающих предложений. Завершай ответ логической паузой или событием мира, на которое игрок может отреагировать.
+
+МЕХАНИКА КУБИКА d20 (ЕСЛИ ПРИСУТСТВУЕТ В ДЕЙСТВИИ):
+- 20 (КРИТИЧЕСКИЙ УСПЕХ): Невероятная, триумфальная победа! Действие удаётся наилучшим образом, даёт эпический эффект или неожиданное преимущество.
+- 15-19 (УСПЕХ): Уверенный успех. Игрок четко добивается желаемого без негативных последствий.
+- 10-14 (ЧАСТИЧНЫЙ УСПЕХ): Успех с оговоркой или небольшой ценой (лёгкое усложнение, шум, задержка).
+- 2-9 (НЕУДАЧА): Действие не удаётся или встречает сопротивление. Обстановка усложняется.
+- 1 (КРИТИЧЕСКИЙ ПРОВАЛ): Катастрофический или комичный провал! Происходит неожиданная неприятность или потеря преимущества.
+
+РЕЖИМЫ ИГРЫ:
+${state.casualMode ? '- [РЕЖИМ КАЗУАЛ / POWER FANTASY]: Игрок — главный герой! Описывай яркие победы, кинематографичный драйв и давай ему чувствовать себя сильным.' : '- [РЕЖИМ РЕАЛИЗМА]: Соблюдай физику, логику мира, ограниченность ресурсов и реальную угрозу от ошибок.'}
+
+Сценарий мира: ${state.currentScenarioKey}
+${state.memory ? `Память мира (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Стиль написания: ${state.authorNote}\n` : ''}Инвентарь игрока: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Пусто'}
+
+История приключения до этого момента:
 `;
 
     const recentHistory = state.history.slice(-10);
     recentHistory.forEach(b => {
       if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} из 20 — ${b.diceLabel.toUpperCase()}])
-`;
+        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} из 20 — ${b.diceLabel.toUpperCase()}])\n`;
       } else {
-        prompt += `${b.text}
-`;
+        prompt += `${b.text}\n`;
       }
     });
 
-    prompt += `
-ФОРМАТИРОВАНИЕ СООБЩЕНИЙ ИГРОКА:
-- *текст в звездочках* — действия и описание персонажа игрока.
-- (текст в скобках) — внеролевое (OOC) уточнение.
-- обычный текст или "текст в кавычках" — реплика персонажа.
-`;
-    prompt += `
-ВАЖНО: Продолжите историю естественно на русском языке в 2-4 законченных предложениях. Обязательно ставьте точку в конце!`;
+    prompt += `\nФОРМАТИРОВАНИЕ СООБЩЕНИЙ ИГРОКА:\n- *текст в звездочках* — действия и описание персонажа игрока.\n- (текст в скобках) — внеролевое (OOC) уточнение.\n- обычный текст или "текст в кавычках" — реплика персонажа.\n\nВАЖНО: Продолжите историю естественно на русском языке в 2-4 законченных предложениях. Обязательно ставьте точку в конце!`;
+
   } else {
-    prompt = `You are a Dungeon Master and storyteller for an interactive roleplay game in English.
-`;
-    prompt += `Setting Scenario: ${state.currentScenarioKey}
-`;
-    if (state.memory) prompt += `World Memory (Remember): ${state.memory}
-`;
-    if (state.authorNote) prompt += `Writing Style: ${state.authorNote}
-`;
-    prompt += `Player Inventory: ${state.inventory.join(', ')}
+    prompt = `You are a world-class Dungeon Master (Game Master) and narrative storyteller for an immersive Tabletop RPG in English.
 
-`;
-    prompt += `Story History so far:
+ROLE & STYLE GUIDELINES:
+- Roleplay the world, non-player characters (NPCs), and hazards with vivid, sensory-rich prose and convincing dialogue.
+- Respond directly to player actions, taking into account the environment, consequences, and items in the player's inventory.
+- Never write internal thoughts or force decisions for the player's character ("Show, Don't Tell").
+- Keep your response to 2-4 atmospheric, captivating sentences. Always end with a natural narrative hook or environmental reaction that invites the player's next move.
+
+D20 DICE MECHANICS INTERPRETATION (WHEN PRESENT):
+- 20 (CRITICAL SUCCESS): Spectacular, triumphant outcome! Grants cinematic flair and unexpected tactical advantage or bonus.
+- 15-19 (SUCCESS): Clean, effective success. The action achieves its goal skillfully.
+- 10-14 (PARTIAL SUCCESS): Success with a minor complication, tradeoff, or noise/delay.
+- 2-9 (FAILURE): The action fails or hits resistance; the situational danger escalates.
+- 1 (CRITICAL FAILURE): Complete disaster! Catastrophic or humorous blunder with immediate repercussions.
+
+GAMEPLAY MODE:
+${state.casualMode ? '- [CASUAL MODE / POWER FANTASY]: The player is the epic protagonist! Provide glorious victories, cinematic flair, and heroic fun without harsh punishment.' : '- [REALISM MODE]: Enforce realistic physics, resource limitations, and genuine consequences for mistakes.'}
+
+Setting Scenario: ${state.currentScenarioKey}
+${state.memory ? `World Memory (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Writing Style: ${state.authorNote}\n` : ''}Player Inventory: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Empty'}
+
+Adventure history so far:
 `;
 
     const recentHistory = state.history.slice(-10);
     recentHistory.forEach(b => {
       if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [d20 Roll Result: ${b.diceVal} of 20 — ${b.diceLabel.toUpperCase()}])
-`;
+        prompt += `${b.text} (🎲 [d20 Roll Result: ${b.diceVal} of 20 — ${b.diceLabel.toUpperCase()}])\n`;
       } else {
-        prompt += `${b.text}
-`;
+        prompt += `${b.text}\n`;
       }
     });
 
-    prompt += `
-PLAYER SYNTAX:
-- *text in asterisks* — player action and character narration.
-- (text in parentheses) — OOC clarification or instruction.
-- plain text / "in quotes" — character dialogue and speech.
-`;
-    prompt += `
-IMPORTANT: Continue the story naturally in English with 2-4 complete sentences. Always end sentences with punctuation!`;
+    prompt += `\nPLAYER SYNTAX:\n- *text in asterisks* — player action and character narration.\n- (text in parentheses) — OOC clarification or instruction.\n- plain text / "in quotes" — character dialogue and speech.\n\nIMPORTANT: Continue the story naturally in English with 2-4 complete sentences. Always end sentences with punctuation!`;
   }
 
   return prompt;
