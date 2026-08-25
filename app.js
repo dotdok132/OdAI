@@ -230,6 +230,13 @@ const I18N = {
     realismGuard: "Realism Guard",
     casualModeLabel: "Casual Mode (Always Succeed)",
     changeScenario: "Change World",
+    behaviorPresetLabel: "Master Behavior / Persona",
+    behaviorClassic: "🎭 Classic DM (Balanced)",
+    behaviorStrict: "⚔️ Strict & Hardcore (Unforgiving)",
+    behaviorRomantic: "💖 Romantic & Emotional (Sensual)",
+    behaviorDark: "🌌 Dark & Grimdark (Gothic)",
+    behaviorChaotic: "🌀 Chaotic & Wild (Unpredictable)",
+    behaviorNoir: "🔎 Cynical Noir (Mystery)",
     masterName: "Dungeon Master",
     youName: "You",
     exportJson: "Export JSON",
@@ -336,6 +343,13 @@ const I18N = {
     realismGuard: "Guardia de Realismo",
     casualModeLabel: "Modo Casual (Siempre Éxito)",
     changeScenario: "Cambiar Mundo",
+    behaviorPresetLabel: "Modo de Comportamiento del DM",
+    behaviorClassic: "🎭 DM Clásico (Equilibrado)",
+    behaviorStrict: "⚔️ Estricto y Hardcore (Sin Piedad)",
+    behaviorRomantic: "💖 Romántico y Emocional (Sensual)",
+    behaviorDark: "🌌 Fantasía Oscura (Gótico)",
+    behaviorChaotic: "🌀 Caótico y Salvaje (Impredecible)",
+    behaviorNoir: "🔎 Noir Cínico (Misterio)",
     masterName: "Dungeon Master",
     youName: "Tú",
     exportJson: "Exportar JSON",
@@ -442,6 +456,13 @@ const I18N = {
     realismGuard: "Захист Реалізму",
     casualModeLabel: "Казуальний Режим (Завжди Успіх)",
     changeScenario: "Змінити Світ",
+    behaviorPresetLabel: "Модель поведінки Майстра",
+    behaviorClassic: "🎭 Класичний Майстер (Баланс)",
+    behaviorStrict: "⚔️ Строгий та Суровий (Хардкор)",
+    behaviorRomantic: "💖 Романтичний та Чуттєвий (Емоції)",
+    behaviorDark: "🌌 Похмуре Фентезі (Готика)",
+    behaviorChaotic: "🌀 Хаотичний та Безумний (Драйв)",
+    behaviorNoir: "🔎 Цинічний Нуар (Детектив)",
     masterName: "Майстер Гри",
     youName: "Ви",
     exportJson: "Експорт JSON",
@@ -548,6 +569,13 @@ const I18N = {
     realismGuard: "Защита Реализма",
     casualModeLabel: "Казуальный Режим (Всегда Успех)",
     changeScenario: "Сменить мир",
+    behaviorPresetLabel: "Модель поведения Мастера",
+    behaviorClassic: "🎭 Классический Мастер (Баланс)",
+    behaviorStrict: "⚔️ Строгий и Суровый (Хардкор)",
+    behaviorRomantic: "💖 Романтик и Чувственный (Эмоции)",
+    behaviorDark: "🌌 Мрачное Фэнтези (Готика)",
+    behaviorChaotic: "🌀 Хаотичный и Безумный (Драйв)",
+    behaviorNoir: "🔎 Циничный Нуар (Детектив)",
     masterName: "Мастер Игры",
     youName: "Вы",
     exportJson: "Экспорт JSON",
@@ -628,6 +656,7 @@ const state = {
   authorNote: "",
   realismMode: true,
   casualMode: false, // Casual Mode (Always Succeed on d20 rolls)
+  behaviorPreset: localStorage.getItem('odai_behavior_preset') || 'classic', // 'classic' | 'strict' | 'romantic' | 'dark' | 'chaotic' | 'noir'
   forceD20: false, // Флаг принудительного броска d20 на следующее действие
   currentMode: 'do', // 'do' | 'say' | 'story'
   isGenerating: false,
@@ -653,6 +682,7 @@ const elements = {
   dropdownRealismToggle: document.getElementById('dropdown-realism-toggle'),
   dropdownScenariosBtn: document.getElementById('dropdown-scenarios-btn'),
   dropdownCasualToggle: document.getElementById('dropdown-casual-toggle'),
+  dropdownBehaviorSelect: document.getElementById('dropdown-behavior-select'),
 
   storyFeed: document.getElementById('story-feed'),
   promptInput: document.getElementById('prompt-input'),
@@ -1281,6 +1311,13 @@ function setupEventListeners() {
   if (elements.dropdownCasualToggle) {
     elements.dropdownCasualToggle.addEventListener('click', () => {
       toggleCasualMode();
+    });
+  }
+  if (elements.dropdownBehaviorSelect) {
+    elements.dropdownBehaviorSelect.value = state.behaviorPreset || 'classic';
+    elements.dropdownBehaviorSelect.addEventListener('change', (e) => {
+      state.behaviorPreset = e.target.value;
+      localStorage.setItem('odai_behavior_preset', state.behaviorPreset);
     });
   }
 
@@ -2759,7 +2796,6 @@ async function fetchGeminiContinuation() {
         const errData = await response.json().catch(() => ({}));
         lastError = errData.error?.message || response.statusText;
         
-        // Прерываем цикл ТЕЛЬКО при явной ошибке недействительного API ключа:
         const isKeyErr = lastError && (
           lastError.includes('API key not valid') ||
           lastError.includes('API_KEY_INVALID') ||
@@ -2796,173 +2832,203 @@ async function fetchGeminiContinuation() {
 
   throw new Error(`Gemini API: ${lastError}`);
 }
+ function getBehaviorPresetDirective(preset, lang) {
+  const p = preset || 'classic';
+  const l = lang || 'en';
 
-
-// Запрос к OpenRouter API с авто-фоллбэком по бесплатным моделям
-async function fetchOpenRouterContinuation() {
-  const apiKey = state.engineConfig.openrouterKey;
-  if (!apiKey) throw new Error("Укажите API Ключ OpenRouter в Настройках.");
-
-  const userModel = state.engineConfig.openrouterModel || "openrouter/free";
-  const promptContext = constructAIPrompt();
-
-  const candidates = [
-    userModel,
-    "openrouter/free",
-    "meta-llama/llama-3.3-70b-instruct:free",
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "qwen/qwen-2.5-72b-instruct:free",
-    "google/gemma-2-9b-it:free",
-    "mistralai/mistral-small-24b-instruct-2501:free"
-  ];
-
-  const candidateChain = [...new Set(candidates.filter(Boolean))];
-  let lastError = null;
-
-  for (const modelCandidate of candidateChain) {
-    try {
-      console.log(`[OpenRouter API] Trying model: ${modelCandidate}`);
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'HTTP-Referer': 'https://github.com/dotdok132/OdAI',
-          'X-Title': 'OdAI RPG App'
-        },
-        body: JSON.stringify({
-          model: modelCandidate,
-          messages: [{ role: "user", content: promptContext }],
-          temperature: state.engineConfig.temperature || 0.8,
-          max_tokens: 2048
-        })
-      });
-
-      let data = {};
-      try {
-        data = await response.json();
-      } catch (e) {
-        data = {};
-      }
-
-      if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-        const rawContent = data.choices[0].message.content.trim();
-        const cleanText = sanitizeAIResponseText(rawContent);
-        if (cleanText) {
-          console.log(`[OpenRouter API Success] Model: ${modelCandidate}`);
-          return cleanText;
-        }
-      }
-
-      if (data.error) {
-        const msg = data.error.message || JSON.stringify(data.error);
-        console.warn(`[OpenRouter Fallback] Model ${modelCandidate} failed: ${msg}`);
-        if (response.status === 401 || msg.includes("API key") || msg.includes("Invalid key")) {
-          throw new Error(`API Ключ OpenRouter недействителен: ${msg}`);
-        }
-        lastError = msg;
-      } else {
-        lastError = `HTTP ${response.status}: ${response.statusText}`;
-      }
-    } catch (err) {
-      if (err.message && err.message.includes("API Ключ")) throw err;
-      lastError = err.message || String(err);
+  const directives = {
+    ru: {
+      classic: "- [МОДЕЛЬ ПОВЕДЕНИЯ: КЛАССИЧЕСКИЙ МАСТЕР]: Баланс атмосферы, кинематографичности, тактики, глубоких диалогов и сюжета.",
+      strict: "- [МОДЕЛЬ ПОВЕДЕНИЯ: СТРОГИЙ И СУРОВЫЙ]: Бескомпромиссная реалистичность, тяжелые тактические последствия, ранения, травмы, физика, никакого сюсюканья.",
+      romantic: "- [МОДЕЛЬ ПОВЕДЕНИЯ: РОМАНТИЧНЫЙ И ЧУВСТВЕННЫЙ]: Глубокий акцент на чувствах, взглядах, эмоциях, романтическом притяжении, химии персонажей и чувственных диалогах.",
+      dark: "- [МОДЕЛЬ ПОВЕДЕНИЯ: МРАЧНОЕ ФЭНТЕЗИ / ГОТИКА]: Похмурый гримдарк, готическая безысходность, кровь, древние проклятия, психоз и атмосфера кошмара.",
+      chaotic: "- [МОДЕЛЬ ПОВЕДЕНИЯ: ХАОТИЧНЫЙ И БЕЗУМНЫЙ]: Непредсказуемые сюжетные повороты, безумный юмор, дикие магические аномалии и эксцентричные персонажи.",
+      noir: "- [МОДЕЛЬ ПОВЕДЕНИЯ: ЦИНИЧНЫЙ НУАР]: Циничный внутренний монолог, промокшие от дождя улицы, детективные тайны, обман и моральная неоднозначность."
+    },
+    en: {
+      classic: "- [BEHAVIOR PRESET: CLASSIC DUNGEON MASTER]: Balanced atmosphere, tactical depth, dialogue, and compelling narrative.",
+      strict: "- [BEHAVIOR PRESET: STRICT & HARDCORE]: Gritty realism, punishing tactical consequences, severe injury logic, zero plot armor.",
+      romantic: "- [BEHAVIOR PRESET: ROMANTIC & EMOTIONAL]: Deep focus on romantic chemistry, sensual tension, character emotions, intimate dialogue, and relationship drama.",
+      dark: "- [BEHAVIOR PRESET: DARK & GRIMDARK]: Visceral horror, grimdark dread, gothic atmosphere, blood, ancient curses, and psychological horror.",
+      chaotic: "- [BEHAVIOR PRESET: CHAOTIC & WILD]: Unpredictable plot twists, wild humor, magical anomalies, bizarre NPCs, and high chaos.",
+      noir: "- [BEHAVIOR PRESET: CYNICAL NOIR]: Cynical hard-boiled tone, rain-soaked streets, mystery, moral ambiguity, secrets and lies."
+    },
+    uk: {
+      classic: "- [МОДЕЛЬ ПОВЕДЕНКИ: КЛАСИЧНИЙ МАЙСТЕР]: Збалансована атмосфера, тактика, діалоги та захопливий сюжет.",
+      strict: "- [МОДЕЛЬ ПОВЕДЕНКИ: СТРОГИЙ ТА СУРОВИЙ]: Безкомпромісний реалізм, важкі тактичні наслідки, травми, відсутність поблажок.",
+      romantic: "- [МОДЕЛЬ ПОВЕДЕНКИ: РОМАНТИЧНИЙ ТА ЧУТТЄВИЙ]: Глибокий акцент на почуттях, поглядах, романтичній хімії, емоційній глибині діалогів.",
+      dark: "- [МОДЕЛЬ ПОВЕДЕНКИ: ПОХМУРЕ ФЕНТЕЗІ / ГОТИКА]: Гримдарк, готична безвихідь, кров, давні прокляття та атмосфера жаху.",
+      chaotic: "- [МОДЕЛЬ ПОВЕДЕНКИ: ХАОТИЧНИЙ ТА БЕЗУМНИЙ]: Непередбачувані сюжетні повороти, божевільний гумор, магічні аномалії.",
+      noir: "- [МОДЕЛЬ ПОВЕДЕНКИ: ЦИНІЧНИЙ НУАР]: Цинічний внутрішній монолог, промоклі від дощу вулиці, детективні таємниці та обман."
+    },
+    es: {
+      classic: "- [MODO DE COMPORTAMIENTO: DUNGEON MASTER CLÁSICO]: Equilibrio de atmósfera, táctica, diálogo y narrativa.",
+      strict: "- [MODO DE COMPORTAMIENTO: ESTRICTO Y HARDCORE]: Realismo crudo, consecuencias tácticas severas, lesiones y cero favores.",
+      romantic: "- [MODO DE COMPORTAMIENTO: ROMÁNTICO Y EMOCIONAL]: Enfoque profundo en la química romántica, tensión sensual, emociones y diálogos íntimos.",
+      dark: "- [MODO DE COMPORTAMIENTO: FANTASÍA OSCURA]: Horror visceral, atmósfera sombría, sangre, maldiciones antiguas y tensión psicológica.",
+      chaotic: "- [MODO DE COMPORTAMIENTO: CAÓTICO Y SALVAJE]: Giros argumentales impredecibles, humor salvaje, anomalías mágicas y caos.",
+      noir: "- [MODO DE COMPORTAMIENTO: NOIR CÍNICO]: Monólogo interior cínico, calles empapadas por la lluvia, misterio y ambigüedad moral."
     }
-  }
+  };
 
-  throw new Error(`OpenRouter: ${lastError || "Выбранная модель недоступна. Попробуйте выбрать 'openrouter/free' в Настройках."}`);
+  const langDict = directives[l] || directives.en;
+  return langDict[p] || langDict.classic;
 }
 
-// Запрос к OpenAI / Custom API (Ollama, LM Studio)
-async function fetchOpenAIContinuation() {
-  const apiKey = state.engineConfig.apiKey || 'lm-studio';
-  const baseUrl = state.engineConfig.openaiBaseUrl ? state.engineConfig.openaiBaseUrl.replace(/\/$/, '') : 'https://api.openai.com/v1';
-  const model = state.engineConfig.openaiModel || 'gpt-4o';
-  const url = `${baseUrl}/chat/completions`;
-  const promptContext = constructAIPrompt();
+function constructAIPrompt() {
+  const lang = state.language || 'en';
+  let prompt = "";
 
-  const headers = { 'Content-Type': 'application/json' };
-  if (apiKey && apiKey !== 'lm-studio') headers['Authorization'] = `Bearer ${apiKey}`;
+  if (lang === 'es') {
+    prompt = `Eres un profesional Dungeon Master (Director de Juego) y narrador inmersivo para un juego interactivo de rol (TTRPG) en español.
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      model: model,
-      messages: [{ role: "user", content: promptContext }],
-      temperature: state.engineConfig.temperature || 0.8,
-      max_tokens: 2048
-    })
-  });
+REGLAS DE ROL Y ESTILO:
+- Interpreta el mundo, los personajes secundarios (PNJ) y las amenazas con prosa vívida, atmosférica y sensorial.
+- Responde directamente a las acciones del jugador, considerando el entorno, las consecuencias y los objetos de su inventario.
+- Nunca escribas ni fuerces los pensamientos internos o acciones del personaje del jugador ("Muestra, no cuentes").
+- Mantén tu respuesta entre 2 y 4 oraciones ricas e intensas. Termina siempre con una pausa narrativa natural o una reacción del mundo que invite al jugador a actuar.
 
-  const data = await response.json();
-  if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-    return data.choices[0].message.content.trim();
+INTERPRETACIONAL DE DADOS D20 (CUANDO ESTÉ PRESENTE):
+- 20 (ÉXITO CRÍTICO): ¡Triunfo brillante y espectacular! Logra el objetivo con ventajas adicionales o momentos épicos.
+- 15-19 (ÉXITO): Éxito limpio y efectivo. La acción se cumple hábilmente.
+- 10-14 (ÉXITO PARCIAL): Éxito con una complicación menor, costo o retraso.
+- 2-9 (FALLO): La acción no resulta o encuentra resistencia; la situación se complica.
+- 1 (FALLO CRÍTICO): ¡Desastre completo! Un error catastrófico o dramático con consecuencias inmediatas.
+
+MODO Y PERSONALIDAD DEL MASTER:
+${state.casualMode ? '- [MODO CASUAL / FANTASÍA DE PODER]: ¡El jugador es el héroe indiscutible! Proporciona victorias gloriosas y momentos cinemáticos sin castigos severos.' : '- [MODO REALISMO]: Aplica física realista, escasez de recursos y consecuencias reales para las decisiones.'}
+${getBehaviorPresetDirective(state.behaviorPreset, 'es')}
+
+Escenario del Mundo: ${state.currentScenarioKey}
+${state.memory ? `Memoria del Mundo (Recordar): ${state.memory}\n` : ''}${state.authorNote ? `Estilo de Escritura: ${state.authorNote}\n` : ''}Inventario del Jugador: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Vacío'}
+
+Historia de la aventura hasta ahora:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [Resultado d20: ${b.diceVal} de 20 — ${b.diceLabel.toUpperCase()}])\n`;
+      } else {
+        prompt += `${b.text}\n`;
+      }
+    });
+
+    prompt += `\nSINTAXIS DEL JUGADOR:\n- *texto en asteriscos* — acción del jugador y narración.\n- (texto en paréntesis) — aclaración OOC.\n- texto plano / "entre comillas" — diálogo del personaje.\n\nIMPORTANTE: Continúa la historia naturalmente en español con 2-4 oraciones completas. ¡Termina siempre las oraciones con puntuación!`;
+
+  } else if (lang === 'uk') {
+    prompt = `Ви — професійний Майстер Гри (Dungeon Master) та атмосферний оповідач для настільної рольової гри (НРИ) українською мовою.
+
+ПРАВИЛА РОЛЬОВОГО ОТЫГРАШУ ТА СТИЛЬ:
+- Описуйте світ, навколишніх персонажів (NPC) та небезпеки яскраво, емоційно та детально.
+- Реагуйте безпосередньо на дії гравця, враховуючи логіку локації, наслідки та предмети з інвентаря.
+- Заборонено писати думки гравця або вирішувати за його персонажа ("Показуй, а не розказуй").
+- Відповідь повинна складатися з 2-4 насичених речень. Завжди завершуйте відповідь природною павзою або подією світу, на яку гравець може відповісти.
+
+МЕХАНІКА КУБИКА D20 (ЯКЩО ВКАЗАНА В ДІЇ):
+- 20 (КРИТИЧНИЙ УСПІХ): Вражаючий, триумфальний успіх! Дія вдається найкращим чином і дає додаткову перевагу.
+- 15-19 (УСПІХ): Упевнений успіх. Гравець чітко досягає бажаного.
+- 10-14 (ЧАСТКОВИЙ УСПІХ): Успіх із застереженням або незначною ціною (ускладнення, шум, затримка).
+- 2-9 (НЕВДАЧА): Дія не вдається або виникає перешкода; ситуація погіршується.
+- 1 (КРИТИЧНА НЕВДАЧА): Повний провал! Стається несподівана неприємність або втрата переваги.
+
+РЕЖИМ ТА ОСОБИСТІСТЬ МАЙСТРА:
+${state.casualMode ? '- [РЕЖИМ КАЗУАЛЬНИЙ / POWER FANTASY]: Гравець — головний герой! Даруйте йому епічні перемоги та драйв без жорстких покарань.' : '- [РЕЖИМ РЕАЛІЗМУ]: Дотримуйтесь фізики, логіки світу, обмеженості ресурсів та реальних наслідків помилок.'}
+${getBehaviorPresetDirective(state.behaviorPreset, 'uk')}
+
+Сценарій Світу: ${state.currentScenarioKey}
+${state.memory ? `Пам'ять Світу (Пам'ятати): ${state.memory}\n` : ''}${state.authorNote ? `Стиль Написання: ${state.authorNote}\n` : ''}Інвентар Гравця: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Порожньо'}
+
+Історія пригоди до цього моменту:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} з 20 — ${b.diceLabel.toUpperCase()}])\n`;
+      } else {
+        prompt += `${b.text}\n`;
+      }
+    });
+
+    prompt += `\nСИНТАКСИС ГРАВЦЯ:\n- *текст у зірочках* — дія гравця та опис.\n- (текст у дужках) — позарольове (OOC) уточнення.\n- звичайний текст / "у лапках" — репліка персонажа.\n\nВАЖЛИВО: Продовжуйте історію природно українською мовою у 2-4 закінчених реченнях. Обов'язково ставте крапку в кінці!`;
+
+  } else if (lang === 'ru') {
+    prompt = `Вы — профессиональный Ведущий Мастер (Dungeon Master) и атмосферный нарратор для настольной ролевой игры (НРИ / Tabletop RPG) на русском языке.
+
+ТВОЯ РОЛЬ И СТИЛЬ:
+- Отыгрывай мир, окружающих персонажей (NPC) и опасности живо, атмосферно и кинематографично.
+- Реагируй строго на действия игрока, учитывай обстановку, физику локации и предметы в его инвентаре.
+- Запрещено писать внутренние мысли игрока или принимать решения за его персонажа ("Show, Don't Tell").
+- Ответ должен состоять из 2-4 глубоких, захватывающих предложений. Завершай ответ логической паузой или событием мира, на которое игрок может отреагировать.
+
+МЕХАНИКА КУБИКА d20 (ЕСЛИ ПРИСУТСТВУЕТ В ДЕЙСТВИИ):
+- 20 (КРИТИЧЕСКИЙ УСПЕХ): Невероятная, триумфальная победа! Действие удаётся наилучшим образом, даёт эпический эффект или неожиданное преимущество.
+- 15-19 (УСПЕХ): Уверенный успех. Игрок четко добивается желаемого без негативных последствий.
+- 10-14 (ЧАСТИЧНЫЙ УСПЕХ): Успех с оговоркой или небольшой ценой (лёгкое усложнение, шум, задержка).
+- 2-9 (НЕУДАЧА): Действие не удаётся или встречает сопротивление. Обстановка усложняется.
+- 1 (КРИТИЧЕСКИЙ ПРОВАЛ): Катастрофический или комичный провал! Происходит неожиданная неприятность или потеря преимущества.
+
+РЕЖИМ И МОДЕЛЬ ПОВЕДЕНИЯ МАСТЕРА:
+${state.casualMode ? '- [РЕЖИМ КАЗУАЛ / POWER FANTASY]: Игрок — главный герой! Описывай яркие победы, кинематографичный драйв и давай ему чувствовать себя сильным.' : '- [РЕЖИМ РЕАЛИЗМА]: Соблюдай физику, логику мира, ограниченность ресурсов и реальную угрозу от ошибок.'}
+${getBehaviorPresetDirective(state.behaviorPreset, 'ru')}
+
+Сценарий мира: ${state.currentScenarioKey}
+${state.memory ? `Память мира (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Стиль написания: ${state.authorNote}\n` : ''}Инвенварь игрока: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Пусто'}
+
+История приключения до этого момента:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} из 20 — ${b.diceLabel.toUpperCase()}])\n`;
+      } else {
+        prompt += `${b.text}\n`;
+      }
+    });
+
+    prompt += `\nФОРМАТИРОВАНИЕ СООБЩЕНИЙ ИГРОКА:\n- *текст в звездочках* — действия и описание персонажа игрока.\n- (текст в скобках) — внеролевое (OOC) уточнение.\n- обычный текст или "текст в кавычках" — реплика персонажа.\n\nВАЖНО: Продолжите историю естественно на русском языке в 2-4 законченных предложениях. Обязательно ставьте точку в конце!`;
+
+  } else {
+    prompt = `You are a world-class Dungeon Master (Game Master) and narrative storyteller for an immersive Tabletop RPG in English.
+
+ROLE & STYLE GUIDELINES:
+- Roleplay the world, non-player characters (NPCs), and hazards with vivid, sensory-rich prose and convincing dialogue.
+- Respond directly to player actions, taking into account the environment, consequences, and items in the player's inventory.
+- Never write internal thoughts or force decisions for the player's character ("Show, Don't Tell").
+- Keep your response to 2-4 atmospheric, captivating sentences. Always end with a natural narrative hook or environmental reaction that invites the player's next move.
+
+D20 DICE MECHANICS INTERPRETATION (WHEN PRESENT):
+- 20 (CRITICAL SUCCESS): Spectacular, triumphant outcome! Grants cinematic flair and unexpected tactical advantage or bonus.
+- 15-19 (SUCCESS): Clean, effective success. The action achieves its goal skillfully.
+- 10-14 (PARTIAL SUCCESS): Success with a minor complication, tradeoff, or noise/delay.
+- 2-9 (FAILURE): The action fails or hits resistance; the situational danger escalates.
+- 1 (CRITICAL FAILURE): Complete disaster! Catastrophic or humorous blunder with immediate repercussions.
+
+GAMEPLAY MODE & MASTER PERSONA:
+${state.casualMode ? '- [CASUAL MODE / POWER FANTASY]: The player is the epic protagonist! Provide glorious victories, cinematic flair, and heroic fun without harsh punishment.' : '- [REALISM MODE]: Enforce realistic physics, resource limitations, and genuine consequences for mistakes.'}
+${getBehaviorPresetDirective(state.behaviorPreset, 'en')}
+
+Setting Scenario: ${state.currentScenarioKey}
+${state.memory ? `World Memory (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Writing Style: ${state.authorNote}\n` : ''}Player Inventory: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Empty'}
+
+Adventure history so far:
+`;
+
+    const recentHistory = state.history.slice(-10);
+    recentHistory.forEach(b => {
+      if (b.diceVal && b.diceLabel) {
+        prompt += `${b.text} (🎲 [d20 Roll Result: ${b.diceVal} of 20 — ${b.diceLabel.toUpperCase()}])\n`;
+      } else {
+        prompt += `${b.text}\n`;
+      }
+    });
+
+    prompt += `\nPLAYER SYNTAX:\n- *text in asterisks* — player action and character narration.\n- (text in parentheses) — OOC clarification or instruction.\n- plain text / "in quotes" — character dialogue and speech.\n\nIMPORTANT: Continue the story naturally in English with 2-4 complete sentences. Always end sentences with punctuation!`;
   }
-  if (data.error) throw new Error(`API Error: ${data.error.message || JSON.stringify(data.error)}`);
-  throw new Error("Неверный ответ от API сервера");
-}
 
-// Запрос к Groq API
-async function fetchGroqContinuation() {
-  const apiKey = state.engineConfig.groqKey;
-  if (!apiKey) throw new Error("Укажите API Ключ Groq в Настройках.");
-
-  const model = state.engineConfig.groqModel || "llama-3.3-70b-versatile";
-  const promptContext = constructAIPrompt();
-
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [{ role: "user", content: promptContext }],
-      temperature: state.engineConfig.temperature || 0.8,
-      max_tokens: 2048
-    })
-  });
-
-  const data = await response.json();
-  if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-    return data.choices[0].message.content.trim();
-  }
-  if (data.error) throw new Error(`Groq API: ${data.error.message || JSON.stringify(data.error)}`);
-  throw new Error("Неверный ответ от Groq API");
-}
-
-// Запрос к Anthropic Claude API
-async function fetchAnthropicContinuation() {
-  const apiKey = state.engineConfig.anthropicKey;
-  if (!apiKey) throw new Error("Укажите API Ключ Anthropic Claude в Настройках.");
-
-  const model = state.engineConfig.anthropicModel || "claude-3-5-sonnet-20241022";
-  const promptContext = constructAIPrompt();
-
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'dangerously-allow-browser': 'true'
-    },
-    body: JSON.stringify({
-      model: model,
-      max_tokens: 2048,
-      temperature: state.engineConfig.temperature || 0.8,
-      messages: [{ role: "user", content: promptContext }]
-    })
-  });
-
-  const data = await response.json();
-  if (response.ok && data.content && data.content[0] && data.content[0].text) {
-    return data.content[0].text.trim();
-  }
-  if (data.error) throw new Error(`Anthropic Claude: ${data.error.message || JSON.stringify(data.error)}`);
-  throw new Error("Неверный ответ от Anthropic Claude API");
+  return prompt;
 }
 
 // Сквозной движок с авто-переключением (Cross-Provider Fallback Engine)
@@ -3055,157 +3121,6 @@ function sanitizeAIResponseText(text) {
   return cleaned.trim();
 }
 
-function constructAIPrompt() {
-  const lang = state.language || 'en';
-  let prompt = "";
-
-  if (lang === 'es') {
-    prompt = `Eres un profesional Dungeon Master (Director de Juego) y narrador inmersivo para un juego interactivo de rol (TTRPG) en español.
-
-REGLAS DE ROL Y ESTILO:
-- Interpreta el mundo, los personajes secundarios (PNJ) y las amenazas con prosa vívida, atmosférica y sensorial.
-- Responde directamente a las acciones del jugador, considerando el entorno, las consecuencias y los objetos de su inventario.
-- Nunca escribas ni fuerces los pensamientos internos o acciones del personaje del jugador ("Muestra, no cuentes").
-- Mantén tu respuesta entre 2 y 4 oraciones ricas e intensas. Termina siempre con una pausa narrativa natural o una reacción del mundo que invite al jugador a actuar.
-
-INTERPRETACIONAL DE DADOS D20 (CUANDO ESTÉ PRESENTE):
-- 20 (ÉXITO CRÍTICO): ¡Triunfo brillante y espectacular! Logra el objetivo con ventajas adicionales o momentos épicos.
-- 15-19 (ÉXITO): Éxito limpio y efectivo. La acción se cumple hábilmente.
-- 10-14 (ÉXITO PARCIAL): Éxito con una complicación menor, costo o retraso.
-- 2-9 (FALLO): La acción no resulta o encuentra resistencia; la situación se complica.
-- 1 (FALLO CRÍTICO): ¡Desastre completo! Un error catastrófico o dramático con consecuencias inmediatas.
-
-MODO DE JUEGO:
-${state.casualMode ? '- [MODO CASUAL / FANTASÍA DE PODER]: ¡El jugador es el héroe indiscutible! Proporciona victorias gloriosas y momentos cinemáticos sin castigos severos.' : '- [MODO REALISMO]: Aplica física realista, escasez de recursos y consecuencias reales para las decisiones.'}
-
-Escenario del Mundo: ${state.currentScenarioKey}
-${state.memory ? `Memoria del Mundo (Recordar): ${state.memory}\n` : ''}${state.authorNote ? `Estilo de Escritura: ${state.authorNote}\n` : ''}Inventario del Jugador: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Vacío'}
-
-Historia de la aventura hasta ahora:
-`;
-
-    const recentHistory = state.history.slice(-10);
-    recentHistory.forEach(b => {
-      if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [Resultado d20: ${b.diceVal} de 20 — ${b.diceLabel.toUpperCase()}])\n`;
-      } else {
-        prompt += `${b.text}\n`;
-      }
-    });
-
-    prompt += `\nSINTAXIS DEL JUGADOR:\n- *texto en asteriscos* — acción del jugador y narración.\n- (texto en paréntesis) — aclaración OOC.\n- texto plano / "entre comillas" — diálogo del personaje.\n\nIMPORTANTE: Continúa la historia naturalmente en español con 2-4 oraciones completas. ¡Termina siempre las oraciones con puntuación!`;
-
-  } else if (lang === 'uk') {
-    prompt = `Ви — професійний Майстер Гри (Dungeon Master) та атмосферний оповідач для настільної рольової гри (НРИ) українською мовою.
-
-ПРАВИЛА РОЛЬОВОГО ОТЫГРАШУ ТА СТИЛЬ:
-- Описуйте світ, навколишніх персонажів (NPC) та небезпеки яскраво, емоційно та детально.
-- Реагуйте безпосередньо на дії гравця, враховуючи логіку локації, наслідки та предмети з інвентаря.
-- Заборонено писати думки гравця або вирішувати за його персонажа ("Показуй, а не розказуй").
-- Відповідь повинна складатися з 2-4 насичених речень. Завжди завершуйте відповідь природною павзою або подією світу, на яку гравець може відповісти.
-
-МЕХАНІКА КУБИКА D20 (ЯКЩО ВКАЗАНА В ДІЇ):
-- 20 (КРИТИЧНИЙ УСПІХ): Вражаючий, триумфальний успіх! Дія вдається найкращим чином і дає додаткову перевагу.
-- 15-19 (УСПІХ): Упевнений успіх. Гравець чітко досягає бажаного.
-- 10-14 (ЧАСТКОВИЙ УСПІХ): Успіх із застереженням або незначною ціною (ускладнення, шум, затримка).
-- 2-9 (НЕВДАЧА): Дія не вдається або виникає перешкода; ситуація погіршується.
-- 1 (КРИТИЧНА НЕВДАЧА): Повний провал! Стається несподівана неприємність або втрата переваги.
-
-РЕЖИМИ ГРИ:
-${state.casualMode ? '- [РЕЖИМ КАЗУАЛЬНИЙ / POWER FANTASY]: Гравець — головний герой! Даруйте йому епічні перемоги та драйв без жорстких покарань.' : '- [РЕЖИМ РЕАЛІЗМУ]: Дотримуйтесь фізики, логіки світу, обмеженості ресурсів та реальних наслідків помилок.'}
-
-Сценарій Світу: ${state.currentScenarioKey}
-${state.memory ? `Пам'ять Світу (Пам'ятати): ${state.memory}\n` : ''}${state.authorNote ? `Стиль Написання: ${state.authorNote}\n` : ''}Інвентар Гравця: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Порожньо'}
-
-Історія пригоди до цього моменту:
-`;
-
-    const recentHistory = state.history.slice(-10);
-    recentHistory.forEach(b => {
-      if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} з 20 — ${b.diceLabel.toUpperCase()}])\n`;
-      } else {
-        prompt += `${b.text}\n`;
-      }
-    });
-
-    prompt += `\nСИНТАКСИС ГРАВЦЯ:\n- *текст у зірочках* — дія гравця та опис.\n- (текст у дужках) — позарольове (OOC) уточнення.\n- звичайний текст / "у лапках" — репліка персонажа.\n\nВАЖЛИВО: Продовжуйте історію природно українською мовою у 2-4 закінчених реченнях. Обов'язково ставте крапку в кінці!`;
-
-  } else if (lang === 'ru') {
-    prompt = `Вы — профессиональный Ведущий Мастер (Dungeon Master) и атмосферный нарратор для настольной ролевой игры (НРИ / Tabletop RPG) на русском языке.
-
-ТВОЯ РОЛЬ И СТИЛЬ:
-- Отыгрывай мир, окружающих персонажей (NPC) и опасности живо, атмосферно и кинематографично.
-- Реагируй строго на действия игрока, учитывай обстановку, физику локации и предметы в его инвентаре.
-- Запрещено писать внутренние мысли игрока или принимать решения за его персонажа ("Show, Don't Tell").
-- Ответ должен состоять из 2-4 глубоких, захватывающих предложений. Завершай ответ логической паузой или событием мира, на которое игрок может отреагировать.
-
-МЕХАНИКА КУБИКА d20 (ЕСЛИ ПРИСУТСТВУЕТ В ДЕЙСТВИИ):
-- 20 (КРИТИЧЕСКИЙ УСПЕХ): Невероятная, триумфальная победа! Действие удаётся наилучшим образом, даёт эпический эффект или неожиданное преимущество.
-- 15-19 (УСПЕХ): Уверенный успех. Игрок четко добивается желаемого без негативных последствий.
-- 10-14 (ЧАСТИЧНЫЙ УСПЕХ): Успех с оговоркой или небольшой ценой (лёгкое усложнение, шум, задержка).
-- 2-9 (НЕУДАЧА): Действие не удаётся или встречает сопротивление. Обстановка усложняется.
-- 1 (КРИТИЧЕСКИЙ ПРОВАЛ): Катастрофический или комичный провал! Происходит неожиданная неприятность или потеря преимущества.
-
-РЕЖИМЫ ИГРЫ:
-${state.casualMode ? '- [РЕЖИМ КАЗУАЛ / POWER FANTASY]: Игрок — главный герой! Описывай яркие победы, кинематографичный драйв и давай ему чувствовать себя сильным.' : '- [РЕЖИМ РЕАЛИЗМА]: Соблюдай физику, логику мира, ограниченность ресурсов и реальную угрозу от ошибок.'}
-
-Сценарий мира: ${state.currentScenarioKey}
-${state.memory ? `Память мира (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Стиль написания: ${state.authorNote}\n` : ''}Инвентарь игрока: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Пусто'}
-
-История приключения до этого момента:
-`;
-
-    const recentHistory = state.history.slice(-10);
-    recentHistory.forEach(b => {
-      if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [Результат кубика d20: ${b.diceVal} из 20 — ${b.diceLabel.toUpperCase()}])\n`;
-      } else {
-        prompt += `${b.text}\n`;
-      }
-    });
-
-    prompt += `\nФОРМАТИРОВАНИЕ СООБЩЕНИЙ ИГРОКА:\n- *текст в звездочках* — действия и описание персонажа игрока.\n- (текст в скобках) — внеролевое (OOC) уточнение.\n- обычный текст или "текст в кавычках" — реплика персонажа.\n\nВАЖНО: Продолжите историю естественно на русском языке в 2-4 законченных предложениях. Обязательно ставьте точку в конце!`;
-
-  } else {
-    prompt = `You are a world-class Dungeon Master (Game Master) and narrative storyteller for an immersive Tabletop RPG in English.
-
-ROLE & STYLE GUIDELINES:
-- Roleplay the world, non-player characters (NPCs), and hazards with vivid, sensory-rich prose and convincing dialogue.
-- Respond directly to player actions, taking into account the environment, consequences, and items in the player's inventory.
-- Never write internal thoughts or force decisions for the player's character ("Show, Don't Tell").
-- Keep your response to 2-4 atmospheric, captivating sentences. Always end with a natural narrative hook or environmental reaction that invites the player's next move.
-
-D20 DICE MECHANICS INTERPRETATION (WHEN PRESENT):
-- 20 (CRITICAL SUCCESS): Spectacular, triumphant outcome! Grants cinematic flair and unexpected tactical advantage or bonus.
-- 15-19 (SUCCESS): Clean, effective success. The action achieves its goal skillfully.
-- 10-14 (PARTIAL SUCCESS): Success with a minor complication, tradeoff, or noise/delay.
-- 2-9 (FAILURE): The action fails or hits resistance; the situational danger escalates.
-- 1 (CRITICAL FAILURE): Complete disaster! Catastrophic or humorous blunder with immediate repercussions.
-
-GAMEPLAY MODE:
-${state.casualMode ? '- [CASUAL MODE / POWER FANTASY]: The player is the epic protagonist! Provide glorious victories, cinematic flair, and heroic fun without harsh punishment.' : '- [REALISM MODE]: Enforce realistic physics, resource limitations, and genuine consequences for mistakes.'}
-
-Setting Scenario: ${state.currentScenarioKey}
-${state.memory ? `World Memory (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Writing Style: ${state.authorNote}\n` : ''}Player Inventory: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Empty'}
-
-Adventure history so far:
-`;
-
-    const recentHistory = state.history.slice(-10);
-    recentHistory.forEach(b => {
-      if (b.diceVal && b.diceLabel) {
-        prompt += `${b.text} (🎲 [d20 Roll Result: ${b.diceVal} of 20 — ${b.diceLabel.toUpperCase()}])\n`;
-      } else {
-        prompt += `${b.text}\n`;
-      }
-    });
-
-    prompt += `\nPLAYER SYNTAX:\n- *text in asterisks* — player action and character narration.\n- (text in parentheses) — OOC clarification or instruction.\n- plain text / "in quotes" — character dialogue and speech.\n\nIMPORTANT: Continue the story naturally in English with 2-4 complete sentences. Always end sentences with punctuation!`;
-  }
-
-  return prompt;
-}
 
 // Обработчики инструментов истории (Отмена, Повтор, Стереть)
 function handleUndo() {
