@@ -649,6 +649,16 @@ function getCurrentChatSession() {
   return state.chats.find(c => c.id === state.currentChatId) || null;
 }
 
+function getLocalizedText(val) {
+  if (!val) return "";
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object') {
+    const lang = state.language || 'ru';
+    return val[lang] || val.ru || val.en || Object.values(val)[0] || "";
+  }
+  return String(val);
+}
+
 // Синхронизация активной сессии с состоянием UI
 function syncActiveChatToState() {
   const activeSession = getCurrentChatSession();
@@ -665,9 +675,10 @@ function syncActiveChatToState() {
     const nameEl = document.getElementById('header-character-name');
     const subEl = document.getElementById('header-character-sub');
     const avatarEl = document.getElementById('header-avatar-img');
-    if (nameEl) nameEl.textContent = activeSession.title || 'OdAI Master';
+    if (nameEl) nameEl.textContent = getLocalizedText(activeSession.title) || 'OdAI Master';
     if (subEl) {
-      const scenTitle = SCENARIOS[activeSession.scenarioKey]?.title || 'Интерактивный ИИ';
+      const scenObj = SCENARIOS[activeSession.scenarioKey]?.title || 'Интерактивный ИИ';
+      const scenTitle = getLocalizedText(scenObj);
       subEl.textContent = `@${scenTitle}`;
     }
     if (avatarEl) {
@@ -686,7 +697,7 @@ function updateActiveChatSession() {
   if (!activeSession) {
     activeSession = {
       id: 'chat_' + Date.now(),
-      title: SCENARIOS[state.currentScenarioKey]?.title || "Новое приключение",
+      title: getLocalizedText(SCENARIOS[state.currentScenarioKey]?.title) || "Новое приключение",
       scenarioKey: state.currentScenarioKey,
       history: state.history,
       inventory: state.inventory,
@@ -724,7 +735,7 @@ function loadStateFromStorage() {
         // Миграция из старого формата одиночной истории
         const legacyChat = {
           id: 'chat_' + Date.now(),
-          title: SCENARIOS[parsed.currentScenarioKey || 'fantasy']?.title || "Сохраненный чат",
+          title: getLocalizedText(SCENARIOS[parsed.currentScenarioKey || 'fantasy']?.title) || "Сохраненный чат",
           scenarioKey: parsed.currentScenarioKey || 'fantasy',
           history: (parsed.history || []).filter(b => b.type !== 'dice'),
           inventory: parsed.inventory || ["Железный длинный меч", "Кожаный доспех", "Целебный бальзам (x2)"],
@@ -1408,7 +1419,7 @@ function renderChatsArchiveList() {
     const lastPreview = lastMsg ? (lastMsg.text.length > 75 ? lastMsg.text.slice(0, 75) + '...' : lastMsg.text) : 'Пустая сессия';
     const msgCount = (chat.history || []).filter(m => m.type !== 'dice').length;
     const dateFormatted = chat.updatedAt ? new Date(chat.updatedAt).toLocaleString([], { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
-    const scenTitle = SCENARIOS[chat.scenarioKey]?.title || (chat.scenarioKey === 'custom' ? 'Пользовательский' : chat.scenarioKey);
+    const scenTitle = getLocalizedText(SCENARIOS[chat.scenarioKey]?.title) || (chat.scenarioKey === 'custom' ? 'Пользовательский' : chat.scenarioKey);
 
     card.innerHTML = `
       <div class="chat-card-header">
