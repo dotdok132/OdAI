@@ -87,7 +87,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: max(0.4rem, env(safe-area-inset-top, 0px));
+  padding-top: max(1.75rem, env(safe-area-inset-top, 28px));
   padding-bottom: 0.4rem;
   padding-left: max(0.85rem, env(safe-area-inset-left, 0px));
   padding-right: max(0.85rem, env(safe-area-inset-right, 0px));
@@ -765,7 +765,8 @@ body {
 }
 
 .fullscreen-header {
-  height: 58px;
+  min-height: 54px;
+  height: auto;
   background: rgba(17, 17, 22, 0.95);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
@@ -773,7 +774,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  padding-top: max(1.75rem, env(safe-area-inset-top, 28px));
+  padding-bottom: 0.65rem;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
   flex-shrink: 0;
 }
 
@@ -2080,7 +2084,10 @@ body {
   }
 
   .settings-modal-box .modal-header {
-    padding: 0.6rem 1rem !important;
+    padding-top: max(0.6rem, env(safe-area-inset-top, 24px)) !important;
+    padding-bottom: 0.6rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
     flex-shrink: 0 !important;
   }
 
@@ -2360,7 +2367,10 @@ body {
 }
 
 .settings-modal-box .modal-header {
-  padding: 1.1rem 1.4rem;
+  padding-top: max(1.1rem, env(safe-area-inset-top, 24px));
+  padding-bottom: 0.85rem;
+  padding-left: 1.4rem;
+  padding-right: 1.4rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(18, 18, 20, 0.8);
   backdrop-filter: blur(12px);
