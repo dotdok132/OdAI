@@ -1146,7 +1146,15 @@ function loadStateFromStorage() {
   elements.realismToggle.classList.toggle('active', state.realismMode);
 }
 
-// Сохранение состояния в LocalStorage
+// Сохранение состояния в LocalStorage с оптимизированным debounce
+let _saveStateTimer = null;
+function saveStateToStorageDebounced(delay = 400) {
+  if (_saveStateTimer) clearTimeout(_saveStateTimer);
+  _saveStateTimer = setTimeout(() => {
+    saveStateToStorage();
+  }, delay);
+}
+
 function saveStateToStorage() {
   try {
     updateActiveChatSession();

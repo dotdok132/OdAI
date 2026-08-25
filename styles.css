@@ -36,7 +36,7 @@
 
   /* Typography */
   --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-story: 'Merriweather', Georgia, serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
   --font-code: 'Fira Code', monospace;
 
   /* Shadows & effects */
