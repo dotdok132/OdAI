@@ -2133,7 +2133,7 @@ body {
   }
 }
 
-/* ---- TABLET & DESKTOP DUAL-COLUMN SPLIT LAYOUT (LARGE SCREENS ONLY) ---- */
+/* ---- TABLET & DESKTOP DUAL-COLUMN LAYOUT OPTIMIZATIONS ---- */
 @media (min-width: 960px) and (min-height: 600px) {
   body {
     display: flex;
@@ -2142,14 +2142,7 @@ body {
     overflow: hidden;
   }
 
-  #view-chat-list.active,
-  #view-chat.active {
-    display: flex !important;
-  }
-
   .tablet-layout {
-    display: flex !important;
-    flex-direction: row !important;
     width: 100vw !important;
     height: 100vh !important;
     height: 100dvh !important;
@@ -2159,30 +2152,6 @@ body {
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
     position: relative;
     overflow: hidden;
-  }
-
-  .tablet-layout #view-chat-list {
-    width: 320px !important;
-    min-width: 320px !important;
-    max-width: 340px !important;
-    height: 100dvh !important;
-    border-right: 1px solid var(--border-subtle);
-    display: flex !important;
-    flex-direction: column !important;
-    position: relative !important;
-    z-index: 10;
-  }
-
-  .tablet-layout #view-chat {
-    flex: 1 !important;
-    height: 100dvh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    position: relative !important;
-  }
-
-  .tablet-layout #back-to-list-btn {
-    display: none !important;
   }
 
   #view-chat-list .chats-archive-list,

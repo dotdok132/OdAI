@@ -886,17 +886,6 @@ function toggleAppFullscreen() {
 }
 
 function showView(viewId, skipHistory = false) {
-  const isTabletSplit = window.innerWidth >= 960 && window.innerHeight >= 600;
-
-  if (isTabletSplit) {
-    elements.viewChatList.classList.add('active');
-    elements.viewChatList.style.display = 'flex';
-    elements.viewChat.classList.add('active');
-    elements.viewChat.style.display = 'flex';
-    renderChatsArchiveList();
-    return;
-  }
-
   elements.viewChatList.classList.remove('active');
   elements.viewChatList.style.display = 'none';
   elements.viewChat.classList.remove('active');
