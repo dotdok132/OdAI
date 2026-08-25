@@ -254,6 +254,28 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-secondary {
+  background: var(--bg-surface, rgba(255, 255, 255, 0.05)) !important;
+  color: var(--text-bright, #f4f4f5) !important;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: var(--radius-md, 10px) !important;
+  padding: 0.55rem 0.85rem !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--border-medium) !important;
+  color: var(--text-bright) !important;
+  transform: translateY(-1px) !important;
+}
+
 /* Switch Toggle — Compact pill */
 .toggle-wrapper {
   display: flex;
@@ -795,14 +817,14 @@ body {
 .fullscreen-header {
   min-height: 54px;
   height: auto;
-  background: rgba(17, 17, 22, 0.95);
+  background: var(--bg-card);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border-bottom: 1px solid var(--border-medium);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: max(1.75rem, env(safe-area-inset-top, 28px));
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
   padding-bottom: 0.65rem;
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
   padding-right: max(1rem, env(safe-area-inset-right, 0px));
@@ -2200,6 +2222,26 @@ body {
     font-size: 0.75rem !important;
   }
 
+  #settings-modal .fullscreen-header {
+    max-width: 1200px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    border-top-left-radius: 18px !important;
+    border-top-right-radius: 18px !important;
+    background: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+  }
+
+  #settings-modal .settings-list-container {
+    max-width: 1200px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    border-bottom-left-radius: 18px !important;
+    border-bottom-right-radius: 18px !important;
+    background: var(--bg-card) !important;
+    padding: 1.5rem 1.5rem 4rem 1.5rem !important;
+  }
+
   #view-chat-list .chats-archive-list,
   .tablet-layout .chats-archive-list {
     max-height: none !important;
@@ -2593,9 +2635,9 @@ body {
   font-size: 0.92rem;
   font-weight: 600;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  background: var(--accent-gradient) !important;
   border: none !important;
-  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
   color: #ffffff !important;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -2603,7 +2645,7 @@ body {
 
 .custom-save-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.45) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* ===========================
