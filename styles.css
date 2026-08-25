@@ -1324,7 +1324,8 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(9, 9, 11, 0.7);
+  height: 100dvh;
+  background: rgba(9, 9, 11, 0.75);
   backdrop-filter: blur(12px);
   z-index: 100;
   display: flex;
@@ -1333,6 +1334,8 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
+  padding: 1rem;
+  overflow-y: auto;
 }
 
 .modal-overlay.active {
@@ -1346,13 +1349,31 @@ body {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   width: 90%;
-  max-width: 520px;
+  max-width: 580px;
+  max-height: 85vh;
+  max-height: 85dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1.5rem;
   box-shadow: var(--shadow-lg), var(--shadow-glow);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-box::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-box::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+.modal-box::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
 }
 
 @keyframes modalAppear {
@@ -2150,10 +2171,18 @@ body {
     border-radius: 6px !important;
   }
 
+  .modal-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+  }
+
   .modal-box {
-    max-height: 94dvh !important;
-    padding: 0.75rem 1rem max(2.5rem, env(safe-area-inset-bottom)) 1rem !important;
+    max-height: 88vh !important;
+    max-height: 88dvh !important;
+    padding: 0.75rem 1rem max(2rem, env(safe-area-inset-bottom)) 1rem !important;
     overflow-y: auto !important;
+    overscroll-behavior: contain !important;
   }
 
   .scenario-grid {
