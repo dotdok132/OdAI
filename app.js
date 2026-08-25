@@ -2744,8 +2744,11 @@ async function fetchGeminiContinuation() {
           if (cand.content && cand.content.parts) {
             const textParts = cand.content.parts.map(p => p.text || '').join('').trim();
             if (textParts) {
-              console.log(`[Gemini API Success] Model: ${model}`);
-              return textParts;
+              const cleanText = sanitizeAIResponseText(textParts);
+              if (cleanText) {
+                console.log(`[Gemini API Success] Model: ${model}`);
+                return cleanText;
+              }
             }
           }
           if (cand.finishReason && cand.finishReason !== 'STOP') {
@@ -2843,7 +2846,12 @@ async function fetchOpenRouterContinuation() {
       }
 
       if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-        return data.choices[0].message.content.trim();
+        const rawContent = data.choices[0].message.content.trim();
+        const cleanText = sanitizeAIResponseText(rawContent);
+        if (cleanText) {
+          console.log(`[OpenRouter API Success] Model: ${modelCandidate}`);
+          return cleanText;
+        }
       }
 
       if (data.error) {
