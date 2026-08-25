@@ -128,7 +128,7 @@ const I18N = {
     settingsTitle: "AI & Connection Settings",
     saveBtn: "Save",
     backBtn: "Back",
-    languageLabel: "Language / Idioma",
+    languageLabel: "Interface Language",
     selectLanguageLabel: "Choose Interface & Story Language:",
     aiProvidersTitle: "AI Providers (Select Active)",
     inventoryTitle: "Inventory & World Memory",
@@ -184,7 +184,7 @@ const I18N = {
     settingsTitle: "Ajustes de IA y Conexión",
     saveBtn: "Guardar",
     backBtn: "Volver",
-    languageLabel: "Idioma / Language",
+    languageLabel: "Idioma de la Interfaz",
     selectLanguageLabel: "Elige el idioma de la interfaz e historia:",
     aiProvidersTitle: "Proveedores de IA (Seleccionar Activo)",
     inventoryTitle: "Inventario y Memoria",
@@ -240,7 +240,7 @@ const I18N = {
     settingsTitle: "Налаштування ШІ та З'єднань",
     saveBtn: "Зберегти",
     backBtn: "Назад",
-    languageLabel: "Мова / Language",
+    languageLabel: "Мова інтерфейсу",
     selectLanguageLabel: "Оберіть мову інтерфейсу та історії:",
     aiProvidersTitle: "Провайдери ШІ (Оберіть активний)",
     inventoryTitle: "Інвентар та Пам'ять",
@@ -296,7 +296,7 @@ const I18N = {
     settingsTitle: "Настройки ИИ и Подключений",
     saveBtn: "Сохранить",
     backBtn: "Назад",
-    languageLabel: "Язык / Language",
+    languageLabel: "Язык интерфейса",
     selectLanguageLabel: "Выберите язык интерфейса и истории:",
     aiProvidersTitle: "Провайдеры ИИ (Выберите активный)",
     inventoryTitle: "Инвентарь и Память",
@@ -313,7 +313,7 @@ const I18N = {
     undoBtn: "Отмена",
     retryBtn: "Повтор",
     eraseBtn: "Стереть",
-    realismGuard: "Защита",
+    realismGuard: "Захист",
     changeScenario: "Сменить мир",
     masterName: "Мастер Игры",
     youName: "Вы",
@@ -349,7 +349,7 @@ const I18N = {
 // Начальное состояние приложения
 // Начальное состояние приложения
 const state = {
-  language: 'en', // Default English language ('en' | 'ru')
+  language: 'ru', // Default Russian language ('ru' | 'en' | 'uk' | 'es')
   chats: [], // Массив сессий { id, title, scenarioKey, history, inventory, memory, authorNote, updatedAt }
   currentChatId: null,
   currentScenarioKey: 'fantasy',
@@ -628,6 +628,7 @@ function setupTextareaAutoResize(el) {
 function init() {
 
   loadStateFromStorage();
+  applyI18nLanguage(state.language || 'ru');
   setupEventListeners();
   setupExportImportBackup();
   setupNativeAndroidBackButton();
