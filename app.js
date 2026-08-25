@@ -223,6 +223,7 @@ const I18N = {
     inputPlaceholder: "Type a message... *action* or (OOC note)",
     sendBtn: "Send",
     d20Btn: "d20: Auto",
+    continueBtn: "Continue",
     undoBtn: "Undo",
     retryBtn: "Retry",
     eraseBtn: "Erase",
@@ -328,6 +329,7 @@ const I18N = {
     inputPlaceholder: "Escribe un mensaje... *acción* o (nota OOC)",
     sendBtn: "Enviar",
     d20Btn: "d20: Auto",
+    continueBtn: "Continuar",
     undoBtn: "Deshacer",
     retryBtn: "Reintentar",
     eraseBtn: "Borrar",
@@ -433,6 +435,7 @@ const I18N = {
     inputPlaceholder: "Напишіть повідомлення... *дія* або (уточнення)",
     sendBtn: "Надіслати",
     d20Btn: "d20: Авто",
+    continueBtn: "Продовжити",
     undoBtn: "Скасувати",
     retryBtn: "Повторити",
     eraseBtn: "Стерти",
@@ -538,6 +541,7 @@ const I18N = {
     inputPlaceholder: "Напишите сообщение... *действие* или (уточнение)",
     sendBtn: "Отправить",
     d20Btn: "d20: Авто",
+    continueBtn: "Продолжить",
     undoBtn: "Отмена",
     retryBtn: "Повтор",
     eraseBtn: "Стереть",
@@ -673,6 +677,7 @@ const elements = {
   // Инструменты истории
   rollD20Btn: document.getElementById('roll-d20-btn'),
   d20BtnLabel: document.getElementById('d20-btn-label'),
+  continueBtn: document.getElementById('continue-btn'),
   undoBtn: document.getElementById('undo-btn'),
   retryBtn: document.getElementById('retry-btn'),
   eraseBtn: document.getElementById('erase-btn'),
@@ -1346,6 +1351,7 @@ function setupEventListeners() {
   });
 
   // Кнопки управления историей
+  if (elements.continueBtn) elements.continueBtn?.addEventListener('click', handleContinueAction);
   if (elements.undoBtn) elements.undoBtn?.addEventListener('click', handleUndo);
   if (elements.retryBtn) elements.retryBtn?.addEventListener('click', handleRetry);
   if (elements.eraseBtn) elements.eraseBtn?.addEventListener('click', handleErase);
@@ -2426,6 +2432,35 @@ function parseItemsFromAIText(text) {
       }
     }
   });
+}
+
+// Обработка кнопки "Продолжить" (Промолчал / Ожидание ответа)
+async function handleContinueAction() {
+  if (state.isGenerating) return;
+
+  const lang = state.language || 'en';
+  let silenceText = "*You remain silent, watching and waiting to see what happens next...*";
+  if (lang === 'ru') silenceText = "*Вы молчите, ожидая развития событий...*";
+  else if (lang === 'uk') silenceText = "*Ви мовчите, очікуючи розвитку подій...*";
+  else if (lang === 'es') silenceText = "*Te quedas en silencio, esperando a ver qué sucede...*";
+
+  state.isGenerating = true;
+  updateUIState();
+  elements.typingIndicator.style.display = 'flex';
+  const labelEl = elements.typingStatusText || elements.typingIndicator;
+  if (labelEl) labelEl.textContent = getLocalizedText(I18N[lang]?.aiGenerating) || "ИИ создает продолжение...";
+  elements.storyFeed.scrollTop = elements.storyFeed.scrollHeight;
+
+  state.history.push({
+    id: Date.now(),
+    type: state.currentMode || 'do',
+    text: `> ${silenceText}`,
+    timestamp: new Date().toLocaleTimeString()
+  });
+  renderStoryFeed();
+  saveStateToStorage();
+
+  await generateAIResponse();
 }
 
 // Обработка действия игрока ПОСЛЕ нажатия Отправить
