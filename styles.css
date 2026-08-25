@@ -772,18 +772,19 @@ body {
    FULLSCREEN ACCORDION SETTINGS PAGE
    ========================================== */
 .fullscreen-page {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background-color: #09090b;
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  animation: pageSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  z-index: 1000 !important;
+  background-color: var(--bg-base, #09090b) !important;
+  display: none !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .fullscreen-page.active {
-  display: flex;
+  display: flex !important;
 }
 
 @keyframes pageSlideUp {
