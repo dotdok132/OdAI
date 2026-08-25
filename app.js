@@ -132,12 +132,12 @@ const I18N = {
     selectLanguageLabel: "Choose Interface & Story Language:",
     aiProvidersTitle: "AI Providers (Select Active)",
     inventoryTitle: "Inventory & World Memory",
-    inventoryLabel: "Inventory Items",
+    inventoryItemsLabel: "Inventory Items",
     addItemPlaceholder: "Add item (e.g., Torch)...",
     addBtn: "Add",
-    memoryLabel: "World Memory (Remember)",
+    worldMemoryLabel: "World Memory",
     memoryPlaceholder: "Key facts for AI to remember...",
-    authorNoteLabel: "Author's Note (Style & Tone)",
+    writingStyleLabel: "Writing Style & Tone",
     authorNotePlaceholder: "e.g., Dark fantasy, immersive prose...",
     inputPlaceholder: "Type a message... *action* or (OOC note)",
     sendBtn: "Send",
@@ -161,10 +161,11 @@ const I18N = {
     caiFileBtn: "📁 Load card file (.json)",
     scenarioModalTitle: "Choose Your World",
     startCustomBtn: "Start Custom World",
+    customPromptLabel: "Or enter custom starting prompt:",
     customPromptPlaceholder: "You wake up in a quiet tavern with no memory of how you got here...",
     aiGenerating: "AI is creating continuation...",
     realismChecking: "Arbiter checking realism...",
-    testConnection: "Test Connection",
+    testConnectionBtn: "🧪 Test Connection",
     noMessages: "No chats yet. Tap + to start a new adventure!",
     messagesCount: "msgs",
     lastMsg: "Last:",
@@ -175,119 +176,42 @@ const I18N = {
     scenZombieTitle: "Zombie Apocalypse",
     scenZombieDesc: "Scavenge supplies and fight off hordes of infected.",
     scenDetectiveTitle: "Noir Detective",
-    scenDetectiveDesc: "Rainy streets, dark secrets, and investigations."
-  },
-  es: {
-    appTitle: "OdAI",
-    chatsTitle: "Tus Aventuras",
-    newChatBtn: "Nueva Aventura",
-    settingsTitle: "Ajustes de IA y Conexión",
-    saveBtn: "Guardar",
-    backBtn: "Volver",
-    languageLabel: "Idioma de la Interfaz",
-    selectLanguageLabel: "Elige el idioma de la interfaz e historia:",
-    aiProvidersTitle: "Proveedores de IA (Seleccionar Activo)",
-    inventoryTitle: "Inventario y Memoria",
-    inventoryLabel: "Objetos del Inventario",
-    addItemPlaceholder: "Añadir objeto (ej. Antorcha)...",
-    addBtn: "Añadir",
-    memoryLabel: "Memoria del Mundo (Recordar)",
-    memoryPlaceholder: "Hechos clave que la IA debe recordar...",
-    authorNoteLabel: "Nota del Autor (Estilo y Tono)",
-    authorNotePlaceholder: "ej. Fantasía oscura, prosa inmersiva...",
-    inputPlaceholder: "Escribe un mensaje... *acción* o (nota OOC)",
-    sendBtn: "Enviar",
-    d20Btn: "d20: Auto",
-    undoBtn: "Deshacer",
-    retryBtn: "Reintentar",
-    eraseBtn: "Borrar",
-    realismGuard: "Guardia Realismo",
-    casualModeLabel: "Modo Casual (Siempre Éxito)",
-    changeScenario: "Cambiar Mundo",
-    masterName: "Dungeon Master",
-    youName: "Tú",
-    exportJson: "📥 Exportar JSON",
-    exportTxt: "📄 Exportar Texto",
-    importBackup: "📤 Importar Copia",
-    backupTitle: "Copia de Seguridad y Exportación",
-    backupSub: "Guardar y restaurar datos del juego",
-    caiTitle: "Importar Personaje de Character.AI / Tarjeta",
-    caiPlaceholder: "Pega enlace c.ai (https://character.ai/chat/...)",
-    caiBtn: "Importar",
-    caiFileBtn: "📁 Cargar archivo de tarjeta (.json)",
-    scenarioModalTitle: "Elige Tu Mundo",
-    startCustomBtn: "Iniciar Mundo Personalizado",
-    customPromptPlaceholder: "Te despiertas en una taberna tranquila sin recordar cómo llegaste...",
-    aiGenerating: "La IA está creando la continuación...",
-    realismChecking: "El Árbitro está verificando el realismo...",
-    testConnection: "Probar Conexión",
-    noMessages: "¡No hay chats aún. Toca + para empezar!",
-    messagesCount: "mensajes",
-    lastMsg: "Último:",
-    scenFantasyTitle: "Fantasía Medieval",
-    scenFantasyDesc: "Caballeros, ruinas antiguas, magia y mazmorras oscuras.",
-    scenCyberpunkTitle: "Cyberpunk Netrunner",
-    scenCyberpunkDesc: "Callejones de neón, implantes neurales y megacorporaciones.",
-    scenZombieTitle: "Apocalipsis Zombi",
-    scenZombieDesc: "Busca suministros y lucha contra hordas de infectados.",
-    scenDetectiveTitle: "Detective Noir",
-    scenDetectiveDesc: "Calles lluviosas, secretos oscuros e investigaciones."
-  },
-  uk: {
-    appTitle: "OdAI",
-    chatsTitle: "Ваші Пригоди",
-    newChatBtn: "Нова Пригода",
-    settingsTitle: "Налаштування ШІ та З'єднань",
-    saveBtn: "Зберегти",
-    backBtn: "Назад",
-    languageLabel: "Мова інтерфейсу",
-    selectLanguageLabel: "Оберіть мову інтерфейсу та історії:",
-    aiProvidersTitle: "Провайдери ШІ (Оберіть активний)",
-    inventoryTitle: "Інвентар та Пам'ять",
-    inventoryLabel: "Предмети в інвентарі",
-    addItemPlaceholder: "Додати предмет (напр. Смолоскип)...",
-    addBtn: "Додати",
-    memoryLabel: "Пам'ять світу (Remember)",
-    memoryPlaceholder: "Ключові факти, які ШІ повинен пам'ятати...",
-    authorNoteLabel: "Замітка автора (Стиль)",
-    authorNotePlaceholder: "напр. Похмуре фентезі, атмосферний стиль...",
-    inputPlaceholder: "Напишіть повідомлення... *дія* або (уточнення)",
-    sendBtn: "Надіслати",
-    d20Btn: "d20: Авто",
-    undoBtn: "Скасувати",
-    retryBtn: "Повторити",
-    eraseBtn: "Стерти",
-    realismGuard: "Захист Реалізму",
-    casualModeLabel: "Казуальний Режим (Завжди Успіх)",
-    changeScenario: "Змінити Світ",
-    masterName: "Майстер Гри",
-    youName: "Ви",
-    exportJson: "📥 Експорт JSON",
-    exportTxt: "📄 Експорт Текст",
-    importBackup: "📤 Імпорт Бэкапу",
-    backupTitle: "Резервне копіювання та Експорт",
-    backupSub: "Збереження та відновлення даних",
-    caiTitle: "Імпорт персонажа з Character.AI / Картки",
-    caiPlaceholder: "Вставте посилання c.ai (https://character.ai/chat/...)",
-    caiBtn: "Імпорт",
-    caiFileBtn: "📁 Завантажити файл картки (.json)",
-    scenarioModalTitle: "Оберіть ваш світ",
-    startCustomBtn: "Почати свій світ",
-    customPromptPlaceholder: "Ви прокидаєтеся у тихій таверні і не пам'ятаєте, як тут опинилися...",
-    aiGenerating: "ШІ створює продовження...",
-    realismChecking: "Арбітр перевіряє реалізм...",
-    testConnection: "Перевірити з'єднання",
-    noMessages: "Чатів поки немає. Натисніть +, щоб почати!",
-    messagesCount: "повідомл.",
-    lastMsg: "Ост:",
-    scenFantasyTitle: "Середньовічне Фентезі",
-    scenFantasyDesc: "Лицарі, стародавні руини, магія та похмурі підземелля.",
-    scenCyberpunkTitle: "Кіберпанк Нетранер",
-    scenCyberpunkDesc: "Неонові провулки, нейроімпланти та мегакорпорації.",
-    scenZombieTitle: "Зомбі Апокаліпсис",
-    scenZombieDesc: "Шукайте припаси та боріться з ордами заражених.",
-    scenDetectiveTitle: "Нуарний Детектив",
-    scenDetectiveDesc: "Дощові вулиці, темні таємниці та розслідування."
+    scenDetectiveDesc: "Rainy streets, dark secrets, and investigations.",
+    geminiSub: "Free (15 req/min), no PC or servers required",
+    geminiKeyLabel: "Google Gemini API Key",
+    getKeyHint: "🔑 Get free key",
+    geminiModelLabel: "Gemini Model",
+    geminiAutoOption: "🤖 Auto-select (Recommended — best working model)",
+    openrouterSub: "Llama 3 70B, Claude 3.5, DeepSeek, Qwen",
+    openrouterKeyLabel: "OpenRouter API Key",
+    openrouterKeysHint: "🔑 OpenRouter Keys",
+    openrouterModelLabel: "OpenRouter Model",
+    openrouterFreeModelsHint: "🎁 Free Models",
+    openrouterFreeOption: "🤖 Auto-select free model (openrouter/free)",
+    g4fSub: "Connect to Python backend on PC or Cloud",
+    serverUrlLabel: "Server Address (IP or URL)",
+    serverUrlHint: "Enter computer IP address on Wi-Fi network or cloud server URL.",
+    openaiSub: "Custom Base URL for any local LLMs (Ollama / LM Studio)",
+    openaiBaseUrlLabel: "Base URL",
+    apiKeyLabel: "API Key",
+    modelLabel: "Model",
+    groqSub: "500+ tokens/sec, free tier (Llama 3.3, DeepSeek R1)",
+    groqKeyLabel: "Groq API Key",
+    groqKeysHint: "🔑 Get Groq Key",
+    groqModelLabel: "Groq Model",
+    anthropicSub: "Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus",
+    anthropicKeyLabel: "Anthropic API Key",
+    anthropicKeysHint: "🔑 Anthropic Keys",
+    anthropicModelLabel: "Claude Model",
+    builtinSub: "100% Offline operation without internet or servers",
+    builtinDesc: "📦 Uses local built-in RPG engine. Requires no internet, keys, or servers.",
+    genSettingsHeader: "Generation Parameters & Testing",
+    tempLabel: "Creativity (Temperature)",
+    contextLengthLabel: "Memory Depth (Context)",
+    settingsTitleBtn: "Settings",
+    backToChatsTitle: "Back to chats",
+    interactiveDM: "Interactive Dungeon Master",
+    chatMenuTitle: "Chat Menu"
   },
   ru: {
     appTitle: "OdAI",
@@ -300,20 +224,21 @@ const I18N = {
     selectLanguageLabel: "Выберите язык интерфейса и истории:",
     aiProvidersTitle: "Провайдеры ИИ (Выберите активный)",
     inventoryTitle: "Инвентарь и Память",
-    inventoryLabel: "Предметы в инвентаре",
+    inventoryItemsLabel: "Предметы с собой",
     addItemPlaceholder: "Добавить предмет (напр. Факел)...",
     addBtn: "Добавить",
-    memoryLabel: "Память мира (Remember)",
-    memoryPlaceholder: "Ключевые факты, которые ИИ должен помнить...",
-    authorNoteLabel: "Заметка автора (Стиль)",
-    authorNotePlaceholder: "напр., Мрачное фэнтези, глубокая атмосфера...",
+    worldMemoryLabel: "Память мира",
+    memoryPlaceholder: "Введите ключевые факты, которые ИИ должен помнить...",
+    writingStyleLabel: "Стиль написания и тон",
+    authorNotePlaceholder: "Задайте стиль написания ИИ (напр. Мрачное фэнтези)...",
     inputPlaceholder: "Напишите сообщение... *действие* или (уточнение)",
     sendBtn: "Отправить",
     d20Btn: "d20: Авто",
     undoBtn: "Отмена",
     retryBtn: "Повтор",
     eraseBtn: "Стереть",
-    realismGuard: "Захист",
+    realismGuard: "Защита Реализма",
+    casualModeLabel: "Казуальный Режим (Завжди Успіх)",
     changeScenario: "Сменить мир",
     masterName: "Мастер Игры",
     youName: "Вы",
@@ -321,17 +246,18 @@ const I18N = {
     exportTxt: "📄 Экспорт Текст",
     importBackup: "📤 Импорт Бэкапа",
     backupTitle: "Резервное копирование и Экспорт",
-    backupSub: "Сохранение и восстановление данных",
+    backupSub: "Сохранение и восстановление данных игры",
     caiTitle: "Импорт персонажа из Character.AI / Карточки",
     caiPlaceholder: "Вставьте ссылку c.ai (https://character.ai/chat/...)",
     caiBtn: "Импорт",
     caiFileBtn: "📁 Загрузить файл карточки (.json)",
     scenarioModalTitle: "Выберите ваш мир",
     startCustomBtn: "Начать свой мир",
+    customPromptLabel: "Или введите свой стартовый промпт:",
     customPromptPlaceholder: "Вы просыпаетесь в тихой таверне и не помните, как здесь оказались...",
     aiGenerating: "ИИ создает продолжение...",
     realismChecking: "Арбитр проверяет реализм...",
-    testConnection: "Проверить соединение",
+    testConnectionBtn: "🧪 Проверить подключение",
     noMessages: "Чатов пока нет. Нажмите +, чтобы начать!",
     messagesCount: "сообщ.",
     lastMsg: "Посл:",
@@ -342,14 +268,49 @@ const I18N = {
     scenZombieTitle: "Зомби Апокалипсис",
     scenZombieDesc: "Добывайте припасы и сражайтесь с ордами зараженных.",
     scenDetectiveTitle: "Нуарный Детектив",
-    scenDetectiveDesc: "Дождливые улицы, тёмные тайны и расследования."
+    scenDetectiveDesc: "Дождливые улицы, тёмные тайны и расследования.",
+    geminiSub: "Бесплатно (15 запр/мин), без ПК и серверов",
+    geminiKeyLabel: "API Ключ Google Gemini",
+    getKeyHint: "🔑 Получить бесплатный ключ",
+    geminiModelLabel: "Модель Gemini",
+    geminiAutoOption: "🤖 Авто-подбор (Рекомендуется — выбор лучшей рабочей модели)",
+    openrouterSub: "Llama 3 70B, Claude 3.5, DeepSeek, Qwen",
+    openrouterKeyLabel: "API Ключ OpenRouter",
+    openrouterKeysHint: "🔑 Ключи OpenRouter",
+    openrouterModelLabel: "Модель OpenRouter",
+    openrouterFreeModelsHint: "🎁 Бесплатные модели",
+    openrouterFreeOption: "🤖 Авто-выбор свободной модели (openrouter/free)",
+    g4fSub: "Подключение к Python бэкенду на ПК или в облаке",
+    serverUrlLabel: "Адрес сервера (IP или URL)",
+    serverUrlHint: "Укажите IP компьютера в Wi-Fi сети или адрес облачного сервера.",
+    openaiSub: "Кастомный Base URL для любых локальных нейросетей (Ollama / LM Studio)",
+    openaiBaseUrlLabel: "Base URL (Конечная точка)",
+    apiKeyLabel: "API Ключ",
+    modelLabel: "Модель",
+    groqSub: "500+ токенов/сек, бесплатный тир (Llama 3.3, DeepSeek R1)",
+    groqKeyLabel: "API Ключ Groq",
+    groqKeysHint: "🔑 Получить ключ Groq",
+    groqModelLabel: "Модель Groq",
+    anthropicSub: "Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus",
+    anthropicKeyLabel: "API Ключ Anthropic",
+    anthropicKeysHint: "🔑 Ключи Anthropic",
+    anthropicModelLabel: "Модель Claude",
+    builtinSub: "100% Офлайн работы без интернета и серверов",
+    builtinDesc: "📦 Используется локальный встроенный RPG-движок. Не требует интернета, ключей и серверов.",
+    genSettingsHeader: "Параметры Генерации и Тестирование",
+    tempLabel: "Креативность (Temperature)",
+    contextLengthLabel: "Глубина Памяти (Контекст)",
+    settingsTitleBtn: "Настройки",
+    backToChatsTitle: "Назад к чатам",
+    interactiveDM: "Интерактивный D&D Ведущий",
+    chatMenuTitle: "Меню чата"
   }
 };
 
 // Начальное состояние приложения
 // Начальное состояние приложения
 const state = {
-  language: 'ru', // Default Russian language ('ru' | 'en' | 'uk' | 'es')
+  language: 'en', // Default English language ('en' | 'ru' | 'uk' | 'es')
   chats: [], // Массив сессий { id, title, scenarioKey, history, inventory, memory, authorNote, updatedAt }
   currentChatId: null,
   currentScenarioKey: 'fantasy',
@@ -494,8 +455,22 @@ function applyI18nLanguage(lang) {
     }
   });
 
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.dataset.i18nPh;
+    if (dict[key]) {
+      el.placeholder = dict[key];
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.dataset.i18nTitle;
+    if (dict[key]) {
+      el.title = dict[key];
+    }
+  });
+
   if (elements.promptInput) {
-    elements.promptInput.placeholder = dict.inputPlaceholder;
+    elements.promptInput.placeholder = dict.inputPlaceholder || "Type a message...";
   }
 
   const langSelect = document.getElementById('language-select');
@@ -628,7 +603,7 @@ function setupTextareaAutoResize(el) {
 function init() {
 
   loadStateFromStorage();
-  applyI18nLanguage(state.language || 'ru');
+  applyI18nLanguage(state.language || 'en');
   setupEventListeners();
   setupExportImportBackup();
   setupNativeAndroidBackButton();
@@ -654,8 +629,8 @@ function getLocalizedText(val) {
   if (!val) return "";
   if (typeof val === 'string') return val;
   if (typeof val === 'object') {
-    const lang = state.language || 'ru';
-    return val[lang] || val.ru || val.en || Object.values(val)[0] || "";
+    const lang = state.language || 'en';
+    return val[lang] || val.en || val.ru || Object.values(val)[0] || "";
   }
   return String(val);
 }
@@ -755,10 +730,10 @@ function loadStateFromStorage() {
   // Если сессий нет — создаем начальный фэнтези чат
   if (state.chats.length === 0) {
     const scen = SCENARIOS.fantasy;
-    const lang = state.language || 'ru';
-    const titleText = typeof scen.title === 'object' ? (scen.title[lang] || scen.title.ru || scen.title.en) : scen.title;
-    const introText = typeof scen.intro === 'object' ? (scen.intro[lang] || scen.intro.ru || scen.intro.en) : scen.intro;
-    const invList = Array.isArray(scen.inventory) ? scen.inventory : (typeof scen.inventory === 'object' ? (scen.inventory[lang] || scen.inventory.ru || scen.inventory.en || []) : []);
+    const lang = state.language || 'en';
+    const titleText = typeof scen.title === 'object' ? (scen.title[lang] || scen.title.en || scen.title.ru) : scen.title;
+    const introText = typeof scen.intro === 'object' ? (scen.intro[lang] || scen.intro.en || scen.intro.ru) : scen.intro;
+    const invList = Array.isArray(scen.inventory) ? scen.inventory : (typeof scen.inventory === 'object' ? (scen.inventory[lang] || scen.inventory.en || scen.inventory.ru || []) : []);
     const defaultChat = {
       id: 'chat_' + Date.now(),
       title: titleText,
@@ -1023,7 +998,8 @@ function setupEventListeners() {
 
   if (elements.contextSlider) {
     elements.contextSlider?.addEventListener('input', (e) => {
-      if (elements.contextVal) elements.contextVal.textContent = `${e.target.value} сообщ.`;
+      const dict = I18N[state.language] || I18N.en;
+      if (elements.contextVal) elements.contextVal.textContent = `${e.target.value} ${dict.messagesCount || 'msgs'}`;
     });
   }
 
@@ -1137,10 +1113,10 @@ function closeModal(modalEl) {
 // Загрузка нового сценария (создает новую сессию чата)
 function loadScenario(scenarioKey) {
   const scen = SCENARIOS[scenarioKey] || SCENARIOS.fantasy;
-  const lang = state.language || 'ru';
-  const titleText = typeof scen.title === 'object' ? (scen.title[lang] || scen.title.ru || scen.title.en) : scen.title;
-  const introText = typeof scen.intro === 'object' ? (scen.intro[lang] || scen.intro.ru || scen.intro.en) : scen.intro;
-  const invList = Array.isArray(scen.inventory) ? scen.inventory : (typeof scen.inventory === 'object' ? (scen.inventory[lang] || scen.inventory.ru || scen.inventory.en || []) : []);
+  const lang = state.language || 'en';
+  const titleText = typeof scen.title === 'object' ? (scen.title[lang] || scen.title.en || scen.title.ru) : scen.title;
+  const introText = typeof scen.intro === 'object' ? (scen.intro[lang] || scen.intro.en || scen.intro.ru) : scen.intro;
+  const invList = Array.isArray(scen.inventory) ? scen.inventory : (typeof scen.inventory === 'object' ? (scen.inventory[lang] || scen.inventory.en || scen.inventory.ru || []) : []);
   
   const newChat = {
     id: 'chat_' + Date.now(),
@@ -1422,24 +1398,29 @@ function renderChatsArchiveList() {
     const dateFormatted = chat.updatedAt ? new Date(chat.updatedAt).toLocaleString([], { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
     const scenTitle = getLocalizedText(SCENARIOS[chat.scenarioKey]?.title) || (chat.scenarioKey === 'custom' ? 'Пользовательский' : chat.scenarioKey);
 
+    const dict = I18N[state.language] || I18N.en;
+    const renameTitle = state.language === 'ru' ? 'Переименовать сессию' : 'Rename session';
+    const deleteTitle = state.language === 'ru' ? 'Удалить сессию' : 'Delete session';
+    const worldLabelText = state.language === 'ru' ? 'Мир' : (state.language === 'uk' ? 'Світ' : (state.language === 'es' ? 'Mundo' : 'World'));
+
     card.innerHTML = `
       <div class="chat-card-header">
         <div class="chat-card-title-row">
           <span class="chat-card-title" title="${escapeHTML(chat.title)}">${escapeHTML(chat.title)}</span>
-          <span class="chat-card-badge">${msgCount} сообщ.</span>
+          <span class="chat-card-badge">${msgCount} ${dict.messagesCount || 'msgs'}</span>
         </div>
         <div class="chat-card-actions">
-          <button class="chat-card-btn rename-btn" title="Переименовать сессию">
+          <button class="chat-card-btn rename-btn" title="${renameTitle}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
-          <button class="chat-card-btn delete-btn" title="Удалить сессию">
+          <button class="chat-card-btn delete-btn" title="${deleteTitle}">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
         </div>
       </div>
       <div class="chat-card-preview">${escapeHTML(lastPreview)}</div>
       <div class="chat-card-footer">
-        <span>Мир: ${escapeHTML(scenTitle)}</span>
+        <span>${worldLabelText}: ${escapeHTML(scenTitle)}</span>
         <span>${dateFormatted}</span>
       </div>
     `;
@@ -2776,7 +2757,8 @@ function updateUIState() {
   }
   if (elements.contextSlider) {
     elements.contextSlider.value = state.engineConfig.contextLength || 10;
-    if (elements.contextVal) elements.contextVal.textContent = `${state.engineConfig.contextLength || 10} сообщ.`;
+    const dict = I18N[state.language] || I18N.en;
+    if (elements.contextVal) elements.contextVal.textContent = `${state.engineConfig.contextLength || 10} ${dict.messagesCount || 'msgs'}`;
   }
   
   if (elements.sendBtn) {
@@ -2831,8 +2813,8 @@ function escapeHTML(str) {
   if (typeof str !== 'string') {
     if (str === null || str === undefined) return '';
     if (typeof str === 'object') {
-      const lang = state.language || 'ru';
-      str = str[lang] || str.ru || str.en || JSON.stringify(str);
+      const lang = state.language || 'en';
+      str = str[lang] || str.en || str.ru || JSON.stringify(str);
     } else {
       str = String(str);
     }

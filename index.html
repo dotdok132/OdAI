@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#09090b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>OdAI - Интерактивное AI Приключение</title>
-  <meta name="description" content="Интерактивный текстовый AI-квест с Защитой Реализма и Системой Инвентаря.">
+  <title>OdAI - Interactive AI Adventure</title>
+  <meta name="description" content="Interactive AI text adventure with Realism Guard and Inventory System.">
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="styles.css?v=27">
 </head>
@@ -22,7 +22,7 @@
         <span class="logo-title">OdAI</span>
       </div>
       <div class="header-actions">
-        <button class="btn-icon" id="main-settings-btn" title="Настройки">
+        <button class="btn-icon" id="main-settings-btn" title="Settings" data-i18n-title="settingsTitleBtn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
@@ -44,7 +44,7 @@
     <!-- Top App Header — Chat Screen -->
     <header class="app-header">
       <div class="cai-header-left">
-        <button class="btn-icon" id="back-to-list-btn" title="Назад к чатам" style="margin-right: 0.25rem;">
+        <button class="btn-icon" id="back-to-list-btn" title="Back to chats" data-i18n-title="backToChatsTitle" style="margin-right: 0.25rem;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
 
@@ -55,7 +55,7 @@
           </div>
           <div class="cai-character-info">
             <div class="cai-character-name" id="header-character-name">OdAI Master</div>
-            <div class="cai-character-sub" id="header-character-sub">Интерактивный D&D Ведущий</div>
+            <div class="cai-character-sub" id="header-character-sub" data-i18n="interactiveDM">Interactive Dungeon Master</div>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@
         </button>
 
         <!-- 3-Dots Menu Button -->
-        <button class="btn-icon" id="chat-menu-btn" title="Меню чата">
+        <button class="btn-icon" id="chat-menu-btn" title="Chat Menu" data-i18n-title="chatMenuTitle">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/></svg>
         </button>
         
@@ -77,11 +77,11 @@
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
              <span data-i18n="inventoryTitle">Inventory & Memory</span>
           </button>
-                    <div class="dropdown-item" id="dropdown-casual-toggle" style="justify-content: space-between;">
+          <div class="dropdown-item" id="dropdown-casual-toggle" style="justify-content: space-between;">
             <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span data-i18n="casualModeLabel">Casual Mode (Always Succeed)</span></span>
             <div class="toggle-wrapper" id="casual-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
           </div>
-<div class="dropdown-item" id="dropdown-realism-toggle" style="justify-content: space-between;">
+          <div class="dropdown-item" id="dropdown-realism-toggle" style="justify-content: space-between;">
             <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span data-i18n="realismGuard">Realism Guard</span></span>
             <div class="toggle-wrapper active" id="realism-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
           </div>
@@ -99,7 +99,7 @@
     <!-- Sidebar backdrop overlay for tap-to-close on mobile -->
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebarDrawer()"></div>
 
-    <!-- Sidebar Drawer: Inventory & Memory Pins — now slides from right as overlay -->
+    <!-- Sidebar Drawer: Inventory & Memory Pins -->
     <aside class="sidebar-drawer collapsed" id="sidebar-drawer">
       <div class="drawer-header">
         <span class="drawer-title">
@@ -115,14 +115,14 @@
         <!-- Inventory Section -->
         <div class="inventory-section">
           <div class="section-label">
-            <span>Предметы с собой</span>
-            <span id="item-count-label">3 предмета</span>
+            <span data-i18n="inventoryItemsLabel">Inventory Items</span>
+            <span id="item-count-label">3 items</span>
           </div>
           <ul class="inventory-list" id="inventory-list">
             <!-- Dynamic items rendered here -->
           </ul>
           <div class="add-item-box">
-            <input type="text" class="input-sm" id="new-item-input" placeholder="Добавить предмет...">
+            <input type="text" class="input-sm" id="new-item-input" placeholder="Add item (e.g., Torch)..." data-i18n-ph="addItemPlaceholder">
             <button class="btn-icon" id="add-item-btn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
@@ -134,11 +134,11 @@
           <div class="section-label">
             <span style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6a3 3 0 0 0-6 0v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
-              Память мира
+              <span data-i18n="worldMemoryLabel">World Memory</span>
             </span>
           </div>
           <div class="memory-box">
-            <textarea class="memory-textarea" id="memory-input" placeholder="Введите ключевые факты, которые ИИ должен помнить..."></textarea>
+            <textarea class="memory-textarea" id="memory-input" placeholder="Key facts for AI to remember..." data-i18n-ph="memoryPlaceholder"></textarea>
           </div>
         </div>
 
@@ -147,11 +147,11 @@
           <div class="section-label">
             <span style="display: flex; align-items: center; gap: 4px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              Стиль написания
+              <span data-i18n="writingStyleLabel">Writing Style & Tone</span>
             </span>
           </div>
           <div class="memory-box">
-            <textarea class="memory-textarea" id="author-note-input" placeholder="Задайте стиль написания ИИ..."></textarea>
+            <textarea class="memory-textarea" id="author-note-input" placeholder="e.g., Dark fantasy, immersive prose..." data-i18n-ph="authorNotePlaceholder"></textarea>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@
         <!-- Chat bubbles appended dynamically -->
       </div>
 
-      <!-- Typing Indicator — with avatar like chat bubble -->
+      <!-- Typing Indicator -->
       <div class="typing-indicator" id="typing-indicator" style="display: none;">
         <div class="typing-indicator-bubble">
           <div class="typing-indicator-avatar">DM</div>
@@ -171,40 +171,39 @@
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
-            <span class="typing-status-text" id="typing-status-text">ИИ создает продолжение...</span>
+            <span class="typing-status-text" id="typing-status-text" data-i18n="aiGenerating">AI is creating continuation...</span>
           </div>
         </div>
       </div>
 
-      <!-- Bottom Action Dock — Floating Input Bar -->
+      <!-- Bottom Action Dock -->
       <div class="action-dock">
         <div class="action-toolbar">
 
-
           <div class="story-tools">
-            <button class="btn-tool" id="roll-d20-btn" title="Принудительно кинуть d20">
+            <button class="btn-tool" id="roll-d20-btn" title="Force roll d20">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
               <span id="d20-btn-label">d20</span>
             </button>
-            <button class="btn-tool" id="undo-btn" title="Отменить последний ход">
+            <button class="btn-tool" id="undo-btn" title="Undo last move">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
-              <span>Отмена</span>
+              <span data-i18n="undoBtn">Undo</span>
             </button>
-            <button class="btn-tool" id="retry-btn" title="Перегенерировать ответ ИИ">
+            <button class="btn-tool" id="retry-btn" title="Regenerate response">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-              <span>Повтор</span>
+              <span data-i18n="retryBtn">Retry</span>
             </button>
-            <button class="btn-tool" id="erase-btn" title="Удалить последний абзац">
+            <button class="btn-tool" id="erase-btn" title="Erase last message">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
-              <span>Стереть</span>
+              <span data-i18n="eraseBtn">Erase</span>
             </button>
           </div>
         </div>
 
         <div class="input-row">
-          <textarea class="prompt-textarea" id="prompt-input" rows="1" placeholder="Напишите сообщение... *действие* или (уточнение)"></textarea>
+          <textarea class="prompt-textarea" id="prompt-input" rows="1" placeholder="Type a message... *action* or (OOC note)" data-i18n-ph="inputPlaceholder"></textarea>
           <button class="send-btn" id="send-btn">
-            <span>Отправить</span>
+            <span data-i18n="sendBtn">Send</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
@@ -220,7 +219,7 @@
   <div class="modal-overlay" id="scenario-modal">
     <div class="modal-box">
       <div class="modal-header">
-        <h2 class="modal-title">Выберите сценарий приключения</h2>
+        <h2 class="modal-title" data-i18n="scenarioModalTitle">Choose Your World</h2>
         <button class="close-btn" id="close-scenario-modal">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -231,57 +230,57 @@
           <div class="scenario-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="M16 16 20 20"/><path d="M19 21 21 19"/></svg>
           </div>
-          <div class="scenario-title" data-i18n="scenFantasyTitle">Средневековое Фэнтези</div>
-          <div class="scenario-desc" data-i18n="scenFantasyDesc">Рыцари, древние руины, магия и мрачные подземелья.</div>
+          <div class="scenario-title" data-i18n="scenFantasyTitle">Medieval Fantasy</div>
+          <div class="scenario-desc" data-i18n="scenFantasyDesc">Knights, ancient ruins, magic, and dark dungeons.</div>
         </div>
 
         <div class="scenario-card" data-scenario="cyberpunk">
           <div class="scenario-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
           </div>
-          <div class="scenario-title" data-i18n="scenCyberpunkTitle">Киберпанк Нетраннер</div>
-          <div class="scenario-desc" data-i18n="scenCyberpunkDesc">Неоновые переулки, нейроимпланты и мегакорпорации.</div>
+          <div class="scenario-title" data-i18n="scenCyberpunkTitle">Cyberpunk Netrunner</div>
+          <div class="scenario-desc" data-i18n="scenCyberpunkDesc">Neon alleys, neural implants, and megacorporations.</div>
         </div>
 
         <div class="scenario-card" data-scenario="zombie">
           <div class="scenario-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
           </div>
-          <div class="scenario-title" data-i18n="scenZombieTitle">Зомби Апокалипсис</div>
-          <div class="scenario-desc" data-i18n="scenZombieDesc">Добывайте припасы и сражайтесь с ордами зараженных.</div>
+          <div class="scenario-title" data-i18n="scenZombieTitle">Zombie Apocalypse</div>
+          <div class="scenario-desc" data-i18n="scenZombieDesc">Scavenge supplies and fight off hordes of infected.</div>
         </div>
 
         <div class="scenario-card" data-scenario="detective">
           <div class="scenario-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
-          <div class="scenario-title" data-i18n="scenDetectiveTitle">Нуарный Детектив</div>
-          <div class="scenario-desc" data-i18n="scenDetectiveDesc">Дождливые улицы, тёмные тайны и расследования.</div>
+          <div class="scenario-title" data-i18n="scenDetectiveTitle">Noir Detective</div>
+          <div class="scenario-desc" data-i18n="scenDetectiveDesc">Rainy streets, dark secrets, and investigations.</div>
         </div>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <label style="font-size: 0.82rem; color: var(--text-muted);">Или введите свой стартовый промпт:</label>
-        <textarea class="input-sm" id="custom-prompt-input" rows="2" placeholder="Вы просыпаетесь в тихой таверне и не помните, как здесь оказались..."></textarea>
-        <button class="btn-primary" id="start-custom-btn" style="align-self: flex-end;">Начать свой мир</button>
+        <label style="font-size: 0.82rem; color: var(--text-muted);" data-i18n="customPromptLabel">Or enter custom starting prompt:</label>
+        <textarea class="input-sm" id="custom-prompt-input" rows="2" placeholder="You wake up in a quiet tavern with no memory of how you got here..." data-i18n-ph="customPromptPlaceholder"></textarea>
+        <button class="btn-primary" id="start-custom-btn" style="align-self: flex-end;" data-i18n="startCustomBtn">Start Custom World</button>
       </div>
 
       <!-- Character.AI URL Importer & Standalone Card Import -->
       <div style="display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
         <label style="font-size: 0.85rem; font-weight: 600; color: var(--accent-secondary); display: flex; align-items: center; gap: 6px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Импорт персонажа из Character.AI / Карточки
+          <span data-i18n="caiTitle">Import Character from Character.AI / Card</span>
         </label>
         <div style="display: flex; gap: 0.4rem;">
-          <input type="text" class="input-sm" id="cai-import-input" placeholder="Вставьте ссылку c.ai (https://character.ai/chat/...)" style="flex: 1;">
-          <button class="btn-primary" id="cai-import-btn" style="padding: 0.4rem 0.85rem; font-size: 0.82rem; white-space: nowrap;">
-            Импорт
+          <input type="text" class="input-sm" id="cai-import-input" placeholder="Paste c.ai link (https://character.ai/chat/...)" data-i18n-ph="caiPlaceholder" style="flex: 1;">
+          <button class="btn-primary" id="cai-import-btn" style="padding: 0.4rem 0.85rem; font-size: 0.82rem; white-space: nowrap;" data-i18n="caiBtn">
+            Import
           </button>
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <input type="file" id="cai-file-input" accept=".json" style="display: none;">
-          <button class="btn-tool" id="cai-file-btn" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
-            📁 Загрузить файл карточки (.json)
+          <button class="btn-tool" id="cai-file-btn" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;" data-i18n="caiFileBtn">
+            📁 Load card file (.json)
           </button>
         </div>
         <div id="cai-import-status" style="font-size: 0.78rem; color: var(--text-muted); display: none;"></div>
@@ -295,7 +294,7 @@
     <header class="fullscreen-header">
       <button class="btn-icon" id="close-settings-modal">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        <span data-i18n="backBtn">Назад</span>
+        <span data-i18n="backBtn">Back</span>
       </button>
       <h2 class="fullscreen-title" data-i18n="settingsTitle">AI & Connection Settings</h2>
       <button class="btn-primary custom-save-btn" id="save-settings-btn" style="width: auto; padding: 0.4rem 1.1rem; font-size: 0.85rem;" data-i18n="saveBtn">
@@ -311,13 +310,13 @@
         <div class="settings-accordion-header">
           <div class="accordion-title-group">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            <span class="accordion-title" data-i18n="languageLabel">Language / Язык</span>
+            <span class="accordion-title" data-i18n="languageLabel">Interface Language</span>
           </div>
           <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="settings-accordion-content">
           <div class="settings-group">
-            <label class="settings-label" data-i18n="selectLanguageLabel">Choose Interface & Story Language / Выберите язык:</label>
+            <label class="settings-label" data-i18n="selectLanguageLabel">Choose Interface & Story Language:</label>
             <select class="input-sm custom-dark-select" id="language-select">
               <option value="en" selected>🇬🇧 English (Default)</option>
               <option value="es">🇪🇸 Español</option>
@@ -361,7 +360,7 @@
             <span class="accordion-icon">⚡</span>
             <div class="accordion-text">
               <div class="accordion-title">Google Gemini API</div>
-              <div class="accordion-sub">Бесплатно (15 запр/мин), без ПК и серверов</div>
+              <div class="accordion-sub" data-i18n="geminiSub">Free (15 req/min), no PC or servers required</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
@@ -369,8 +368,8 @@
         <div class="accordion-body">
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label">API Ключ Google Gemini</label>
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-hint">🔑 Получить бесплатный ключ</a>
+              <label class="form-label" data-i18n="geminiKeyLabel">Google Gemini API Key</label>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-hint" data-i18n="getKeyHint">🔑 Get free key</a>
             </div>
             <div class="input-with-icon">
               <input type="password" class="input-sm custom-dark-input" id="gemini-key-input" placeholder="AIzaSy...">
@@ -378,13 +377,13 @@
             </div>
           </div>
           <div class="form-group" style="margin-top: 0.75rem;">
-            <label class="form-label">Модель Gemini</label>
+            <label class="form-label" data-i18n="geminiModelLabel">Gemini Model</label>
             <select class="input-sm custom-dark-select" id="gemini-model-select">
-              <option value="auto" selected>🤖 Авто-подбор (Рекомендуется — выбор лучшей рабочей модели)</option>
-              <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash (Самая стабильная & умная)</option>
-              <option value="gemini-3.7-flash">🚀 Gemini 3.7 Flash (Новейшая флеш-модель)</option>
-              <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash (Классическая быстрая)</option>
-              <option value="gemini-flash-latest">⚡ Gemini Flash Latest (Авто-обновление)</option>
+              <option value="auto" selected data-i18n="geminiAutoOption">🤖 Auto-select (Recommended — best working model)</option>
+              <option value="gemini-3.6-flash">⚡ Gemini 3.6 Flash</option>
+              <option value="gemini-3.7-flash">🚀 Gemini 3.7 Flash</option>
+              <option value="gemini-3.5-flash">⚡ Gemini 3.5 Flash</option>
+              <option value="gemini-flash-latest">⚡ Gemini Flash Latest</option>
             </select>
           </div>
         </div>
@@ -397,7 +396,7 @@
             <span class="accordion-icon">🌐</span>
             <div class="accordion-text">
               <div class="accordion-title">OpenRouter API</div>
-              <div class="accordion-sub">Llama 3 70B, Claude 3.5, DeepSeek, Qwen</div>
+              <div class="accordion-sub" data-i18n="openrouterSub">Llama 3 70B, Claude 3.5, DeepSeek, Qwen</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
@@ -405,8 +404,8 @@
         <div class="accordion-body">
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label">API Ключ OpenRouter</label>
-              <a href="https://openrouter.ai/keys" target="_blank" class="link-hint">🔑 Ключи OpenRouter</a>
+              <label class="form-label" data-i18n="openrouterKeyLabel">OpenRouter API Key</label>
+              <a href="https://openrouter.ai/keys" target="_blank" class="link-hint" data-i18n="openrouterKeysHint">🔑 OpenRouter Keys</a>
             </div>
             <div class="input-with-icon">
               <input type="password" class="input-sm custom-dark-input" id="openrouter-key-input" placeholder="sk-or-v1-...">
@@ -415,16 +414,16 @@
           </div>
           <div class="form-group" style="margin-top: 0.75rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label">Модель OpenRouter</label>
-              <a href="https://openrouter.ai/models?max_price=0" target="_blank" class="link-hint">🎁 Бесплатные модели</a>
+              <label class="form-label" data-i18n="openrouterModelLabel">OpenRouter Model</label>
+              <a href="https://openrouter.ai/models?max_price=0" target="_blank" class="link-hint" data-i18n="openrouterFreeModelsHint">🎁 Free Models</a>
             </div>
             <select class="input-sm custom-dark-select" id="openrouter-preset-select" style="margin-bottom: 0.5rem;">
-              <option value="openrouter/free" selected>🤖 Авто-выбор свободной модели (openrouter/free)</option>
-              <option value="meta-llama/llama-3.3-70b-instruct:free">🦙 Llama 3.3 70B Free (Бесплатно)</option>
-              <option value="deepseek/deepseek-r1:free">🧠 DeepSeek R1 Free (Бесплатно)</option>
-              <option value="qwen/qwen-2.5-72b-instruct:free">🌐 Qwen 2.5 72B Free (Бесплатно)</option>
-              <option value="mistralai/mistral-small-24b-instruct-2501:free">🌪️ Mistral Small 24B Free (Бесплатно)</option>
-              <option value="custom">✏️ Своё название модели (Ввести вручную)</option>
+              <option value="openrouter/free" selected data-i18n="openrouterFreeOption">🤖 Auto-select free model (openrouter/free)</option>
+              <option value="meta-llama/llama-3.3-70b-instruct:free">🦙 Llama 3.3 70B Free</option>
+              <option value="deepseek/deepseek-r1:free">🧠 DeepSeek R1 Free</option>
+              <option value="qwen/qwen-2.5-72b-instruct:free">🌐 Qwen 2.5 72B Free</option>
+              <option value="mistralai/mistral-small-24b-instruct-2501:free">🌪️ Mistral Small 24B Free</option>
+              <option value="custom">✏️ Custom model slug</option>
             </select>
             <input type="text" class="input-sm custom-dark-input" id="openrouter-model-input" placeholder="openrouter/free" value="openrouter/free">
           </div>
@@ -437,17 +436,17 @@
           <div class="accordion-title-row">
             <span class="accordion-icon">📡</span>
             <div class="accordion-text">
-              <div class="accordion-title">g4f Python-Сервер</div>
-              <div class="accordion-sub">Подключение к Python бэкенду на ПК или в облаке</div>
+              <div class="accordion-title">g4f Python Server</div>
+              <div class="accordion-sub" data-i18n="g4fSub">Connect to Python backend on PC or Cloud</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
         </div>
         <div class="accordion-body">
           <div class="form-group">
-            <label class="form-label">Адрес сервера (Server URL / IP)</label>
-            <input type="text" class="input-sm custom-dark-input" id="server-url-input" placeholder="http://192.168.1.100:8080 или https://my-server.onrender.com">
-            <span class="field-desc">Укажите IP компьютера в Wi-Fi сети или адрес облачного сервера.</span>
+            <label class="form-label" data-i18n="serverUrlLabel">Server Address (IP or URL)</label>
+            <input type="text" class="input-sm custom-dark-input" id="server-url-input" placeholder="http://192.168.1.100:8080 or https://my-server.onrender.com">
+            <span class="field-desc" data-i18n="serverUrlHint">Enter computer IP address on Wi-Fi network or cloud server URL.</span>
           </div>
         </div>
       </div>
@@ -459,25 +458,25 @@
             <span class="accordion-icon">🤖</span>
             <div class="accordion-text">
               <div class="accordion-title">OpenAI / Local API (Ollama / LM Studio)</div>
-              <div class="accordion-sub">Кастомный Base URL для любых локальных нейросетей</div>
+              <div class="accordion-sub" data-i18n="openaiSub">Custom Base URL for any local LLMs</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
         </div>
         <div class="accordion-body">
           <div class="form-group">
-            <label class="form-label">Base URL (Конечная точка)</label>
-            <input type="text" class="input-sm custom-dark-input" id="openai-baseurl-input" placeholder="https://api.openai.com/v1 или http://localhost:11434/v1">
+            <label class="form-label" data-i18n="openaiBaseUrlLabel">Base URL</label>
+            <input type="text" class="input-sm custom-dark-input" id="openai-baseurl-input" placeholder="https://api.openai.com/v1 or http://localhost:11434/v1">
           </div>
           <div class="form-group" style="margin-top: 0.6rem;">
-            <label class="form-label">API Ключ</label>
+            <label class="form-label" data-i18n="apiKeyLabel">API Key</label>
             <div class="input-with-icon">
               <input type="password" class="input-sm custom-dark-input" id="api-key-input" placeholder="sk-...">
               <button class="btn-icon toggle-pass-btn" type="button">👁️</button>
             </div>
           </div>
           <div class="form-group" style="margin-top: 0.6rem;">
-            <label class="form-label">Модель</label>
+            <label class="form-label" data-i18n="modelLabel">Model</label>
             <input type="text" class="input-sm custom-dark-input" id="openai-model-input" placeholder="gpt-4o" value="gpt-4o">
           </div>
         </div>
@@ -489,8 +488,8 @@
           <div class="accordion-title-row">
             <span class="accordion-icon">⚡</span>
             <div class="accordion-text">
-              <div class="accordion-title">Groq API (Супер-быстрый)</div>
-              <div class="accordion-sub">500+ токенов/сек, бесплатный тир (Llama 3.3, DeepSeek R1)</div>
+              <div class="accordion-title">Groq API</div>
+              <div class="accordion-sub" data-i18n="groqSub">500+ tokens/sec, free tier (Llama 3.3, DeepSeek R1)</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
@@ -498,8 +497,8 @@
         <div class="accordion-body">
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label">API Ключ Groq</label>
-              <a href="https://console.groq.com/keys" target="_blank" class="link-hint">🔑 Получить ключ Groq</a>
+              <label class="form-label" data-i18n="groqKeyLabel">Groq API Key</label>
+              <a href="https://console.groq.com/keys" target="_blank" class="link-hint" data-i18n="groqKeysHint">🔑 Get Groq Key</a>
             </div>
             <div class="input-with-icon">
               <input type="password" class="input-sm custom-dark-input" id="groq-key-input" placeholder="gsk_...">
@@ -507,12 +506,12 @@
             </div>
           </div>
           <div class="form-group" style="margin-top: 0.75rem;">
-            <label class="form-label">Модель Groq</label>
+            <label class="form-label" data-i18n="groqModelLabel">Groq Model</label>
             <select class="input-sm custom-dark-select" id="groq-model-select">
-              <option value="llama-3.3-70b-versatile" selected>🦙 Llama 3.3 70B Versatile (Умная & Быстрая)</option>
-              <option value="llama-3.1-8b-instant">⚡ Llama 3.1 8B Instant (Мгновенный ответ)</option>
-              <option value="deepseek-r1-distill-llama-70b">🧠 DeepSeek R1 Distill 70B (Рассуждающая)</option>
-              <option value="mixtral-8x7b-32768">🌪️ Mixtral 8x7B (Большой контекст)</option>
+              <option value="llama-3.3-70b-versatile" selected>🦙 Llama 3.3 70B Versatile</option>
+              <option value="llama-3.1-8b-instant">⚡ Llama 3.1 8B Instant</option>
+              <option value="deepseek-r1-distill-llama-70b">🧠 DeepSeek R1 Distill 70B</option>
+              <option value="mixtral-8x7b-32768">🌪️ Mixtral 8x7B</option>
             </select>
           </div>
         </div>
@@ -525,7 +524,7 @@
             <span class="accordion-icon">🎭</span>
             <div class="accordion-text">
               <div class="accordion-title">Anthropic Claude API</div>
-              <div class="accordion-sub">Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus</div>
+              <div class="accordion-sub" data-i18n="anthropicSub">Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Opus</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
@@ -533,8 +532,8 @@
         <div class="accordion-body">
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <label class="form-label">API Ключ Anthropic</label>
-              <a href="https://console.anthropic.com/settings/keys" target="_blank" class="link-hint">🔑 Ключи Anthropic</a>
+              <label class="form-label" data-i18n="anthropicKeyLabel">Anthropic API Key</label>
+              <a href="https://console.anthropic.com/settings/keys" target="_blank" class="link-hint" data-i18n="anthropicKeysHint">🔑 Anthropic Keys</a>
             </div>
             <div class="input-with-icon">
               <input type="password" class="input-sm custom-dark-input" id="anthropic-key-input" placeholder="sk-ant-api03-...">
@@ -542,11 +541,11 @@
             </div>
           </div>
           <div class="form-group" style="margin-top: 0.75rem;">
-            <label class="form-label">Модель Claude</label>
+            <label class="form-label" data-i18n="anthropicModelLabel">Claude Model</label>
             <select class="input-sm custom-dark-select" id="anthropic-model-select">
-              <option value="claude-3-5-sonnet-20241022" selected>🎭 Claude 3.5 Sonnet (Лучшая для отыгрыша)</option>
-              <option value="claude-3-5-haiku-20241022">⚡ Claude 3.5 Haiku (Очень быстрая)</option>
-              <option value="claude-3-opus-20240229">👑 Claude 3 Opus (Максимальный интеллект)</option>
+              <option value="claude-3-5-sonnet-20241022" selected>🎭 Claude 3.5 Sonnet</option>
+              <option value="claude-3-5-haiku-20241022">⚡ Claude 3.5 Haiku</option>
+              <option value="claude-3-opus-20240229">👑 Claude 3 Opus</option>
             </select>
           </div>
         </div>
@@ -558,27 +557,27 @@
           <div class="accordion-title-row">
             <span class="accordion-icon">📦</span>
             <div class="accordion-text">
-              <div class="accordion-title">Встроенный Офлайн-Движок</div>
-              <div class="accordion-sub">100% Офлайн работы без интернета и серверов</div>
+              <div class="accordion-title">Built-in Offline Engine</div>
+              <div class="accordion-sub" data-i18n="builtinSub">100% Offline operation without internet or servers</div>
             </div>
           </div>
           <div class="accordion-radio"></div>
         </div>
         <div class="accordion-body">
-          <div class="provider-desc-badge">
-            📦 Используется локальный встроенный RPG-движок. Не требует интернета, ключей и серверов.
+          <div class="provider-desc-badge" data-i18n="builtinDesc">
+            📦 Uses local built-in RPG engine. Requires no internet, keys, or servers.
           </div>
         </div>
       </div>
 
       <!-- Section Divider -->
-      <div class="settings-group-header" style="margin-top: 1rem;">Параметры Генерации и Тестирование</div>
+      <div class="settings-group-header" style="margin-top: 1rem;" data-i18n="genSettingsHeader">Generation Parameters & Testing</div>
 
       <div class="accordion-static-panel">
         <div class="form-row-2col">
           <div class="form-group">
             <div style="display: flex; justify-content: space-between;">
-              <label class="form-label">Креативность (Temperature)</label>
+              <label class="form-label" data-i18n="tempLabel">Creativity (Temperature)</label>
               <span class="range-value-badge" id="temp-val">0.8</span>
             </div>
             <input type="range" class="custom-range-slider" id="temp-slider" min="0.1" max="1.5" step="0.05" value="0.8">
@@ -586,16 +585,16 @@
 
           <div class="form-group">
             <div style="display: flex; justify-content: space-between;">
-              <label class="form-label">Глубина Памяти (Контекст)</label>
-              <span class="range-value-badge" id="context-val">10 сообщ.</span>
+              <label class="form-label" data-i18n="contextLengthLabel">Memory Depth (Context)</label>
+              <span class="range-value-badge" id="context-val">10 msgs</span>
             </div>
             <input type="range" class="custom-range-slider" id="context-slider" min="4" max="25" step="1" value="10">
           </div>
         </div>
 
         <div class="test-connection-bar" style="margin-top: 1rem;">
-          <button class="btn-tool" id="test-connection-btn" style="padding: 0.5rem 1rem; font-weight: 600;">
-            🧪 Проверить подключение
+          <button class="btn-tool" id="test-connection-btn" style="padding: 0.5rem 1rem; font-weight: 600;" data-i18n="testConnectionBtn">
+            🧪 Test Connection
           </button>
           <div class="connection-status-badge" id="connection-status-badge" style="display: none;"></div>
         </div>
@@ -604,14 +603,12 @@
     </div>
   </div>
 
-  <!-- Archive modal replaced by view-chat-list -->
-
   <!-- Animated d20 Dice Roll Overlay -->
   <div class="dice-overlay-modal" id="dice-overlay-modal">
     <div class="d20-stage">
       <div class="d20-die" id="d20-die-face">20</div>
     </div>
-    <div class="dice-label-text" id="dice-overlay-label">Бросок кубика d20...</div>
+    <div class="dice-label-text" id="dice-overlay-label">Rolling d20 die...</div>
   </div>
 
   <script src="app.js?v=27"></script>
