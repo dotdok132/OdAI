@@ -2604,15 +2604,19 @@ body {
   display: flex !important;
 }
 
+#view-chat-list {
+  position: relative !important;
+}
+
 /* ===========================
    FAB & DROPDOWN MENU
    =========================== */
 .fab-new-chat {
-  position: fixed;
-  bottom: 2rem;
+  position: absolute;
+  bottom: 1.5rem;
   right: 1.5rem;
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: var(--accent-gradient);
   color: white;
