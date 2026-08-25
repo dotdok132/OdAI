@@ -8,13 +8,11 @@ const { chromium } = require('playwright');
   await page.waitForTimeout(1000);
 
   await page.evaluate(() => {
-    if (typeof showView === 'function') {
-      showView('view-chat');
-    }
+    if (typeof showView === 'function') showView('view-chat');
   });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 
-  await page.screenshot({ path: '/home/dotdok/.gemini/antigravity/brain/2568b0a2-a4d8-43fa-81d4-736a343d03df/scratch/pc_chat_header_fixed.png' });
-  console.log('Screenshot saved to pc_chat_header_fixed.png');
+  await page.screenshot({ path: '/home/dotdok/.gemini/antigravity/brain/2568b0a2-a4d8-43fa-81d4-736a343d03df/scratch/pc_rounded_header.png' });
+  console.log('Saved rounded header screenshot');
   await browser.close();
 })();

@@ -2169,6 +2169,7 @@ body {
     width: 100% !important;
     max-width: 1200px;
     margin: 0 auto;
+    border-radius: 18px;
   }
 
   .app-header {
@@ -2180,7 +2181,13 @@ body {
     padding-right: 1.25rem !important;
     background: var(--bg-card) !important;
     border-bottom: 1px solid var(--border-subtle) !important;
-    border-radius: 0 !important;
+    border-top-left-radius: 18px !important;
+    border-top-right-radius: 18px !important;
+  }
+
+  .action-dock {
+    border-bottom-left-radius: 18px !important;
+    border-bottom-right-radius: 18px !important;
   }
 
   .cai-character-name {
