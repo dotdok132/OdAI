@@ -702,6 +702,7 @@ const elements = {
 
   storyFeed: document.getElementById('story-feed'),
   promptInput: document.getElementById('prompt-input'),
+  customPromptInput: document.getElementById('custom-prompt-input'),
   sendBtn: document.getElementById('send-btn'),
   modeBtns: document.querySelectorAll('.mode-btn'),
   realismToggle: document.getElementById('realism-toggle'),
@@ -1022,13 +1023,42 @@ window.addEventListener('popstate', (e) => {
 
 
 
-function setupTextareaAutoResize(el) {
+function setupTextareaAutoResize(el, maxH = 220) {
   if (!el) return;
-  el.addEventListener('input', function() {
-    this.style.height = 'auto';
-    const newHeight = Math.min(this.scrollHeight, 150); // max 150px
-    this.style.height = newHeight + 'px';
+
+  const adjustHeight = () => {
+    const scrollPos = window.scrollY || document.documentElement.scrollTop;
+    el.style.height = 'auto';
+    const computedStyle = window.getComputedStyle(el);
+    const minH = parseInt(computedStyle.minHeight, 10) || 36;
+    const limitH = Math.max(maxH, minH);
+    const targetH = Math.min(el.scrollHeight, limitH);
+
+    el.style.height = Math.max(targetH, minH) + 'px';
+    if (el.scrollHeight > limitH) {
+      el.style.overflowY = 'auto';
+    } else {
+      el.style.overflowY = 'hidden';
+    }
+    if (window.scrollY !== scrollPos) {
+      window.scrollTo(0, scrollPos);
+    }
+  };
+
+  ['input', 'paste', 'change', 'keyup', 'focus', 'compositionend', 'blur'].forEach(evt => {
+    el.addEventListener(evt, () => setTimeout(adjustHeight, 0));
   });
+
+  // Watch for external content insertions (Google Translate, GBoard, copy-paste)
+  let lastVal = el.value;
+  setInterval(() => {
+    if (el.value !== lastVal) {
+      lastVal = el.value;
+      adjustHeight();
+    }
+  }, 250);
+
+  adjustHeight();
 }
 
 // Инициализация
@@ -1258,6 +1288,7 @@ function saveStateToStorage() {
 function setupEventListeners() {
   // Навигация и экраны
   setupTextareaAutoResize(elements.promptInput);
+  setupTextareaAutoResize(elements.customPromptInput);
   setupTextareaAutoResize(elements.memoryInput);
   setupTextareaAutoResize(elements.authorNoteInput);
 

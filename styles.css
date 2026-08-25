@@ -1244,9 +1244,13 @@ body {
   padding: 0.7rem 1rem;
   resize: none;
   min-height: 44px;
-  max-height: 140px;
+  max-height: 220px;
   line-height: 1.5;
-  transition: all 0.2s ease;
+  overflow-y: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .prompt-textarea:focus {
@@ -1814,8 +1818,11 @@ body {
     font-size: 0.86rem;
     padding: 0.45rem 0.65rem;
     min-height: 36px;
-    max-height: 90px;
+    max-height: 160px;
     line-height: 1.35;
+    overflow-y: auto !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
   }
 
   .send-btn {
@@ -2091,11 +2098,14 @@ body {
   }
 
   .prompt-textarea {
-    max-height: 48px !important;
+    max-height: 120px !important;
     min-height: 34px !important;
-    padding: 0.25rem 0.5rem !important;
+    padding: 0.35rem 0.55rem !important;
     font-size: 0.82rem !important;
     border-radius: 8px !important;
+    overflow-y: auto !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
   }
 
   .send-btn {
