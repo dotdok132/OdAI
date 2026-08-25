@@ -2116,6 +2116,21 @@ body {
     font-size: 0.7rem !important;
     border-radius: 6px !important;
   }
+
+  .modal-box {
+    max-height: 94dvh !important;
+    padding: 0.75rem 1rem max(2.5rem, env(safe-area-inset-bottom)) 1rem !important;
+    overflow-y: auto !important;
+  }
+
+  .scenario-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .scenario-card {
+    padding: 0.5rem 0.75rem !important;
+  }
 }
 
 /* ---- TABLET & DESKTOP DUAL-COLUMN SPLIT LAYOUT (LARGE SCREENS ONLY) ---- */
