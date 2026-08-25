@@ -643,7 +643,23 @@ const I18N = {
   }
 };
 
-// Начальное состояние приложения
+function safeGetStorage(key, fallback = null) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.warn(`[Storage] Reading '${key}' failed:`, e);
+    return fallback;
+  }
+}
+
+function safeSetStorage(key, val) {
+  try {
+    localStorage.setItem(key, typeof val === 'object' ? JSON.stringify(val) : String(val));
+  } catch (e) {
+    console.warn(`[Storage] Writing '${key}' failed:`, e);
+  }
+}
+
 // Начальное состояние приложения
 const state = {
   language: 'en', // Default English language ('en' | 'ru' | 'uk' | 'es')
@@ -656,7 +672,7 @@ const state = {
   authorNote: "",
   realismMode: true,
   casualMode: false, // Casual Mode (Always Succeed on d20 rolls)
-  behaviorPreset: localStorage.getItem('odai_behavior_preset') || 'classic', // 'classic' | 'strict' | 'romantic' | 'dark' | 'chaotic' | 'noir'
+  behaviorPreset: safeGetStorage('odai_behavior_preset') || 'classic', // 'classic' | 'strict' | 'romantic' | 'dark' | 'chaotic' | 'noir'
   forceD20: false, // Флаг принудительного броска d20 на следующее действие
   currentMode: 'do', // 'do' | 'say' | 'story'
   isGenerating: false,
@@ -1108,9 +1124,26 @@ function updateActiveChatSession() {
   }
 }
 
+function safeGetStorage(key, fallback = null) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.warn(`[Storage] Reading '${key}' failed:`, e);
+    return fallback;
+  }
+}
+
+function safeSetStorage(key, val) {
+  try {
+    localStorage.setItem(key, typeof val === 'object' ? JSON.stringify(val) : String(val));
+  } catch (e) {
+    console.warn(`[Storage] Writing '${key}' failed:`, e);
+  }
+}
+
 // Загрузка состояния из LocalStorage (с поддержкой автомиграции)
 function loadStateFromStorage() {
-  const saved = localStorage.getItem('odai_app_state');
+  const saved = safeGetStorage('odai_app_state');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
@@ -3029,6 +3062,213 @@ Adventure history so far:
   }
 
   return prompt;
+}
+
+// Запрос к OpenRouter API с авто-фоллбэком по бесплатным моделям
+async function fetchOpenRouterContinuation() {
+  const apiKey = state.engineConfig.openrouterKey;
+  if (!apiKey) throw new Error("Укажите API Ключ OpenRouter в Настройках.");
+
+  const userModel = state.engineConfig.openrouterModel || "openrouter/free";
+  const promptContext = constructAIPrompt();
+
+  const candidates = [
+    userModel,
+    "openrouter/free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "meta-llama/llama-3.1-8b-instruct:free",
+    "qwen/qwen-2.5-72b-instruct:free",
+    "google/gemma-2-9b-it:free",
+    "mistralai/mistral-small-24b-instruct-2501:free"
+  ];
+
+  const candidateChain = [...new Set(candidates.filter(Boolean))];
+  let lastError = null;
+
+  for (const modelCandidate of candidateChain) {
+    try {
+      console.log(`[OpenRouter API] Trying model: ${modelCandidate}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://github.com/dotdok132/OdAI',
+          'X-Title': 'OdAI RPG App'
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: modelCandidate,
+          messages: [{ role: "user", content: promptContext }],
+          temperature: state.engineConfig.temperature || 0.8,
+          max_tokens: 2048
+        })
+      });
+      clearTimeout(timeoutId);
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = {};
+      }
+
+      if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+        const rawContent = data.choices[0].message.content.trim();
+        const cleanText = sanitizeAIResponseText(rawContent);
+        if (cleanText) {
+          console.log(`[OpenRouter API Success] Model: ${modelCandidate}`);
+          return cleanText;
+        }
+      }
+
+      if (data.error) {
+        const msg = data.error.message || JSON.stringify(data.error);
+        console.warn(`[OpenRouter Fallback] Model ${modelCandidate} failed: ${msg}`);
+        if (response.status === 401 || msg.includes("API key") || msg.includes("Invalid key")) {
+          throw new Error(`API Ключ OpenRouter недействителен: ${msg}`);
+        }
+        lastError = msg;
+      } else {
+        lastError = `HTTP ${response.status}: ${response.statusText}`;
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        lastError = "Timeout (15s)";
+      } else if (err.message && err.message.includes("API Ключ")) {
+        throw err;
+      } else {
+        lastError = err.message || String(err);
+      }
+    }
+  }
+
+  throw new Error(`OpenRouter: ${lastError || "Выбранная модель недоступна. Попробуйте выбрать 'openrouter/free' в Настройках."}`);
+}
+
+// Запрос к OpenAI / Custom API (Ollama, LM Studio)
+async function fetchOpenAIContinuation() {
+  const apiKey = state.engineConfig.apiKey || 'lm-studio';
+  const baseUrl = state.engineConfig.openaiBaseUrl ? state.engineConfig.openaiBaseUrl.replace(/\/$/, '') : 'https://api.openai.com/v1';
+  const model = state.engineConfig.openaiModel || 'gpt-4o';
+  const url = `${baseUrl}/chat/completions`;
+  const promptContext = constructAIPrompt();
+
+  const headers = { 'Content-Type': 'application/json' };
+  if (apiKey && apiKey !== 'lm-studio') headers['Authorization'] = `Bearer ${apiKey}`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: "user", content: promptContext }],
+        temperature: state.engineConfig.temperature || 0.8,
+        max_tokens: 2048
+      })
+    });
+    clearTimeout(timeoutId);
+
+    const data = await response.json();
+    if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+      return sanitizeAIResponseText(data.choices[0].message.content);
+    }
+    if (data.error) throw new Error(`API Error: ${data.error.message || JSON.stringify(data.error)}`);
+    throw new Error("Неверный ответ от API сервера");
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error("OpenAI API Timeout (15s)");
+    throw err;
+  }
+}
+
+// Запрос к Groq API
+async function fetchGroqContinuation() {
+  const apiKey = state.engineConfig.groqKey;
+  if (!apiKey) throw new Error("Укажите API Ключ Groq в Настройках.");
+
+  const model = state.engineConfig.groqModel || "llama-3.3-70b-versatile";
+  const promptContext = constructAIPrompt();
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: "user", content: promptContext }],
+        temperature: state.engineConfig.temperature || 0.8,
+        max_tokens: 2048
+      })
+    });
+    clearTimeout(timeoutId);
+
+    const data = await response.json();
+    if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+      return sanitizeAIResponseText(data.choices[0].message.content);
+    }
+    if (data.error) throw new Error(`Groq API: ${data.error.message || JSON.stringify(data.error)}`);
+    throw new Error("Неверный ответ от Groq API");
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error("Groq API Timeout (15s)");
+    throw err;
+  }
+}
+
+// Запрос к Anthropic Claude API
+async function fetchAnthropicContinuation() {
+  const apiKey = state.engineConfig.anthropicKey;
+  if (!apiKey) throw new Error("Укажите API Ключ Anthropic Claude в Настройках.");
+
+  const model = state.engineConfig.anthropicModel || "claude-3-5-sonnet-20241022";
+  const promptContext = constructAIPrompt();
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'dangerously-allow-browser': 'true'
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 2048,
+        temperature: state.engineConfig.temperature || 0.8,
+        messages: [{ role: "user", content: promptContext }]
+      })
+    });
+    clearTimeout(timeoutId);
+
+    const data = await response.json();
+    if (response.ok && data.content && data.content[0] && data.content[0].text) {
+      return sanitizeAIResponseText(data.content[0].text);
+    }
+    if (data.error) throw new Error(`Anthropic Claude: ${data.error.message || JSON.stringify(data.error)}`);
+    throw new Error("Неверный ответ от Anthropic Claude API");
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error("Anthropic API Timeout (15s)");
+    throw err;
+  }
 }
 
 // Сквозной движок с авто-переключением (Cross-Provider Fallback Engine)
