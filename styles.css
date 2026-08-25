@@ -686,10 +686,10 @@ body {
 }
 
 .chat-bubble-timestamp {
-  font-size: 0.7rem;
-  color: var(--text-muted);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
   font-family: var(--font-ui);
-  opacity: 0.7;
+  opacity: 0.95;
 }
 
 .chat-sender-name {

@@ -701,13 +701,12 @@ const elements = {
 
   // Элементы шапки и полноэкранного режима
   fullscreenToggleBtn: document.getElementById('fullscreen-toggle-btn'),
-  mainSettingsBtn: document.getElementById('main-settings-btn'),
   languageSelect: document.getElementById('language-select'),
-  saveSettingsBtn: document.getElementById('save-settings-btn'),
   
   // Настройки ИИ и подключений
   settingsModal: document.getElementById('settings-modal'),
   closeSettingsModal: document.getElementById('close-settings-modal'),
+  saveSettingsBtn: document.getElementById('save-settings-btn'),
   providerCards: document.querySelectorAll('.provider-card'),
   providerPanels: document.querySelectorAll('.provider-panel'),
   geminiKeyInput: document.getElementById('gemini-key-input'),
@@ -728,8 +727,7 @@ const elements = {
   contextSlider: document.getElementById('context-slider'),
   contextVal: document.getElementById('context-val'),
   testConnectionBtn: document.getElementById('test-connection-btn'),
-  connectionStatusBadge: document.getElementById('connection-status-badge'),
-  saveSettingsBtn: document.getElementById('save-settings-btn')
+  connectionStatusBadge: document.getElementById('connection-status-badge')
 };
 
 // Вспомогательная функция для формирования URL эндпоинтов
@@ -750,6 +748,7 @@ function getApiEndpoint(path) {
 
 function applyI18nLanguage(lang) {
   state.language = lang || 'en';
+  document.documentElement.lang = state.language;
   const dict = I18N[state.language] || I18N.en;
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1149,18 +1148,22 @@ function loadStateFromStorage() {
 
 // Сохранение состояния в LocalStorage
 function saveStateToStorage() {
-  updateActiveChatSession();
-  const dataToSave = {
-    chats: state.chats,
-    currentChatId: state.currentChatId,
-    realismMode: state.realismMode,
-    casualMode: state.casualMode,
-    language: state.language,
-    theme: state.theme,
-    customThemeColors: state.customThemeColors,
-    engineConfig: state.engineConfig
-  };
-  localStorage.setItem('odai_app_state', JSON.stringify(dataToSave));
+  try {
+    updateActiveChatSession();
+    const dataToSave = {
+      chats: state.chats,
+      currentChatId: state.currentChatId,
+      realismMode: state.realismMode,
+      casualMode: state.casualMode,
+      language: state.language,
+      theme: state.theme,
+      customThemeColors: state.customThemeColors,
+      engineConfig: state.engineConfig
+    };
+    localStorage.setItem('odai_app_state', JSON.stringify(dataToSave));
+  } catch (e) {
+    console.warn("Не удалось сохранить состояние в localStorage (превышена квота или приватный режим):", e);
+  }
 }
 
 // Настройка слушателей событий
@@ -2786,7 +2789,13 @@ async function fetchOpenRouterContinuation() {
         })
       });
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (e) {
+        data = {};
+      }
+
       if (response.ok && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
         return data.choices[0].message.content.trim();
       }
