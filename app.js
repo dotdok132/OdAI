@@ -633,6 +633,7 @@ const state = {
     temperature: 0.8
   }
 };
+window.state = state;
 
 // DOM Элементы
 const elements = {
@@ -1069,8 +1070,6 @@ function updateActiveChatSession() {
     activeSession.inventory = state.inventory;
     activeSession.memory = state.memory;
     activeSession.authorNote = state.authorNote;
-    activeSession.scenarioKey = state.currentScenarioKey;
-    activeSession.updatedAt = new Date().toISOString();
   }
 }
 
@@ -1132,7 +1131,7 @@ function loadStateFromStorage() {
   }
 
   syncActiveChatToState();
-  elements.realismToggle.classList.toggle('active', state.realismMode);
+  updateToggleUI();
 }
 
 // Сохранение состояния в LocalStorage с оптимизированным debounce
@@ -1142,6 +1141,30 @@ function saveStateToStorageDebounced(delay = 400) {
   _saveStateTimer = setTimeout(() => {
     saveStateToStorage();
   }, delay);
+}
+
+function updateToggleUI() {
+  const realismWrap = document.getElementById('realism-toggle');
+  const dropdownRealism = document.getElementById('dropdown-realism-toggle');
+  if (realismWrap) realismWrap.classList.toggle('active', !!state.realismMode);
+  if (dropdownRealism) dropdownRealism.setAttribute('aria-checked', state.realismMode ? 'true' : 'false');
+
+  const casualWrap = document.getElementById('casual-toggle');
+  const dropdownCasual = document.getElementById('dropdown-casual-toggle');
+  if (casualWrap) casualWrap.classList.toggle('active', !!state.casualMode);
+  if (dropdownCasual) dropdownCasual.setAttribute('aria-checked', state.casualMode ? 'true' : 'false');
+}
+
+function toggleRealismGuard() {
+  state.realismMode = !state.realismMode;
+  updateToggleUI();
+  saveStateToStorage();
+}
+
+function toggleCasualMode() {
+  state.casualMode = !state.casualMode;
+  updateToggleUI();
+  saveStateToStorage();
 }
 
 function saveStateToStorage() {
@@ -1240,9 +1263,8 @@ function setupEventListeners() {
     });
   }
   if (elements.dropdownRealismToggle) {
-    elements.dropdownRealismToggle?.addEventListener('click', (e) => {
-      if (e.target.closest('.toggle-switch')) return; // handled by realismToggle listener
-      elements.realismToggle.click();
+    elements.dropdownRealismToggle.addEventListener('click', () => {
+      toggleRealismGuard();
     });
   }
   if (elements.dropdownScenariosBtn) {
@@ -1252,18 +1274,10 @@ function setupEventListeners() {
     });
   }
   if (elements.dropdownCasualToggle) {
-    elements.dropdownCasualToggle?.addEventListener('click', (e) => {
-      if (e.target.closest('.toggle-switch')) return; 
-      const tgl = elements.dropdownCasualToggle.querySelector('.toggle-switch');
-      if (tgl) {
-        state.casualMode = !state.casualMode;
-        tgl.classList.toggle('active', state.casualMode);
-        saveStateToStorage();
-      }
+    elements.dropdownCasualToggle.addEventListener('click', () => {
+      toggleCasualMode();
     });
   }
-
-
 
   // Переключатель принудительного броска d20 для следующего действия
   elements.rollD20Btn?.addEventListener('click', () => {
@@ -1279,12 +1293,12 @@ function setupEventListeners() {
     }
   });
 
-  // Переключатель Защиты Реализма
-  elements.realismToggle?.addEventListener('click', () => {
-    state.realismMode = !state.realismMode;
-    elements.realismToggle.classList.toggle('active', state.realismMode);
-    saveStateToStorage();
-  });
+  if (elements.realismToggle) {
+    elements.realismToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleRealismGuard();
+    });
+  }
 
   // Sidebar drawer open/close with backdrop
   const getSidebarBackdrop = () => document.getElementById('sidebar-backdrop');
