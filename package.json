@@ -1,6 +1,6 @@
 {
   "name": "odai",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "description": "OdAI Interactive AI Adventure",
   "main": "index.html",
   "scripts": {

@@ -780,6 +780,11 @@ function applyI18nLanguage(lang) {
   const langSelect = document.getElementById('language-select');
   if (langSelect) langSelect.value = state.language;
 
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) themeSelect.value = state.theme || 'dark';
+
+  applyTheme(state.theme || 'dark', state.customThemeColors);
+
   renderChatsArchiveList();
   renderStoryFeed();
   saveStateToStorage();
