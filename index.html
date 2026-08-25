@@ -327,6 +327,53 @@
         </div>
       </div>
 
+      <!-- Accordion Item: Theme Selector & Custom Theme Engine -->
+      <div class="settings-accordion-item">
+        <div class="settings-accordion-header">
+          <div class="accordion-title-group">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            <span class="accordion-title" data-i18n="themeLabel">Theme & Appearance</span>
+          </div>
+          <svg class="accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="settings-accordion-content">
+          <div class="settings-group">
+            <label class="settings-label" data-i18n="selectThemeLabel">Select Color Theme:</label>
+            <select class="input-sm custom-dark-select" id="theme-select">
+              <option value="dark" selected data-i18n="themeDefault">🖤 Onyx Dark (Default)</option>
+              <option value="emerald" data-i18n="themeEmerald">🌲 Dark Emerald</option>
+              <option value="purple" data-i18n="themePurple">🔮 Cyber Purple</option>
+              <option value="crimson" data-i18n="themeCrimson">🩸 Vampire Crimson</option>
+              <option value="amber" data-i18n="themeAmber">📜 Amber Terminal</option>
+              <option value="light" data-i18n="themeLight">☀️ Light Parchment</option>
+              <option value="custom" data-i18n="themeCustom">🎨 Custom Colors...</option>
+            </select>
+          </div>
+
+          <!-- Custom Theme Color Pickers Box -->
+          <div class="custom-theme-box" id="custom-theme-box" style="display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="font-size: 0.82rem; color: var(--text-secondary);" data-i18n="customBgPrimary">Main Background</label>
+                <input type="color" id="custom-color-bg" value="#09090b" style="border: none; width: 36px; height: 28px; background: transparent; cursor: pointer; border-radius: 4px;">
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="font-size: 0.82rem; color: var(--text-secondary);" data-i18n="customBgSurface">Surface & Cards</label>
+                <input type="color" id="custom-color-surface" value="#121215" style="border: none; width: 36px; height: 28px; background: transparent; cursor: pointer; border-radius: 4px;">
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="font-size: 0.82rem; color: var(--text-secondary);" data-i18n="customAccent">Accent Color</label>
+                <input type="color" id="custom-color-accent" value="#10b981" style="border: none; width: 36px; height: 28px; background: transparent; cursor: pointer; border-radius: 4px;">
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="font-size: 0.82rem; color: var(--text-secondary);" data-i18n="customText">Text Color</label>
+                <input type="color" id="custom-color-text" value="#e4e4e7" style="border: none; width: 36px; height: 28px; background: transparent; cursor: pointer; border-radius: 4px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       <!-- Accordion Item: Backup & Export -->
       <div class="settings-accordion-item">

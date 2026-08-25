@@ -102,7 +102,7 @@ const SCENARIOS = {
       en: "Rain beats a steady rhythm against your office window. The wall clock shows two in the morning. You pour a glass of cheap bourbon when the silhouette of a man in a fedora appears on the frosted glass door.",
       es: "La lluvia golpea un ritmo constante contra la ventana de tu oficina. El reloj marca las dos de la mañana. Sirves un vaso de bourbon barato cuando la silueta de un hombre con sombrero aparece en la puerta de cristal esmerilado.",
       uk: "Дощ відбиває чіткий ритм по склу вашого кабінету. Годинник на стіні показує другу годину ночі. Ви наливаєте склянку дешевого бурбону, коли на матовому склі дверей з'являється силует чоловіка в капелюсі.",
-      ru: "Дождь отбивает четкий ритм по стеклу вашего кабинета. Часы на стене показывают два часа ночи. Вы наливаете стакан дешевого бурбона, когда на матовом стекле двери появляется силуэт человека в шляпе."
+      ru: "Дождь отбивает четкий ритм по стеклу вашего кабинета. Часы на стене показывают два часа ночи. Вы наливаете стакан дешевого бурбона, когда на матовом стекле двери появляется силует человека в шляпе."
     },
     defaultMemory: {
       en: "You are a hard-boiled private detective in 1940s noir city, investigating crimes and conspiracies.",
@@ -116,6 +116,87 @@ const SCENARIOS = {
       uk: "Класична нуарна атмосфера 1940-х, цинічний внутрішній монолог, промоклі вулиці, моральна неоднозначність.",
       ru: "Классическая нуарная атмосфера 1940-х, циничный внутренний монолог, промокшие улицы, моральная неоднозначность."
     }
+  }
+};
+
+const THEME_PRESETS = {
+  dark: {
+    bgBase: '#09090b',
+    bgSurface: '#121215',
+    bgElevated: '#1a1a1f',
+    bgOverlay: '#222228',
+    bgInput: '#16161b',
+    textPrimary: '#e4e4e7',
+    textSecondary: '#a1a1aa',
+    textMuted: '#71717a',
+    accentPrimary: '#10b981',
+    accentSecondary: '#34d399',
+    accentGradient: 'linear-gradient(135deg, #10b981, #34d399)'
+  },
+  emerald: {
+    bgBase: '#041710',
+    bgSurface: '#08271c',
+    bgElevated: '#0d3829',
+    bgOverlay: '#134a37',
+    bgInput: '#092e21',
+    textPrimary: '#ecfdf5',
+    textSecondary: '#a7f3d0',
+    textMuted: '#6ee7b7',
+    accentPrimary: '#10b981',
+    accentSecondary: '#34d399',
+    accentGradient: 'linear-gradient(135deg, #10b981, #34d399)'
+  },
+  purple: {
+    bgBase: '#0d0714',
+    bgSurface: '#180e25',
+    bgElevated: '#241537',
+    bgOverlay: '#311d4b',
+    bgInput: '#1e1130',
+    textPrimary: '#f3e8ff',
+    textSecondary: '#c084fc',
+    textMuted: '#a855f7',
+    accentPrimary: '#a855f7',
+    accentSecondary: '#c084fc',
+    accentGradient: 'linear-gradient(135deg, #a855f7, #c084fc)'
+  },
+  crimson: {
+    bgBase: '#140505',
+    bgSurface: '#240a0a',
+    bgElevated: '#360f0f',
+    bgOverlay: '#4a1515',
+    bgInput: '#2b0c0c',
+    textPrimary: '#fee2e2',
+    textSecondary: '#fca5a5',
+    textMuted: '#f87171',
+    accentPrimary: '#ef4444',
+    accentSecondary: '#f87171',
+    accentGradient: 'linear-gradient(135deg, #ef4444, #f87171)'
+  },
+  amber: {
+    bgBase: '#120c03',
+    bgSurface: '#211606',
+    bgElevated: '#302009',
+    bgOverlay: '#422c0c',
+    bgInput: '#261a07',
+    textPrimary: '#fef3c7',
+    textSecondary: '#fcd34d',
+    textMuted: '#fbbf24',
+    accentPrimary: '#f59e0b',
+    accentSecondary: '#fbbf24',
+    accentGradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)'
+  },
+  light: {
+    bgBase: '#fcfbf7',
+    bgSurface: '#f5f2eb',
+    bgElevated: '#e9e4d9',
+    bgOverlay: '#ddd6c7',
+    bgInput: '#ebe6da',
+    textPrimary: '#1c1917',
+    textSecondary: '#44403c',
+    textMuted: '#78716c',
+    accentPrimary: '#059669',
+    accentSecondary: '#10b981',
+    accentGradient: 'linear-gradient(135deg, #059669, #10b981)'
   }
 };
 
@@ -211,7 +292,20 @@ const I18N = {
     settingsTitleBtn: "Settings",
     backToChatsTitle: "Back to chats",
     interactiveDM: "Interactive Dungeon Master",
-    chatMenuTitle: "Chat Menu"
+    chatMenuTitle: "Chat Menu",
+    themeLabel: "Theme & Appearance",
+    selectThemeLabel: "Select Color Theme:",
+    themeDefault: "🖤 Onyx Dark (Default)",
+    themeEmerald: "🌲 Dark Emerald",
+    themePurple: "🔮 Cyber Purple",
+    themeCrimson: "🩸 Vampire Crimson",
+    themeAmber: "📜 Amber Terminal",
+    themeLight: "☀️ Light Parchment",
+    themeCustom: "🎨 Custom Colors...",
+    customBgPrimary: "Main Background",
+    customBgSurface: "Surface & Cards",
+    customAccent: "Accent Color",
+    customText: "Text Color"
   },
   es: {
     appTitle: "OdAI",
@@ -303,7 +397,20 @@ const I18N = {
     settingsTitleBtn: "Ajustes",
     backToChatsTitle: "Volver a los chats",
     interactiveDM: "Dungeon Master Interactivo",
-    chatMenuTitle: "Menú del chat"
+    chatMenuTitle: "Menú del chat",
+    themeLabel: "Tema y Apariencia",
+    selectThemeLabel: "Seleccionar Tema de Color:",
+    themeDefault: "🖤 Onyx Oscuro (Predeterminado)",
+    themeEmerald: "🌲 Esmeralda Oscuro",
+    themePurple: "🔮 Púrpura Cíber",
+    themeCrimson: "🩸 Carmesí Vampiro",
+    themeAmber: "📜 Terminal Ámbar",
+    themeLight: "☀️ Pergamino Claro",
+    themeCustom: "🎨 Colores Personalizados...",
+    customBgPrimary: "Fondo Principal",
+    customBgSurface: "Superficie y Tarjetas",
+    customAccent: "Color de Acento",
+    customText: "Color de Texto"
   },
   uk: {
     appTitle: "OdAI",
@@ -395,7 +502,20 @@ const I18N = {
     settingsTitleBtn: "Налаштування",
     backToChatsTitle: "Назад до чатів",
     interactiveDM: "Інтерактивний D&D Ведучий",
-    chatMenuTitle: "Меню чату"
+    chatMenuTitle: "Меню чату",
+    themeLabel: "Тема та Оформлення",
+    selectThemeLabel: "Оберіть тему оформлення:",
+    themeDefault: "🖤 Онікс Темна (За замовчуванням)",
+    themeEmerald: "🌲 Темний Смарагд",
+    themePurple: "🔮 Кібер Фіолетовий",
+    themeCrimson: "🩸 Багряно-Червона",
+    themeAmber: "📜 Янтарний Термінал",
+    themeLight: "☀️ Світлий Пергамент",
+    themeCustom: "🎨 Свої Кольори...",
+    customBgPrimary: "Основний Фон",
+    customBgSurface: "Поверхні та Картки",
+    customAccent: "Акцентний Колір",
+    customText: "Колір Тексту"
   },
   ru: {
     appTitle: "OdAI",
@@ -665,6 +785,89 @@ function applyI18nLanguage(lang) {
   saveStateToStorage();
 }
 
+// Применение темы оформления
+function applyTheme(themeKey, customColors) {
+  state.theme = themeKey || 'dark';
+  if (customColors) state.customThemeColors = customColors;
+
+  let themeVars;
+  if (state.theme === 'custom' && state.customThemeColors) {
+    const c = state.customThemeColors;
+    themeVars = {
+      bgBase: c.bgBase || '#09090b',
+      bgSurface: c.bgSurface || '#121215',
+      bgElevated: lightenDarkenColor(c.bgSurface || '#121215', 12),
+      bgOverlay: lightenDarkenColor(c.bgSurface || '#121215', 24),
+      bgInput: lightenDarkenColor(c.bgSurface || '#121215', 6),
+      textPrimary: c.text || '#e4e4e7',
+      textSecondary: adjustAlpha(c.text || '#e4e4e7', 0.75),
+      textMuted: adjustAlpha(c.text || '#e4e4e7', 0.55),
+      accentPrimary: c.accent || '#10b981',
+      accentSecondary: c.accent || '#34d399',
+      accentGradient: `linear-gradient(135deg, ${c.accent || '#10b981'}, ${c.accent || '#34d399'})`
+    };
+  } else {
+    themeVars = THEME_PRESETS[state.theme] || THEME_PRESETS.dark;
+  }
+
+  const root = document.documentElement;
+  root.style.setProperty('--bg-base', themeVars.bgBase);
+  root.style.setProperty('--bg-surface', themeVars.bgSurface);
+  root.style.setProperty('--bg-elevated', themeVars.bgElevated);
+  root.style.setProperty('--bg-overlay', themeVars.bgOverlay);
+  root.style.setProperty('--bg-input', themeVars.bgInput);
+  root.style.setProperty('--text-primary', themeVars.textPrimary);
+  root.style.setProperty('--text-secondary', themeVars.textSecondary);
+  root.style.setProperty('--text-muted', themeVars.textMuted);
+  root.style.setProperty('--accent-primary', themeVars.accentPrimary);
+  root.style.setProperty('--accent-secondary', themeVars.accentSecondary);
+  root.style.setProperty('--accent-gradient', themeVars.accentGradient);
+
+  if (state.theme === 'light') {
+    root.style.setProperty('--border-subtle', 'rgba(0, 0, 0, 0.08)');
+    root.style.setProperty('--border-medium', 'rgba(0, 0, 0, 0.15)');
+  } else {
+    root.style.setProperty('--border-subtle', 'rgba(255, 255, 255, 0.06)');
+    root.style.setProperty('--border-medium', 'rgba(255, 255, 255, 0.1)');
+  }
+
+  // Обновление цвета статус-бара на мобильных устройствах
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.content = themeVars.bgBase;
+
+  // Отображение контейнера выбора своих цветов
+  const customBox = document.getElementById('custom-theme-box');
+  if (customBox) {
+    customBox.style.display = state.theme === 'custom' ? 'block' : 'none';
+  }
+
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) themeSelect.value = state.theme;
+
+  saveStateToStorage();
+}
+
+function lightenDarkenColor(col, amt) {
+  let num = parseInt(col.replace('#', ''), 16);
+  if (isNaN(num)) return col;
+  let r = (num >> 16) + amt;
+  let b = ((num >> 8) & 0x00FF) + amt;
+  let g = (num & 0x0000FF) + amt;
+  r = Math.min(255, Math.max(0, r));
+  b = Math.min(255, Math.max(0, b));
+  g = Math.min(255, Math.max(0, g));
+  return '#' + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+}
+
+function adjustAlpha(hex, alpha) {
+  let num = parseInt(hex.replace('#', ''), 16);
+  if (isNaN(num)) return hex;
+  let r = (num >> 16);
+  let g = ((num >> 8) & 0x00FF);
+  let b = (num & 0x0000FF);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 
 function toggleAppFullscreen() {
   if (!document.fullscreenElement) {
@@ -788,6 +991,7 @@ function init() {
 
   loadStateFromStorage();
   applyI18nLanguage(state.language || 'en');
+  applyTheme(state.theme || 'dark', state.customThemeColors);
   setupEventListeners();
   setupExportImportBackup();
   setupNativeAndroidBackButton();
@@ -886,6 +1090,8 @@ function loadStateFromStorage() {
       state.realismMode = parsed.realismMode !== undefined ? parsed.realismMode : true;
       state.casualMode = parsed.casualMode !== undefined ? parsed.casualMode : false;
       if (parsed.language) state.language = parsed.language;
+      if (parsed.theme) state.theme = parsed.theme;
+      if (parsed.customThemeColors) state.customThemeColors = parsed.customThemeColors;
       state.engineConfig = parsed.engineConfig || state.engineConfig;
 
       if (parsed.chats && Array.isArray(parsed.chats) && parsed.chats.length > 0) {
@@ -945,6 +1151,8 @@ function saveStateToStorage() {
     realismMode: state.realismMode,
     casualMode: state.casualMode,
     language: state.language,
+    theme: state.theme,
+    customThemeColors: state.customThemeColors,
     engineConfig: state.engineConfig
   };
   localStorage.setItem('odai_app_state', JSON.stringify(dataToSave));
@@ -956,6 +1164,45 @@ function setupEventListeners() {
   setupTextareaAutoResize(elements.promptInput);
   setupTextareaAutoResize(elements.memoryInput);
   setupTextareaAutoResize(elements.authorNoteInput);
+
+  const themeSelect = document.getElementById('theme-select');
+  if (themeSelect) {
+    themeSelect.value = state.theme || 'dark';
+    themeSelect.addEventListener('change', (e) => {
+      applyTheme(e.target.value, state.customThemeColors);
+    });
+  }
+
+  const colorBgInput = document.getElementById('custom-color-bg');
+  const colorSurfaceInput = document.getElementById('custom-color-surface');
+  const colorAccentInput = document.getElementById('custom-color-accent');
+  const colorTextInput = document.getElementById('custom-color-text');
+
+  if (state.customThemeColors) {
+    if (colorBgInput) colorBgInput.value = state.customThemeColors.bgBase || '#09090b';
+    if (colorSurfaceInput) colorSurfaceInput.value = state.customThemeColors.bgSurface || '#121215';
+    if (colorAccentInput) colorAccentInput.value = state.customThemeColors.accent || '#10b981';
+    if (colorTextInput) colorTextInput.value = state.customThemeColors.text || '#e4e4e7';
+  }
+
+  const updateCustomColors = () => {
+    state.customThemeColors = {
+      bgBase: colorBgInput ? colorBgInput.value : '#09090b',
+      bgSurface: colorSurfaceInput ? colorSurfaceInput.value : '#121215',
+      accent: colorAccentInput ? colorAccentInput.value : '#10b981',
+      text: colorTextInput ? colorTextInput.value : '#e4e4e7'
+    };
+    if (state.theme === 'custom') {
+      applyTheme('custom', state.customThemeColors);
+    }
+  };
+
+  [colorBgInput, colorSurfaceInput, colorAccentInput, colorTextInput].forEach(input => {
+    if (input) {
+      input.addEventListener('input', updateCustomColors);
+      input.addEventListener('change', updateCustomColors);
+    }
+  });
 
   if (elements.mainSettingsBtn) {
     elements.mainSettingsBtn?.addEventListener('click', () => openModal(elements.settingsModal));
