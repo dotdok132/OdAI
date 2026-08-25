@@ -232,6 +232,7 @@ const I18N = {
     changeScenario: "Change World",
     behaviorPresetLabel: "Master Behavior / Persona",
     behaviorClassic: "🎭 Classic DM (Balanced)",
+    behaviorConcise: "⚡ Concise & No-Fluff (Direct)",
     behaviorStrict: "⚔️ Strict & Hardcore (Unforgiving)",
     behaviorRomantic: "💖 Romantic & Emotional (Sensual)",
     behaviorDark: "🌌 Dark & Grimdark (Gothic)",
@@ -345,6 +346,7 @@ const I18N = {
     changeScenario: "Cambiar Mundo",
     behaviorPresetLabel: "Modo de Comportamiento del DM",
     behaviorClassic: "🎭 DM Clásico (Equilibrado)",
+    behaviorConcise: "⚡ Conciso y Directo (Sin Relleno)",
     behaviorStrict: "⚔️ Estricto y Hardcore (Sin Piedad)",
     behaviorRomantic: "💖 Romántico y Emocional (Sensual)",
     behaviorDark: "🌌 Fantasía Oscura (Gótico)",
@@ -458,6 +460,7 @@ const I18N = {
     changeScenario: "Змінити Світ",
     behaviorPresetLabel: "Модель поведінки Майстра",
     behaviorClassic: "🎭 Класичний Майстер (Баланс)",
+    behaviorConcise: "⚡ Лаконічний та Без Води (Чіткий)",
     behaviorStrict: "⚔️ Строгий та Суровий (Хардкор)",
     behaviorRomantic: "💖 Романтичний та Чуттєвий (Емоції)",
     behaviorDark: "🌌 Похмуре Фентезі (Готика)",
@@ -571,6 +574,7 @@ const I18N = {
     changeScenario: "Сменить мир",
     behaviorPresetLabel: "Модель поведения Мастера",
     behaviorClassic: "🎭 Классический Мастер (Баланс)",
+    behaviorConcise: "⚡ Лаконичный и Без Воды (Четкий)",
     behaviorStrict: "⚔️ Строгий и Суровый (Хардкор)",
     behaviorRomantic: "💖 Романтик и Чувственный (Эмоции)",
     behaviorDark: "🌌 Мрачное Фэнтези (Готика)",
@@ -1029,8 +1033,8 @@ function setupTextareaAutoResize(el, maxH = 220) {
   const adjustHeight = () => {
     const scrollPos = window.scrollY || document.documentElement.scrollTop;
     el.style.height = 'auto';
-    const computedStyle = window.getComputedStyle(el);
-    const minH = parseInt(computedStyle.minHeight, 10) || 36;
+    const computedStyle = (typeof window !== 'undefined' && window.getComputedStyle) ? window.getComputedStyle(el) : {};
+    const minH = parseInt(computedStyle.minHeight || '36', 10) || 36;
     const limitH = Math.max(maxH, minH);
     const targetH = Math.min(el.scrollHeight, limitH);
 
@@ -2903,6 +2907,7 @@ async function fetchGeminiContinuation() {
   const directives = {
     ru: {
       classic: "- [МОДЕЛЬ ПОВЕДЕНИЯ: КЛАССИЧЕСКИЙ МАСТЕР]: Баланс атмосферы, кинематографичности, тактики, глубоких диалогов и сюжета.",
+      concise: "- [МОДЕЛЬ ПОВЕДЕНИЯ: ЛАКОНИЧНЫЙ И БЕЗ ВОДЫ]: Выдавай максимально краткий, емкий и сжатый ответ (1-2 предложения). Никакой лишней эпичности, поэтики, филлеров и пересказа действий игрока. Только факты, действия и прямой результат.",
       strict: "- [МОДЕЛЬ ПОВЕДЕНИЯ: СТРОГИЙ И СУРОВЫЙ]: Бескомпромиссная реалистичность, тяжелые тактические последствия, ранения, травмы, физика, никакого сюсюканья.",
       romantic: "- [МОДЕЛЬ ПОВЕДЕНИЯ: РОМАНТИЧНЫЙ И ЧУВСТВЕННЫЙ]: Глубокий акцент на чувствах, взглядах, эмоциях, романтическом притяжении, химии персонажей и чувственных диалогах.",
       dark: "- [МОДЕЛЬ ПОВЕДЕНИЯ: МРАЧНОЕ ФЭНТЕЗИ / ГОТИКА]: Похмурый гримдарк, готическая безысходность, кровь, древние проклятия, психоз и атмосфера кошмара.",
@@ -2911,6 +2916,7 @@ async function fetchGeminiContinuation() {
     },
     en: {
       classic: "- [BEHAVIOR PRESET: CLASSIC DUNGEON MASTER]: Balanced atmosphere, tactical depth, dialogue, and compelling narrative.",
+      concise: "- [BEHAVIOR PRESET: CONCISE & NO-FLUFF]: Ultra-concise, punchy storytelling (1-2 sentences max). Zero prose fluff, flowery description, or repeated actions. Only concrete facts, immediate actions, and crisp outcomes.",
       strict: "- [BEHAVIOR PRESET: STRICT & HARDCORE]: Gritty realism, punishing tactical consequences, severe injury logic, zero plot armor.",
       romantic: "- [BEHAVIOR PRESET: ROMANTIC & EMOTIONAL]: Deep focus on romantic chemistry, sensual tension, character emotions, intimate dialogue, and relationship drama.",
       dark: "- [BEHAVIOR PRESET: DARK & GRIMDARK]: Visceral horror, grimdark dread, gothic atmosphere, blood, ancient curses, and psychological horror.",
@@ -2919,6 +2925,7 @@ async function fetchGeminiContinuation() {
     },
     uk: {
       classic: "- [МОДЕЛЬ ПОВЕДЕНКИ: КЛАСИЧНИЙ МАЙСТЕР]: Збалансована атмосфера, тактика, діалоги та захопливий сюжет.",
+      concise: "- [МОДЕЛЬ ПОВЕДЕНКИ: ЛАКОНІЧНИЙ ТА БЕЗ ВОДИ]: Пиши максимально стисло та чітко (1-2 речення). Жодної зайвої поетики, описового шуму та повторів дій гравця. Лише гострі факти та прямий результат.",
       strict: "- [МОДЕЛЬ ПОВЕДЕНКИ: СТРОГИЙ ТА СУРОВИЙ]: Безкомпромісний реалізм, важкі тактичні наслідки, травми, відсутність поблажок.",
       romantic: "- [МОДЕЛЬ ПОВЕДЕНКИ: РОМАНТИЧНИЙ ТА ЧУТТЄВИЙ]: Глибокий акцент на почуттях, поглядах, романтичній хімії, емоційній глибині діалогів.",
       dark: "- [МОДЕЛЬ ПОВЕДЕНКИ: ПОХМУРЕ ФЕНТЕЗІ / ГОТИКА]: Гримдарк, готична безвихідь, кров, давні прокляття та атмосфера жаху.",
@@ -2927,6 +2934,7 @@ async function fetchGeminiContinuation() {
     },
     es: {
       classic: "- [MODO DE COMPORTAMIENTO: DUNGEON MASTER CLÁSICO]: Equilibrio de atmósfera, táctica, diálogo y narrativa.",
+      concise: "- [MODO DE COMPORTAMIENTO: CONCISO Y DIRECTO]: Respuestas extremadamente cortas y directas (1-2 oraciones). Sin relleno narrativo ni repeticiones. Solo hechos concretos y consecuencias inmediatas.",
       strict: "- [MODO DE COMPORTAMIENTO: ESTRICTO Y HARDCORE]: Realismo crudo, consecuencias tácticas severas, lesiones y cero favores.",
       romantic: "- [MODO DE COMPORTAMIENTO: ROMÁNTICO Y EMOCIONAL]: Enfoque profundo en la química romántica, tensión sensual, emociones y diálogos íntimos.",
       dark: "- [MODO DE COMPORTAMIENTO: FANTASÍA OSCURA]: Horror visceral, atmósfera sombría, sangre, maldiciones antiguas y tensión psicológica.",
