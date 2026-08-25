@@ -4,7 +4,7 @@
   "description": "OdAI Interactive AI Adventure",
   "main": "index.html",
   "scripts": {
-    "build": "mkdir -p dist && cp index.html styles.css app.js logo.png favicon.png dist/ 2>/dev/null || cp index.html styles.css app.js dist/"
+    "build": "rm -rf dist && mkdir -p dist && cp index.html styles.css app.js logo.png favicon.png dist/"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
