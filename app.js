@@ -2258,14 +2258,6 @@ function renderStoryFeed() {
       const toolbar = document.createElement('div');
       toolbar.className = 'msg-action-toolbar';
 
-      // TTS Sound Speaker button
-      const ttsBtn = document.createElement('button');
-      ttsBtn.className = 'msg-action-btn';
-      ttsBtn.title = 'Озвучить';
-      ttsBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
-      ttsBtn.onclick = (e) => { e.stopPropagation(); speakAIText(currentText); };
-      toolbar.appendChild(ttsBtn);
-
       // Copy text button
       const copyBtn = document.createElement('button');
       copyBtn.className = 'msg-action-btn';
@@ -2338,17 +2330,6 @@ function renderStoryFeed() {
   });
 
   elements.storyFeed.scrollTop = elements.storyFeed.scrollHeight;
-}
-
-// Озвучивание речи (TTS)
-function speakAIText(text) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const clean = text.replace(/[*#_`>]/g, '').trim();
-  const u = new SpeechSynthesisUtterance(clean);
-  u.lang = 'ru-RU';
-  u.rate = 1.0;
-  window.speechSynthesis.speak(u);
 }
 
 // Снайпинг вариаций (Swipes)
