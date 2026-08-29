@@ -261,6 +261,7 @@ const I18N = {
     aiCreatorBtn: "✨ Generate & Start Bot",
     aiCreatorGenerating: "⚡ AI is studying franchise lore and building character personality...",
     aiCreatorError: "Please enter franchise title and character name!",
+    pwaInstallBtn: "📲 Install App (PWA)",
     aiGenerating: "AI is creating continuation...",
     realismChecking: "Arbiter checking realism...",
     testConnectionBtn: "Test Connection",
@@ -383,6 +384,7 @@ const I18N = {
     aiCreatorBtn: "✨ Generar y Empezar Bot",
     aiCreatorGenerating: "⚡ La IA está estudiando el lore y creando la personalidad...",
     aiCreatorError: "¡Ingresa el título y el nombre del personaje!",
+    pwaInstallBtn: "📲 Instalar Aplicación (PWA)",
     aiGenerating: "La IA está creando la continuación...",
     realismChecking: "El Árbitro está verificando el realismo...",
     testConnectionBtn: "🧪 Probar Conexión",
@@ -505,6 +507,7 @@ const I18N = {
     aiCreatorBtn: "✨ Згенерувати та Почати",
     aiCreatorGenerating: "⚡ ШІ вивчає лор тайтлу та генерує особистість персонажа...",
     aiCreatorError: "Вкажіть назву тайтлу та ім'я персонажа!",
+    pwaInstallBtn: "📲 Встановити додаток (PWA)",
     aiGenerating: "ШІ створює продовження...",
     realismChecking: "Арбітр перевіряє реалізм...",
     testConnectionBtn: "🧪 Перевірити з'єднання",
@@ -627,6 +630,7 @@ const I18N = {
     aiCreatorBtn: "✨ Сгенерировать и Начать",
     aiCreatorGenerating: "⚡ ИИ изучает лор тайтла и генерирует личность персонажа...",
     aiCreatorError: "Укажите название тайтла и имя персонажа!",
+    pwaInstallBtn: "📲 Установить приложение (PWA)",
     aiGenerating: "ИИ создает продолжение...",
     realismChecking: "Арбитр проверяет реализм...",
     testConnectionBtn: "🧪 Проверить подключение",
@@ -778,6 +782,7 @@ const elements = {
   aiCreatorSituation: document.getElementById('ai-creator-situation'),
   aiCreatorSubmitBtn: document.getElementById('ai-creator-submit-btn'),
   aiCreatorStatus: document.getElementById('ai-creator-status'),
+  pwaInstallBtn: document.getElementById('pwa-install-btn'),
   
   // Архив чатов (c.ai style)
   chatsArchiveBtn: document.getElementById('chats-archive-btn'),
@@ -3683,6 +3688,38 @@ function escapeHTML(str) {
   return str.replace(/[&<>'"]/g, 
     tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );
+}
+
+// PWA Service Worker & Install Prompt Integration
+let deferredPwaPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('[PWA] ServiceWorker registered with scope:', reg.scope))
+      .catch(err => console.warn('[PWA] ServiceWorker registration failed:', err));
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  if (elements.pwaInstallBtn) {
+    elements.pwaInstallBtn.style.display = 'flex';
+  }
+});
+
+if (elements.pwaInstallBtn) {
+  elements.pwaInstallBtn.addEventListener('click', async () => {
+    if (!deferredPwaPrompt) return;
+    deferredPwaPrompt.prompt();
+    const { outcome } = await deferredPwaPrompt.userChoice;
+    console.log(`[PWA] User response to install prompt: ${outcome}`);
+    deferredPwaPrompt = null;
+    if (elements.pwaInstallBtn) {
+      elements.pwaInstallBtn.style.display = 'none';
+    }
+  });
 }
 
 // Запуск приложения

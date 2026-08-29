@@ -1,10 +1,10 @@
 {
   "name": "odai",
-  "version": "1.0.71",
+  "version": "1.0.72",
   "description": "OdAI Interactive AI Adventure",
   "main": "index.html",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp index.html styles.css app.js logo.png favicon.png dist/"
+    "build": "rm -rf dist && mkdir -p dist && cp index.html styles.css app.js logo.png favicon.png manifest.json sw.js dist/"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
