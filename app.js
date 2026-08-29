@@ -1519,35 +1519,61 @@ function processAIDndResponse(text) {
   if (!state.dndMode || !text) return;
   const stats = state.dndStats;
 
-  // 1. Определяем нового врага, если ИИ описывает появление противника
-  // Форматы: (enemy: Orc, HP: 15, AC: 13) | (Враг: Орк, HP: 15, AC: 13) | (Ворог: Орк, HP: 15, AC: 13)
-  const enemyTagMatch = text.match(/\((?:enemy|враг|ворог|enemigo)\s*:\s*([^,;)]+?)(?:[,;]\s*hp\s*:\s*(\d+))?(?:[,;]\s*ac\s*:\s*(\d+))?\)/i);
-  if (enemyTagMatch) {
-    const newName = enemyTagMatch[1].trim();
-    const parsedHp = enemyTagMatch[2] ? parseInt(enemyTagMatch[2], 10) : null;
-    const parsedAC = enemyTagMatch[3] ? parseInt(enemyTagMatch[3], 10) : null;
+  // 1. Ищем тег нового врага в ЛЮБОМ формате:
+  //   (enemy: Name, HP: X, AC: Y)
+  //   (Враг: Имя, HP: X, AC: Y)
+  //   (Ворог: Ім'я, HP: X, AC: Y)
+  //   [Enemy: Name, HP: X] — квадратные скобки тоже
+  //   Enemy: Name HP: X AC: Y  — без скобок
+  const enemyTagPatterns = [
+    // Со скобками (круглые или квадратные)
+    /[([]\s*(?:enemy|враг|ворог|enemigo|противник|opponent)\s*:\s*([^\],;)]+?)(?:[,;]\s*hp\s*:\s*(\d+))?(?:[,;]\s*ac\s*:\s*(\d+))?\s*[)\]]/i,
+    // Без скобок, отдельной строкой (начинается с ключевого слова)
+    /^(?:enemy|враг|ворог|enemigo|противник)\s*:\s*(.+?)(?:,\s*hp\s*:\s*(\d+))?(?:,\s*ac\s*:\s*(\d+))?$/im,
+  ];
+
+  let enemyMatch = null;
+  for (const pat of enemyTagPatterns) {
+    enemyMatch = text.match(pat);
+    if (enemyMatch) break;
+  }
+
+  if (enemyMatch) {
+    const newName = enemyMatch[1].trim().replace(/[.,!*_]/g, '');
+    const parsedHp = enemyMatch[2] ? parseInt(enemyMatch[2], 10) : null;
+    const parsedAC = enemyMatch[3] ? parseInt(enemyMatch[3], 10) : null;
     const lookup = lookupEnemyStats(newName);
-    const finalHp = parsedHp || lookup.hp;
-    const finalAC = parsedAC || lookup.ac;
+    const finalHp = (parsedHp && parsedHp > 0) ? parsedHp : lookup.hp;
+    const finalAC = (parsedAC && parsedAC > 0) ? parsedAC : lookup.ac;
+
+    // Спавним врага (в том числе замена старого на нового посреди сессии)
     stats.enemyName = newName;
     stats.enemyHp = finalHp;
     stats.maxEnemyHp = finalHp;
     stats.enemyAC = finalAC;
     stats.combatActive = true;
-    console.log(`[D&D] New enemy spawned: ${newName} HP:${finalHp} AC:${finalAC}`);
+    console.log(`[D&D] Enemy spawned/replaced: "${newName}" HP:${finalHp} AC:${finalAC}`);
     renderDndHud();
-    return;
+    // Не выходим — продолжаем, ИИ мог в том же сообщении нанести урон
   }
 
-  // 2. Если враг уже активен — ищем урон по игроку в ответе ИИ
+  // 2. Ищем урон по игроку (в том же или без врага-тега)
   if (stats.combatActive && stats.enemyHp > 0) {
-    const dmgMatch = text.match(/(?:наносит|deals|inflige|hits?|damage|урон|ударяет|бьет|задевает)\s*[:\s]*(\d+)\s*(?:hp|hp урона|урона|damage|кп|daño)?/i);
-    if (dmgMatch) {
-      const dmg = parseInt(dmgMatch[1], 10);
-      if (!isNaN(dmg) && dmg > 0 && dmg <= 80) {
-        stats.playerHp = Math.max(0, stats.playerHp - dmg);
-        console.log(`[D&D] Enemy dealt ${dmg} damage. Player HP: ${stats.playerHp}/${stats.maxPlayerHp}`);
-        renderDndHud();
+    // Форматы: "наносит: 8 HP" | "deals 6 damage" | "Враг наносит урон: 7 HP" | "(Enemy deals X HP damage)"
+    const dmgPatterns = [
+      /(?:наносит\s+урон|наносит|deals\s+damage|deals|inflige|hits?\s+for|ударяет|бьёт|задевает)\s*:?\s*(\d+)\s*(?:hp|урона|damage|кп|daño)?/i,
+      /\((?:enemy|враг|ворог)\s+(?:deals|наносит)\s+(\d+)\s*(?:hp\s+damage|урона|hp)?\)/i,
+    ];
+    for (const pat of dmgPatterns) {
+      const dmgMatch = text.match(pat);
+      if (dmgMatch) {
+        const dmg = parseInt(dmgMatch[1], 10);
+        if (!isNaN(dmg) && dmg > 0 && dmg <= 100) {
+          stats.playerHp = Math.max(0, stats.playerHp - dmg);
+          console.log(`[D&D] Enemy dealt ${dmg} dmg. Player HP: ${stats.playerHp}/${stats.maxPlayerHp}`);
+          renderDndHud();
+        }
+        break;
       }
     }
   }
@@ -3263,12 +3289,15 @@ function getDndModeDirective(lang) {
   * Веди игру строго по механикам D&D 5e: броски d20 на атаку против AC, броски урона d4/d6/d8/d10/d12, спасброски.
   * HP Игрока: ${stats.playerHp}/${stats.maxPlayerHp} | AC Игрока: ${stats.playerAC}
   * ${enemyStatus}
-  * ОБЯЗАТЕЛЬНО: Когда вводишь нового врага в бой — укажи его ПЕРВОЙ строкой: (Враг: [ИМЯ ВРАГА], HP: [ЧИСЛО], AC: [ЧИСЛО])
-    Пример: (Враг: Орк-воин, HP: 15, AC: 13)
-  * Когда враг атакует игрока и попадает (бросок d20 ≥ ${stats.playerAC}): пиши точный урон в формате: (Враг наносит урон: X HP)
+  * КАК СОЗДАВАТЬ ВРАГОВ: Ты МОЖЕШЬ и ДОЛЖЕН самостоятельно вводить врагов в любой момент нарратива.
+    Когда вводишь врага (нового или замену) — укажи тег в начале описания: (Враг: [ИМЯ], HP: [ЧИСЛО], AC: [ЧИСЛО])
+    Примеры: (Враг: Орк-воин, HP: 15, AC: 13) | (Враг: Некромант, HP: 45, AC: 14) | (Враг: Дракон, HP: 195, AC: 19)
+    Ты можешь вводить врагов ДАЖЕ если игрок не инициировал бой — если по сюжету так надо.
+    Ты можешь вводить НОВЫХ врагов после победы над предыдущим (волны, засады, подкрепления).
+  * Когда враг атакует игрока и попадает (d20 ≥ AC ${stats.playerAC}): (Враг наносит урон: X HP)
   * Описывай бой кинематографично: звуки, запахи, ощущения. Каждый удар — это история.
-  * Если HP игрока = 0 — он без сознания. Если HP врага = 0 — враг повержен.
-  * НЕ придумывай статы за игрока. НЕ говори от лица игрока.`;
+  * HP игрока = 0 → без сознания. HP врага = 0 → враг повержен. Нарративно описывай оба события.
+  * НЕ придумывай действия за игрока. НЕ говори от лица игрока.`;
   }
   if (lang === 'uk') {
     const enemyStatusUk = hasEnemy
@@ -3279,9 +3308,12 @@ function getDndModeDirective(lang) {
   * Веди гру за механіками D&D 5e: кидки d20 на атаку проти AC, кидки урону d4/d6/d8/d10/d12.
   * HP Гравця: ${stats.playerHp}/${stats.maxPlayerHp} | AC Гравця: ${stats.playerAC}
   * ${enemyStatusUk}
-  * ОБОВ'ЯЗКОВО: Коли вводиш нового ворога — першим рядком: (Ворог: [ІМ'Я ВОРОГА], HP: [ЧИСЛО], AC: [ЧИСЛО])
-  * Коли ворог атакує і влучає: (Ворог завдає урон: X HP)
-  * Описуй бій кінематографічно. Якщо HP гравця = 0 — він непритомний. Якщо HP ворога = 0 — переможений.`;
+  * ЯК СТВОРЮВАТИ ВОРОГІВ: Ти МОЖЕШ і ПОВИНЕН самостійно вводити ворогів у будь-який момент.
+    Тег на початку: (Ворог: [ІМ'Я], HP: [ЧИСЛО], AC: [ЧИСЛО])
+    Приклади: (Ворог: Орк, HP: 15, AC: 13) | (Ворог: Некромант, HP: 45, AC: 14)
+    Можна вводити нових ворогів після перемоги над попереднім (хвилі, засідки).
+  * Коли ворог атакує і влучає (d20 ≥ AC ${stats.playerAC}): (Ворог завдає урон: X HP)
+  * HP гравця = 0 → непритомний. HP ворога = 0 → переможений.`;
   }
   if (lang === 'es') {
     const enemyStatusEs = hasEnemy
@@ -3292,9 +3324,12 @@ function getDndModeDirective(lang) {
   * Usa mecánicas D&D 5e: tiradas d20 vs CA, dados de daño d4/d6/d8/d10/d12.
   * HP del Jugador: ${stats.playerHp}/${stats.maxPlayerHp} | CA del Jugador: ${stats.playerAC}
   * ${enemyStatusEs}
-  * OBLIGATORIO: Al introducir un nuevo enemigo: (enemy: [NOMBRE], HP: [NÚMERO], AC: [NÚMERO])
-  * Cuando el enemigo impacta: (El enemigo inflige: X HP de daño)
-  * Narra el combate cinematográficamente. HP 0 del jugador = inconsciente. HP 0 del enemigo = derrotado.`;
+  * CÓMO CREAR ENEMIGOS: PUEDES y DEBES introducir enemigos en cualquier momento narrativo.
+    Etiqueta al inicio: (enemy: [NOMBRE], HP: [NÚMERO], AC: [NÚMERO])
+    Ej: (enemy: Orco guerrero, HP: 15, AC: 13) | (enemy: Dragón, HP: 195, AC: 19)
+    Puedes introducir nuevos enemigos tras derrotar al anterior (oleadas, emboscadas).
+  * Cuando el enemigo impacta (d20 ≥ CA ${stats.playerAC}): (El enemigo inflige: X HP de daño)
+  * HP 0 del jugador = inconsciente. HP 0 del enemigo = derrotado.`;
   }
   // English (default)
   const enemyStatusEn = hasEnemy
@@ -3305,11 +3340,15 @@ function getDndModeDirective(lang) {
   * Run combat strictly by D&D 5e rules: d20 attack rolls vs AC, damage dice d4/d6/d8/d10/d12, saving throws.
   * Player HP: ${stats.playerHp}/${stats.maxPlayerHp} | Player AC: ${stats.playerAC}
   * ${enemyStatusEn}
-  * MANDATORY: When introducing a new enemy into combat, write as the FIRST LINE: (enemy: [ENEMY NAME], HP: [NUMBER], AC: [NUMBER])
-    Example: (enemy: Orc Warrior, HP: 15, AC: 13)
-  * When enemy hits player (attack roll ≥ ${stats.playerAC}): write exact damage as: (Enemy deals X HP damage)
-  * Narrate combat cinematically with vivid sensory detail. HP 0 = unconscious/defeated.
-  * NEVER invent player's actions. NEVER speak as the player character.`;
+  * HOW TO CREATE ENEMIES: You CAN and SHOULD spawn enemies organically at any narrative moment.
+    When introducing an enemy (new or replacement), write a tag at the START of the response:
+    (enemy: [NAME], HP: [NUMBER], AC: [NUMBER])
+    Examples: (enemy: Orc Warrior, HP: 15, AC: 13) | (enemy: Ancient Dragon, HP: 195, AC: 19) | (enemy: Shadow Assassin, HP: 58, AC: 16)
+    You may introduce NEW enemies after the previous one is defeated (waves, ambushes, reinforcements).
+    You may ALSO spawn enemies proactively if the story calls for it, even if the player didn't start a fight.
+  * When the enemy attacks and hits player (d20 ≥ AC ${stats.playerAC}): (Enemy deals X HP damage)
+  * Narrate combat cinematically. HP 0 player = unconscious. HP 0 enemy = defeated — narrate both dramatically.
+  * NEVER speak as the player character. NEVER invent player actions.`;
 }
 
 function constructAIPrompt() {
