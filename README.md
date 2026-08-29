@@ -4,13 +4,24 @@
 </p>
 
 <p align="center">
+  <a href="https://od-ai.vercel.app/"><img src="https://img.shields.io/badge/Web%20App-od--ai.vercel.app-10b981?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"></a>
+  <a href="https://github.com/dotdok132/OdAI/releases/latest"><img src="https://img.shields.io/badge/Android%20APK-Download-059669?style=for-the-badge&logo=android&logoColor=white" alt="Android APK"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/dotdok132/OdAI/releases/latest"><img src="https://img.shields.io/github/v/release/dotdok132/OdAI?color=10b981&label=Release" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
-  <a href="https://github.com/dotdok132/OdAI/releases/latest"><img src="https://img.shields.io/badge/Platform-Android%20%7C%20Web-brightgreen" alt="Platform"></a>
   <a href="https://github.com/dotdok132/OdAI"><img src="https://img.shields.io/badge/Speed-100%25%20Vanilla%20JS-blueviolet" alt="Performance"></a>
 </p>
 
 **OdAI** is an ultra-fast, lightweight, interactive AI roleplay and text adventure game application for Android and Web browsers, inspired by Character.AI, JanitorAI, and SillyTavern.
+
+---
+
+## 🌐 Live Web App
+
+Play OdAI directly in your browser without installing anything:
+👉 **[https://od-ai.vercel.app/](https://od-ai.vercel.app/)**
 
 ---
 
@@ -85,7 +96,7 @@ cd android && ./gradlew assembleRelease
 ---
 
 ## 📱 Prebuilt Android APK
-The compiled Android release APK `OdAI-v1.0.69.apk` is available under [GitHub Releases](https://github.com/dotdok132/OdAI/releases/latest).
+The compiled Android release APK is available under [GitHub Releases](https://github.com/dotdok132/OdAI/releases/latest).
 
 ---
 
