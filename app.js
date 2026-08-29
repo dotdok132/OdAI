@@ -1368,10 +1368,20 @@ function renderDndHud() {
     if (elements.dndEnemyHpFill) elements.dndEnemyHpFill.style.width = `${enemyPct}%`;
   }
 
-  // --- Attack btn: неактивна если нет врага ---
+  // --- Attack btn: неактивна если нет врага или идет генерация ---
   if (elements.dndAttackBtn) {
-    elements.dndAttackBtn.disabled = !stats.combatActive || stats.enemyHp <= 0;
-    elements.dndAttackBtn.style.opacity = (!stats.combatActive || stats.enemyHp <= 0) ? '0.5' : '1';
+    elements.dndAttackBtn.disabled = state.isGenerating || !stats.combatActive || stats.enemyHp <= 0;
+  }
+  
+  // --- Остальные кнопки блокируются во время генерации ---
+  if (elements.dndHealBtn) {
+    elements.dndHealBtn.disabled = state.isGenerating;
+  }
+  
+  if (elements.dndDiceBtns) {
+    elements.dndDiceBtns.forEach(btn => {
+      btn.disabled = state.isGenerating;
+    });
   }
 }
 
@@ -4006,6 +4016,11 @@ function updateUIState() {
       elements.sendBtn.style.opacity = '1';
       elements.sendBtn.style.cursor = 'pointer';
     }
+  }
+
+  // Синхронизируем D&D HUD (чтобы заблокировать/разблокировать кнопки)
+  if (state.dndMode) {
+    renderDndHud();
   }
 }
 

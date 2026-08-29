@@ -2902,7 +2902,7 @@ body {
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
   border-radius: var(--radius-sm);
-  padding: 0.3rem 0.65rem;
+  padding: 0.4rem 0.75rem;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
@@ -2910,11 +2910,24 @@ body {
   align-items: center;
   gap: 0.3rem;
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dnd-btn:hover {
+.dnd-btn:hover:not(:disabled) {
   border-color: var(--accent-color);
   background: var(--bg-card);
+}
+
+.dnd-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  background: var(--bg-surface);
+}
+
+.dnd-btn:disabled, .dnd-dice-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(80%);
 }
 
 .dnd-attack-btn {
@@ -2948,16 +2961,23 @@ body {
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
   border-radius: 4px;
-  padding: 0.25rem 0.45rem;
-  font-size: 0.72rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
   font-weight: 700;
   font-family: var(--font-mono);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dnd-dice-btn:hover {
+.dnd-dice-btn:hover:not(:disabled) {
   border-color: var(--accent-color);
   color: var(--accent-color);
   transform: translateY(-1px);
+}
+
+.dnd-dice-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.95);
+  background: var(--bg-card);
 }
