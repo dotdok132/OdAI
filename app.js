@@ -711,15 +711,18 @@ const state = {
   memory: "",
   authorNote: "",
   realismMode: true,
-  casualMode: false, // Casual Mode (Always Succeed on d20 rolls)
+  casualMode: false,
   dndMode: safeGetStorage('odai_dnd_mode') === 'true',
   dndStats: {
-    playerHp: 24,
-    maxPlayerHp: 24,
-    enemyHp: 30,
-    maxEnemyHp: 30,
-    enemyName: 'Goblin Boss',
-    ac: 14
+    playerHp: 30,
+    maxPlayerHp: 30,
+    playerClass: 'Fighter',
+    playerAC: 15,
+    enemyHp: 0,         // 0 = нет активного врага
+    maxEnemyHp: 0,
+    enemyName: '',
+    enemyAC: 12,
+    combatActive: false
   },
   behaviorPreset: safeGetStorage('odai_behavior_preset') || 'classic', // 'classic' | 'strict' | 'romantic' | 'dark' | 'chaotic' | 'noir'
   forceD20: false, // Флаг принудительного броска d20 на следующее действие
@@ -1337,36 +1340,50 @@ function renderDndHud() {
   }
 
   elements.dndHudBar.style.display = 'flex';
-  const stats = state.dndStats || { playerHp: 24, maxPlayerHp: 24, enemyHp: 30, maxEnemyHp: 30, enemyName: 'Goblin Boss' };
+  const stats = state.dndStats;
 
-  // Update Player HP
-  const playerPct = Math.max(0, Math.min(100, Math.round((stats.playerHp / stats.maxPlayerHp) * 100)));
+  // --- Player HP ---
+  const playerPct = stats.maxPlayerHp > 0
+    ? Math.max(0, Math.min(100, Math.round((stats.playerHp / stats.maxPlayerHp) * 100)))
+    : 100;
   if (elements.dndPlayerHpText) elements.dndPlayerHpText.textContent = `${stats.playerHp}/${stats.maxPlayerHp}`;
   if (elements.dndPlayerHpFill) {
     elements.dndPlayerHpFill.style.width = `${playerPct}%`;
-    if (playerPct < 30) {
-      elements.dndPlayerHpFill.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
-    } else if (playerPct < 60) {
-      elements.dndPlayerHpFill.style.background = 'linear-gradient(90deg, #f59e0b, #eab308)';
-    } else {
-      elements.dndPlayerHpFill.style.background = 'linear-gradient(90deg, #22c55e, #10b981)';
-    }
+    elements.dndPlayerHpFill.style.background = playerPct < 30
+      ? 'linear-gradient(90deg, #ef4444, #dc2626)'
+      : playerPct < 60
+        ? 'linear-gradient(90deg, #f59e0b, #eab308)'
+        : 'linear-gradient(90deg, #22c55e, #10b981)';
   }
 
-  // Update Enemy HP
-  if (stats.enemyHp > 0) {
-    if (elements.dndEnemyCard) elements.dndEnemyCard.style.display = 'flex';
-    const enemyPct = Math.max(0, Math.min(100, Math.round((stats.enemyHp / stats.maxEnemyHp) * 100)));
-    if (elements.dndEnemyName) elements.dndEnemyName.textContent = stats.enemyName || 'Enemy HP';
+  // --- Enemy HP (показываем только если есть активный враг) ---
+  const hasEnemy = stats.combatActive && stats.enemyHp > 0 && stats.enemyName;
+  if (elements.dndEnemyCard) elements.dndEnemyCard.style.display = hasEnemy ? 'flex' : 'none';
+  if (hasEnemy) {
+    const enemyPct = stats.maxEnemyHp > 0
+      ? Math.max(0, Math.min(100, Math.round((stats.enemyHp / stats.maxEnemyHp) * 100)))
+      : 0;
+    if (elements.dndEnemyName) elements.dndEnemyName.textContent = stats.enemyName;
     if (elements.dndEnemyHpText) elements.dndEnemyHpText.textContent = `${stats.enemyHp}/${stats.maxEnemyHp}`;
     if (elements.dndEnemyHpFill) elements.dndEnemyHpFill.style.width = `${enemyPct}%`;
-  } else {
-    if (elements.dndEnemyCard) elements.dndEnemyCard.style.display = 'none';
+  }
+
+  // --- Attack btn: неактивна если нет врага ---
+  if (elements.dndAttackBtn) {
+    elements.dndAttackBtn.disabled = !stats.combatActive || stats.enemyHp <= 0;
+    elements.dndAttackBtn.style.opacity = (!stats.combatActive || stats.enemyHp <= 0) ? '0.5' : '1';
   }
 }
 
 function handleDndToggle() {
   state.dndMode = !state.dndMode;
+  // При включении — сбрасываем боевое состояние чисто
+  if (state.dndMode) {
+    state.dndStats.playerHp = state.dndStats.maxPlayerHp;
+    state.dndStats.enemyHp = 0;
+    state.dndStats.enemyName = '';
+    state.dndStats.combatActive = false;
+  }
   safeSetStorage('odai_dnd_mode', String(state.dndMode));
   updateToggleUI();
   saveStateToStorage();
@@ -1376,75 +1393,162 @@ function rollDiceRandom(sides) {
   return Math.floor(Math.random() * sides) + 1;
 }
 
+// --- Полноценная D&D 5e атака с проверкой AC ---
 async function handleDndAttack() {
   if (state.isGenerating) return;
+  const stats = state.dndStats;
+  if (!stats.combatActive || stats.enemyHp <= 0) return;
 
+  const lang = state.language || 'en';
   const d20 = rollDiceRandom(20);
   const isCritHit = d20 === 20;
   const isCritMiss = d20 === 1;
+  // Модификатор атаки: +5 (proficiency +3, STR +2)
+  const attackRoll = isCritMiss ? 1 : isCritHit ? 20 : d20 + 5;
+  const hits = isCritHit || (!isCritMiss && attackRoll >= stats.enemyAC);
 
-  let baseDamage = rollDiceRandom(8) + 3; // 1d8 + 3
-  if (isCritHit) baseDamage *= 2;
-  if (isCritMiss) baseDamage = 0;
-
-  const stats = state.dndStats;
-  if (baseDamage > 0) {
-    stats.enemyHp = Math.max(0, stats.enemyHp - baseDamage);
+  let dmg = 0;
+  if (hits) {
+    dmg = rollDiceRandom(8) + 3; // 1d8+3 longsword
+    if (isCritHit) dmg += rollDiceRandom(8); // D&D 5e правило крита: доп. кубик
+    stats.enemyHp = Math.max(0, stats.enemyHp - dmg);
+    if (stats.enemyHp === 0) stats.combatActive = false;
   }
 
   renderDndHud();
 
-  let actionText = "";
-  if (isCritHit) {
-    actionText = `*Атакую врага! ⚔️ (🎲 [Бросок d20: 20 — КРИТИЧЕСКИЙ ПОПАДАНИЕ!💥] — Урон: ${baseDamage} HP! Осталось HP врага: ${stats.enemyHp}/${stats.maxEnemyHp})*`;
-  } else if (isCritMiss) {
-    actionText = `*Пытаюсь атаковать, но промахиваюсь! ⚔️ (🎲 [Бросок d20: 1 — КРИТИЧЕСКИЙ ПРОМАХ!])*`;
-  } else if (d20 >= 10) {
-    actionText = `*Атакую врага оружием! ⚔️ (🎲 [Бросок d20: ${d20} — Попадание] — Нанесено урона: ${baseDamage} HP. Осталось HP врага: ${stats.enemyHp}/${stats.maxEnemyHp})*`;
+  const enemyN = stats.enemyName || 'врага';
+  let msg = '';
+
+  if (lang === 'ru' || lang === 'uk') {
+    if (isCritMiss) {
+      msg = `*Замахиваюсь оружием, но неловко оступаюсь! 🎲 [Атака d20: 1 — КРИТИЧЕСКИЙ ПРОМАХ! Оружие выскальзывает из рук.]*`;
+    } else if (isCritHit) {
+      msg = `*Наношу КРИТИЧЕСКИЙ удар по ${enemyN}! 🎲 [Атака d20: 20 — КРИТ!] Урон: ${dmg} HP! Осталось у врага: ${stats.enemyHp}/${stats.maxEnemyHp} HP.*`;
+    } else if (hits) {
+      msg = `*Атакую ${enemyN}! 🎲 [Атака d20: ${d20}+5 = ${attackRoll} vs AC ${stats.enemyAC} — Попадание!] Урон: ${dmg} HP. Осталось у врага: ${stats.enemyHp}/${stats.maxEnemyHp} HP.*`;
+    } else {
+      msg = `*Атакую ${enemyN}, но удар уходит мимо. 🎲 [Атака d20: ${d20}+5 = ${attackRoll} vs AC ${stats.enemyAC} — Промах!]*`;
+    }
+    if (stats.enemyHp === 0) msg += ` Противник повержен!`;
   } else {
-    actionText = `*Наношу удар, но враг блокирует! ⚔️ (🎲 [Бросок d20: ${d20} — Промах])*`;
+    if (isCritMiss) {
+      msg = `*I swing my weapon but fumble badly! 🎲 [Attack d20: 1 — CRITICAL MISS! The weapon slips.]*`;
+    } else if (isCritHit) {
+      msg = `*CRITICAL HIT on ${enemyN}! 🎲 [Attack d20: 20 — CRIT!] Damage: ${dmg} HP! Enemy remaining: ${stats.enemyHp}/${stats.maxEnemyHp} HP.*`;
+    } else if (hits) {
+      msg = `*I attack ${enemyN}! 🎲 [Attack d20: ${d20}+5 = ${attackRoll} vs AC ${stats.enemyAC} — Hit!] Damage: ${dmg} HP. Enemy remaining: ${stats.enemyHp}/${stats.maxEnemyHp} HP.*`;
+    } else {
+      msg = `*I attack ${enemyN} but miss. 🎲 [Attack d20: ${d20}+5 = ${attackRoll} vs AC ${stats.enemyAC} — Miss!]*`;
+    }
+    if (stats.enemyHp === 0) msg += ` The enemy is defeated!`;
   }
 
-  if (elements.promptInput) {
-    elements.promptInput.value = actionText;
-  }
+  if (elements.promptInput) elements.promptInput.value = msg;
   await handleSendAction();
 }
 
+// --- Лечение: Short Rest (1d8+CON) или Potion (2d4+2) ---
 function handleDndHeal() {
   const stats = state.dndStats;
-  const healAmount = rollDiceRandom(8) + 2;
+  const lang = state.language || 'en';
+  const potionDmg = rollDiceRandom(4) + rollDiceRandom(4) + 2;
   const oldHp = stats.playerHp;
-  stats.playerHp = Math.min(stats.maxPlayerHp, stats.playerHp + healAmount);
-  const actualHeal = stats.playerHp - oldHp;
-
+  stats.playerHp = Math.min(stats.maxPlayerHp, stats.playerHp + potionDmg);
+  const healed = stats.playerHp - oldHp;
   renderDndHud();
 
-  if (elements.promptInput) {
-    elements.promptInput.value = `*Использую зелье / отдыхаю! ❤️ (🎲 [Восстановлено: +${actualHeal} HP] — Ваши HP: ${stats.playerHp}/${stats.maxPlayerHp})*`;
+  let msg = '';
+  if (lang === 'ru' || lang === 'uk') {
+    msg = `*Выпиваю зелье лечения! 🧪 [Восстановлено: ${healed} HP (2d4+2)] HP: ${stats.playerHp}/${stats.maxPlayerHp}.*`;
+  } else {
+    msg = `*I drink a healing potion! 🧪 [Restored: ${healed} HP (2d4+2)] HP: ${stats.playerHp}/${stats.maxPlayerHp}.*`;
   }
+  if (elements.promptInput) elements.promptInput.value = msg;
 }
 
+// --- Бросок произвольного кубика (в поле ввода) ---
 function handleDndDiceRollBtn(sides) {
   const result = rollDiceRandom(sides);
-  const text = `🎲 (Бросок d${sides}: ${result})`;
-
+  const lang = state.language || 'en';
+  const text = lang === 'ru' || lang === 'uk'
+    ? `🎲 (Бросок d${sides}: ${result})`
+    : `🎲 (Roll d${sides}: ${result})`;
   if (elements.promptInput) {
     const cur = elements.promptInput.value.trim();
     elements.promptInput.value = cur ? `${cur} ${text}` : text;
   }
 }
 
+// D&D таблица HP врагов по типу существ (CR)
+const DND_ENEMY_HP_TABLE = [
+  { patterns: ['zombie', 'зомби', 'undead', 'скелет', 'skeleton'], hp: 22, ac: 8 },
+  { patterns: ['goblin', 'гоблин'], hp: 7, ac: 15 },
+  { patterns: ['orc', 'орк', 'орг'], hp: 15, ac: 13 },
+  { patterns: ['troll', 'тролль'], hp: 84, ac: 15 },
+  { patterns: ['dragon', 'дракон', 'wyrm', 'draco'], hp: 195, ac: 19 },
+  { patterns: ['giant', 'гигант', 'великан'], hp: 114, ac: 13 },
+  { patterns: ['ogre', 'огр'], hp: 59, ac: 11 },
+  { patterns: ['wolf', 'волк', 'dire wolf', 'dire'], hp: 11, ac: 13 },
+  { patterns: ['bear', 'медведь'], hp: 34, ac: 11 },
+  { patterns: ['demon', 'демон', 'devil', 'дьявол', 'balor', 'балор'], hp: 262, ac: 19 },
+  { patterns: ['vampire', 'вампир'], hp: 144, ac: 16 },
+  { patterns: ['lich', 'лич', 'лич'], hp: 135, ac: 17 },
+  { patterns: ['knight', 'рыцарь', 'лицар'], hp: 52, ac: 18 },
+  { patterns: ['guard', 'страж', 'стражник', 'охранник', 'soldier', 'солдат', 'воин'], hp: 11, ac: 16 },
+  { patterns: ['bandit', 'бандит', 'разбойник', 'разбійник', 'thug', 'бандюк'], hp: 11, ac: 12 },
+  { patterns: ['cultist', 'культист'], hp: 9, ac: 12 },
+  { patterns: ['wizard', 'маг', 'mage', 'sorcerer', 'чародей', 'warlock'], hp: 40, ac: 12 },
+  { patterns: ['boss', 'босс', 'chief', 'вождь', 'lord', 'лорд', 'master', 'мастер'], hp: 120, ac: 17 },
+];
+
+function lookupEnemyStats(name) {
+  if (!name) return { hp: 20, ac: 12 };
+  const lower = name.toLowerCase();
+  for (const entry of DND_ENEMY_HP_TABLE) {
+    if (entry.patterns.some(p => lower.includes(p))) {
+      return { hp: entry.hp, ac: entry.ac };
+    }
+  }
+  // Generic humanoid fallback
+  return { hp: Math.floor(Math.random() * 20) + 15, ac: 12 };
+}
+
+// --- Разбор ответа ИИ: извлечение врага и урона ---
 function processAIDndResponse(text) {
   if (!state.dndMode || !text) return;
-  const dmgMatch = text.match(/(?:урон|damage|наносит|inflige|deals|hits for|-)\s*:?\s*(\d+)\s*(?:hp|урона|кп|daño)?/i);
-  if (dmgMatch) {
-    const damageDealt = parseInt(dmgMatch[1], 10);
-    if (!isNaN(damageDealt) && damageDealt > 0 && damageDealt <= 50) {
-      const stats = state.dndStats;
-      stats.playerHp = Math.max(0, stats.playerHp - damageDealt);
-      console.log(`[D&D Engine] AI dealt ${damageDealt} damage to player. Player HP: ${stats.playerHp}/${stats.maxPlayerHp}`);
-      renderDndHud();
+  const stats = state.dndStats;
+
+  // 1. Определяем нового врага, если ИИ описывает появление противника
+  // Форматы: (enemy: Orc, HP: 15, AC: 13) | (Враг: Орк, HP: 15, AC: 13) | (Ворог: Орк, HP: 15, AC: 13)
+  const enemyTagMatch = text.match(/\((?:enemy|враг|ворог|enemigo)\s*:\s*([^,;)]+?)(?:[,;]\s*hp\s*:\s*(\d+))?(?:[,;]\s*ac\s*:\s*(\d+))?\)/i);
+  if (enemyTagMatch) {
+    const newName = enemyTagMatch[1].trim();
+    const parsedHp = enemyTagMatch[2] ? parseInt(enemyTagMatch[2], 10) : null;
+    const parsedAC = enemyTagMatch[3] ? parseInt(enemyTagMatch[3], 10) : null;
+    const lookup = lookupEnemyStats(newName);
+    const finalHp = parsedHp || lookup.hp;
+    const finalAC = parsedAC || lookup.ac;
+    stats.enemyName = newName;
+    stats.enemyHp = finalHp;
+    stats.maxEnemyHp = finalHp;
+    stats.enemyAC = finalAC;
+    stats.combatActive = true;
+    console.log(`[D&D] New enemy spawned: ${newName} HP:${finalHp} AC:${finalAC}`);
+    renderDndHud();
+    return;
+  }
+
+  // 2. Если враг уже активен — ищем урон по игроку в ответе ИИ
+  if (stats.combatActive && stats.enemyHp > 0) {
+    const dmgMatch = text.match(/(?:наносит|deals|inflige|hits?|damage|урон|ударяет|бьет|задевает)\s*[:\s]*(\d+)\s*(?:hp|hp урона|урона|damage|кп|daño)?/i);
+    if (dmgMatch) {
+      const dmg = parseInt(dmgMatch[1], 10);
+      if (!isNaN(dmg) && dmg > 0 && dmg <= 80) {
+        stats.playerHp = Math.max(0, stats.playerHp - dmg);
+        console.log(`[D&D] Enemy dealt ${dmg} damage. Player HP: ${stats.playerHp}/${stats.maxPlayerHp}`);
+        renderDndHud();
+      }
     }
   }
 }
@@ -3146,35 +3250,66 @@ async function fetchGeminiContinuation() {
 }
 
 function getDndModeDirective(lang) {
-  if (!state.dndMode) return "";
-  const stats = state.dndStats || { playerHp: 24, maxPlayerHp: 24, enemyHp: 30, maxEnemyHp: 30, enemyName: 'Enemy' };
+  if (!state.dndMode) return '';
+  const stats = state.dndStats;
+  const hasEnemy = stats.combatActive && stats.enemyHp > 0 && stats.enemyName;
+  const enemyStatus = hasEnemy
+    ? `HP врага (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}, AC: ${stats.enemyAC}`
+    : `Активного врага нет. Как только игрок встречает противника — сразу вводи его в формате тега.`;
 
   if (lang === 'ru') {
-    return `- [РЕЖИМ D&D 5E С БРОСКАМИ УРОНА И HP]:
-  * Отыгрывай бои по правилам D&D 5e (Атака d20 против Класса Доспеха AC, броски урона d4/d6/d8/d10/d12).
-  * Текущие HP Игрока: ${stats.playerHp}/${stats.maxPlayerHp}. Текущие HP Врага (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
-  * Если враг атакует игрока и попадает, обязательно укажи нанесенный урон в формате: (Враг наносит урон: X HP. Ваши HP: Y/${stats.maxPlayerHp}).
-  * Если HP врага равны 0, он повержен. Если HP игрока равны 0, он теряет сознание.`;
+    return `
+- [АКТИВЕН РЕЖИМ D&D 5E — МАСТЕР ПОДЗЕМЕЛИЙ]:
+  * Веди игру строго по механикам D&D 5e: броски d20 на атаку против AC, броски урона d4/d6/d8/d10/d12, спасброски.
+  * HP Игрока: ${stats.playerHp}/${stats.maxPlayerHp} | AC Игрока: ${stats.playerAC}
+  * ${enemyStatus}
+  * ОБЯЗАТЕЛЬНО: Когда вводишь нового врага в бой — укажи его ПЕРВОЙ строкой: (Враг: [ИМЯ ВРАГА], HP: [ЧИСЛО], AC: [ЧИСЛО])
+    Пример: (Враг: Орк-воин, HP: 15, AC: 13)
+  * Когда враг атакует игрока и попадает (бросок d20 ≥ ${stats.playerAC}): пиши точный урон в формате: (Враг наносит урон: X HP)
+  * Описывай бой кинематографично: звуки, запахи, ощущения. Каждый удар — это история.
+  * Если HP игрока = 0 — он без сознания. Если HP врага = 0 — враг повержен.
+  * НЕ придумывай статы за игрока. НЕ говори от лица игрока.`;
   }
   if (lang === 'uk') {
-    return `- [РЕЖИМ D&D 5E З БРОСКАМИ УРОНУ ТА HP]:
-  * Отигруй бої за правилами D&D 5e (Атака d20 проти Класу Обліку AC, броски урону d4/d6/d8/d10/d12).
-  * Поточні HP Гравця: ${stats.playerHp}/${stats.maxPlayerHp}. Поточні HP Ворога (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
-  * Якщо ворог атакує гравця і влучає, обов'язково вкажи завданий урон у форматі: (Ворог завдає урон: X HP. Ваші HP: Y/${stats.maxPlayerHp}).
-  * Якщо HP ворога дорівнюють 0, він повержений. Якщо HP гравця дорівнюють 0, він непритомніє.`;
+    const enemyStatusUk = hasEnemy
+      ? `HP ворога (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}, AC: ${stats.enemyAC}`
+      : `Активного ворога немає. Коли гравець зустрічає противника — введи його в форматі тегу.`;
+    return `
+- [АКТИВОВАНО РЕЖИМ D&D 5E — МАЙСТЕР ПІДЗЕМЕЛЬ]:
+  * Веди гру за механіками D&D 5e: кидки d20 на атаку проти AC, кидки урону d4/d6/d8/d10/d12.
+  * HP Гравця: ${stats.playerHp}/${stats.maxPlayerHp} | AC Гравця: ${stats.playerAC}
+  * ${enemyStatusUk}
+  * ОБОВ'ЯЗКОВО: Коли вводиш нового ворога — першим рядком: (Ворог: [ІМ'Я ВОРОГА], HP: [ЧИСЛО], AC: [ЧИСЛО])
+  * Коли ворог атакує і влучає: (Ворог завдає урон: X HP)
+  * Описуй бій кінематографічно. Якщо HP гравця = 0 — він непритомний. Якщо HP ворога = 0 — переможений.`;
   }
   if (lang === 'es') {
-    return `- [MODO D&D 5E CON DADOS DE DAÑO Y HP]:
-  * Interpreta los combates bajo las reglas de D&D 5e (Ataque d20 vs Clase de Armadura AC, dados de daño d4/d6/d8/d10/d12).
-  * HP actual del Jugador: ${stats.playerHp}/${stats.maxPlayerHp}. HP actual del Enemigo (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
-  * Si el enemigo ataca al jugador y acierta, indica el daño en el formato: (El enemigo inflige: X HP de daño. Tus HP: Y/${stats.maxPlayerHp}).
-  * Si los HP del enemigo caen a 0, queda derrotado. Si los HP del jugador caen a 0, cae inconsciente.`;
+    const enemyStatusEs = hasEnemy
+      ? `HP del enemigo (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}, AC: ${stats.enemyAC}`
+      : `Sin enemigo activo. Cuando el jugador encuentre uno, introdúcelo con la etiqueta de formato.`;
+    return `
+- [MODO D&D 5E ACTIVADO — DUNGEON MASTER]:
+  * Usa mecánicas D&D 5e: tiradas d20 vs CA, dados de daño d4/d6/d8/d10/d12.
+  * HP del Jugador: ${stats.playerHp}/${stats.maxPlayerHp} | CA del Jugador: ${stats.playerAC}
+  * ${enemyStatusEs}
+  * OBLIGATORIO: Al introducir un nuevo enemigo: (enemy: [NOMBRE], HP: [NÚMERO], AC: [NÚMERO])
+  * Cuando el enemigo impacta: (El enemigo inflige: X HP de daño)
+  * Narra el combate cinematográficamente. HP 0 del jugador = inconsciente. HP 0 del enemigo = derrotado.`;
   }
-  return `- [D&D 5E COMBAT MODE WITH DAMAGE ROLLS & HP TRACKING]:
-  * DM combat using D&D 5e rules (d20 Attack Roll vs Armor Class AC, damage dice d4/d6/d8/d10/d12).
-  * Player HP: ${stats.playerHp}/${stats.maxPlayerHp}. Enemy HP (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
-  * If an enemy hits the player, explicitly specify damage dealt in format: (Enemy deals X HP damage. Your HP: Y/${stats.maxPlayerHp}).
-  * If enemy HP hits 0, enemy is defeated. If player HP hits 0, player is knocked unconscious.`;
+  // English (default)
+  const enemyStatusEn = hasEnemy
+    ? `Active enemy — ${stats.enemyName}: HP ${stats.enemyHp}/${stats.maxEnemyHp}, AC ${stats.enemyAC}`
+    : `No active enemy yet. When combat begins, introduce the enemy with the required tag.`;
+  return `
+- [D&D 5E COMBAT MODE ACTIVE — DUNGEON MASTER]:
+  * Run combat strictly by D&D 5e rules: d20 attack rolls vs AC, damage dice d4/d6/d8/d10/d12, saving throws.
+  * Player HP: ${stats.playerHp}/${stats.maxPlayerHp} | Player AC: ${stats.playerAC}
+  * ${enemyStatusEn}
+  * MANDATORY: When introducing a new enemy into combat, write as the FIRST LINE: (enemy: [ENEMY NAME], HP: [NUMBER], AC: [NUMBER])
+    Example: (enemy: Orc Warrior, HP: 15, AC: 13)
+  * When enemy hits player (attack roll ≥ ${stats.playerAC}): write exact damage as: (Enemy deals X HP damage)
+  * Narrate combat cinematically with vivid sensory detail. HP 0 = unconscious/defeated.
+  * NEVER invent player's actions. NEVER speak as the player character.`;
 }
 
 function constructAIPrompt() {
