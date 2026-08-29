@@ -3285,70 +3285,59 @@ function getDndModeDirective(lang) {
 
   if (lang === 'ru') {
     return `
-- [АКТИВЕН РЕЖИМ D&D 5E — МАСТЕР ПОДЗЕМЕЛИЙ]:
-  * Веди игру строго по механикам D&D 5e: броски d20 на атаку против AC, броски урона d4/d6/d8/d10/d12, спасброски.
-  * HP Игрока: ${stats.playerHp}/${stats.maxPlayerHp} | AC Игрока: ${stats.playerAC}
-  * ${enemyStatus}
-  * КАК СОЗДАВАТЬ ВРАГОВ: Ты МОЖЕШЬ и ДОЛЖЕН самостоятельно вводить врагов в любой момент нарратива.
-    Когда вводишь врага (нового или замену) — укажи тег в начале описания: (Враг: [ИМЯ], HP: [ЧИСЛО], AC: [ЧИСЛО])
-    Примеры: (Враг: Орк-воин, HP: 15, AC: 13) | (Враг: Некромант, HP: 45, AC: 14) | (Враг: Дракон, HP: 195, AC: 19)
-    Ты можешь вводить врагов ДАЖЕ если игрок не инициировал бой — если по сюжету так надо.
-    Ты можешь вводить НОВЫХ врагов после победы над предыдущим (волны, засады, подкрепления).
-  * Когда враг атакует игрока и попадает (d20 ≥ AC ${stats.playerAC}): (Враг наносит урон: X HP)
-  * Описывай бой кинематографично: звуки, запахи, ощущения. Каждый удар — это история.
-  * HP игрока = 0 → без сознания. HP врага = 0 → враг повержен. Нарративно описывай оба события.
-  * НЕ придумывай действия за игрока. НЕ говори от лица игрока.`;
+- [РЕЖИМ D&D 5E | МАСТЕР ПОДЗЕМЕЛИЙ]:
+  * D&D — это прежде всего история, диалоги, исследование мира. Бой — лишь один из инструментов.
+  * НЕ навязывай бой искусственно. Врагов вводи только если этого органически требует сюжет. Большая часть времени — нарратив, взаимодействия, атмосфера.
+  * HP Игрока: ${stats.playerHp}/${stats.maxPlayerHp} | AC: ${stats.playerAC} | ${enemyStatus}
+  * КОГДА вводить врага: если игрок вступает в бой или если по сюжету появляется опасность. Тег: (Враг: [ИМЯ], HP: [X], AC: [Y])
+    Пример: (Враг: Орк-воин, HP: 15, AC: 13). После победы можно ввести нового если сюжет этого требует.
+  * Боевые механики D&D 5e: атака d20 против AC, урон d4–d12, спасброски. Когда враг попадает: (Враг наносит урон: X HP)
+  * HP = 0 → без сознания (игрок) / повержен (враг). Не говори от лица игрока.`;
   }
   if (lang === 'uk') {
     const enemyStatusUk = hasEnemy
       ? `HP ворога (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}, AC: ${stats.enemyAC}`
       : `Активного ворога немає. Коли гравець зустрічає противника — введи його в форматі тегу.`;
     return `
-- [АКТИВОВАНО РЕЖИМ D&D 5E — МАЙСТЕР ПІДЗЕМЕЛЬ]:
-  * Веди гру за механіками D&D 5e: кидки d20 на атаку проти AC, кидки урону d4/d6/d8/d10/d12.
-  * HP Гравця: ${stats.playerHp}/${stats.maxPlayerHp} | AC Гравця: ${stats.playerAC}
-  * ${enemyStatusUk}
-  * ЯК СТВОРЮВАТИ ВОРОГІВ: Ти МОЖЕШ і ПОВИНЕН самостійно вводити ворогів у будь-який момент.
-    Тег на початку: (Ворог: [ІМ'Я], HP: [ЧИСЛО], AC: [ЧИСЛО])
-    Приклади: (Ворог: Орк, HP: 15, AC: 13) | (Ворог: Некромант, HP: 45, AC: 14)
-    Можна вводити нових ворогів після перемоги над попереднім (хвилі, засідки).
-  * Коли ворог атакує і влучає (d20 ≥ AC ${stats.playerAC}): (Ворог завдає урон: X HP)
-  * HP гравця = 0 → непритомний. HP ворога = 0 → переможений.`;
+- [РЕЖИМ D&D 5E | МАЙСТЕР ПІДЗЕМЕЛЬ]:
+  * D&D — це перед усім історія, діалоги, дослідження. Бій — лише один з елементів.
+  * НЕ нав'язуй бій штучно. Ворогів вводи лише коли цього органічно потребує сюжет.
+  * HP Гравця: ${stats.playerHp}/${stats.maxPlayerHp} | AC: ${stats.playerAC} | ${enemyStatusUk}
+  * Коли вводиш ворога: тег на початку: (Ворог: [ІМ'Я], HP: [X], AC: [Y])
+    Приклад: (Ворог: Орк, HP: 15, AC: 13). Після перемоги можна ввести нового якщо сюжет вимагає.
+  * Механіки D&D 5e: d20 проти AC, урон d4–d12. Коли ворог влучає: (Ворог завдає урон: X HP)
+  * HP = 0 → непритомний (гравець) / переможений (ворог). Не говори від особи гравця.`;
   }
   if (lang === 'es') {
     const enemyStatusEs = hasEnemy
       ? `HP del enemigo (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}, AC: ${stats.enemyAC}`
       : `Sin enemigo activo. Cuando el jugador encuentre uno, introdúcelo con la etiqueta de formato.`;
     return `
-- [MODO D&D 5E ACTIVADO — DUNGEON MASTER]:
-  * Usa mecánicas D&D 5e: tiradas d20 vs CA, dados de daño d4/d6/d8/d10/d12.
-  * HP del Jugador: ${stats.playerHp}/${stats.maxPlayerHp} | CA del Jugador: ${stats.playerAC}
-  * ${enemyStatusEs}
-  * CÓMO CREAR ENEMIGOS: PUEDES y DEBES introducir enemigos en cualquier momento narrativo.
-    Etiqueta al inicio: (enemy: [NOMBRE], HP: [NÚMERO], AC: [NÚMERO])
-    Ej: (enemy: Orco guerrero, HP: 15, AC: 13) | (enemy: Dragón, HP: 195, AC: 19)
-    Puedes introducir nuevos enemigos tras derrotar al anterior (oleadas, emboscadas).
-  * Cuando el enemigo impacta (d20 ≥ CA ${stats.playerAC}): (El enemigo inflige: X HP de daño)
-  * HP 0 del jugador = inconsciente. HP 0 del enemigo = derrotado.`;
+- [MODO D&D 5E | DUNGEON MASTER]:
+  * D&D es ante todo historia, diálogo y exploración. El combate es solo un elemento más.
+  * NO forces el combate artificialmente. Introduce enemigos solo cuando el relato lo requiera.
+  * HP: ${stats.playerHp}/${stats.maxPlayerHp} | CA: ${stats.playerAC} | ${enemyStatusEs}
+  * Al introducir un enemigo (cuando sea narrativamente apropiado): (enemy: [NOMBRE], HP: [X], AC: [Y])
+    Ej: (enemy: Orco, HP: 15, AC: 13). Puedes introducir otro tras derrotar al anterior si el relato lo pide.
+  * Mecánicas 5e: d20 vs CA, dados de daño d4–d12. Si el enemigo impacta: (El enemigo inflige: X HP)
+  * HP 0 = inconsciente (jugador) / derrotado (enemigo). No hables por el jugador.`;
   }
   // English (default)
   const enemyStatusEn = hasEnemy
     ? `Active enemy — ${stats.enemyName}: HP ${stats.enemyHp}/${stats.maxEnemyHp}, AC ${stats.enemyAC}`
     : `No active enemy yet. When combat begins, introduce the enemy with the required tag.`;
   return `
-- [D&D 5E COMBAT MODE ACTIVE — DUNGEON MASTER]:
-  * Run combat strictly by D&D 5e rules: d20 attack rolls vs AC, damage dice d4/d6/d8/d10/d12, saving throws.
-  * Player HP: ${stats.playerHp}/${stats.maxPlayerHp} | Player AC: ${stats.playerAC}
-  * ${enemyStatusEn}
-  * HOW TO CREATE ENEMIES: You CAN and SHOULD spawn enemies organically at any narrative moment.
-    When introducing an enemy (new or replacement), write a tag at the START of the response:
-    (enemy: [NAME], HP: [NUMBER], AC: [NUMBER])
-    Examples: (enemy: Orc Warrior, HP: 15, AC: 13) | (enemy: Ancient Dragon, HP: 195, AC: 19) | (enemy: Shadow Assassin, HP: 58, AC: 16)
-    You may introduce NEW enemies after the previous one is defeated (waves, ambushes, reinforcements).
-    You may ALSO spawn enemies proactively if the story calls for it, even if the player didn't start a fight.
-  * When the enemy attacks and hits player (d20 ≥ AC ${stats.playerAC}): (Enemy deals X HP damage)
-  * Narrate combat cinematically. HP 0 player = unconscious. HP 0 enemy = defeated — narrate both dramatically.
-  * NEVER speak as the player character. NEVER invent player actions.`;
+- [D&D 5E MODE | DUNGEON MASTER]:
+  * D&D is first and foremost about story, roleplay, and exploration. Combat is just one tool among many.
+  * DO NOT force combat artificially. Let the narrative breathe. Most of the time should be roleplay, not fighting.
+  * Player HP: ${stats.playerHp}/${stats.maxPlayerHp} | AC: ${stats.playerAC} | ${enemyStatusEn}
+  * ENEMIES: Introduce them only when the story naturally calls for it — a threat emerges, the player picks a fight, or the plot demands tension.
+    Tag at the start of your response: (enemy: [NAME], HP: [NUMBER], AC: [NUMBER])
+    Examples: (enemy: Orc Guard, HP: 15, AC: 13) | (enemy: Shadow Wraith, HP: 45, AC: 14) | (enemy: Elder Dragon, HP: 195, AC: 19)
+    You may introduce a NEW enemy after the previous one is defeated — if the story calls for it (waves, ambush, boss reveal).
+    You do NOT have to introduce an enemy every scene. Dialogue, exploration, intrigue are just as valid.
+  * D&D 5e combat mechanics: d20 attack vs AC, damage dice d4–d12, saving throws. When enemy hits: (Enemy deals X HP damage)
+  * HP 0 = unconscious (player) / defeated (enemy). Narrate both dramatically. NEVER speak as the player.`;
 }
 
 function constructAIPrompt() {
