@@ -712,6 +712,15 @@ const state = {
   authorNote: "",
   realismMode: true,
   casualMode: false, // Casual Mode (Always Succeed on d20 rolls)
+  dndMode: safeGetStorage('odai_dnd_mode') === 'true',
+  dndStats: {
+    playerHp: 24,
+    maxPlayerHp: 24,
+    enemyHp: 30,
+    maxEnemyHp: 30,
+    enemyName: 'Goblin Boss',
+    ac: 14
+  },
   behaviorPreset: safeGetStorage('odai_behavior_preset') || 'classic', // 'classic' | 'strict' | 'romantic' | 'dark' | 'chaotic' | 'noir'
   forceD20: false, // Флаг принудительного броска d20 на следующее действие
   currentMode: 'do', // 'do' | 'say' | 'story'
@@ -783,6 +792,20 @@ const elements = {
   aiCreatorSubmitBtn: document.getElementById('ai-creator-submit-btn'),
   aiCreatorStatus: document.getElementById('ai-creator-status'),
   pwaInstallBtn: document.getElementById('pwa-install-btn'),
+  
+  // D&D 5e Mode HUD & Controls
+  dropdownDndToggle: document.getElementById('dropdown-dnd-toggle'),
+  dndToggle: document.getElementById('dnd-toggle'),
+  dndHudBar: document.getElementById('dnd-hud-bar'),
+  dndPlayerHpText: document.getElementById('dnd-player-hp-text'),
+  dndPlayerHpFill: document.getElementById('dnd-player-hp-fill'),
+  dndEnemyCard: document.getElementById('dnd-enemy-card'),
+  dndEnemyName: document.getElementById('dnd-enemy-name'),
+  dndEnemyHpText: document.getElementById('dnd-enemy-hp-text'),
+  dndEnemyHpFill: document.getElementById('dnd-enemy-hp-fill'),
+  dndAttackBtn: document.getElementById('dnd-attack-btn'),
+  dndHealBtn: document.getElementById('dnd-heal-btn'),
+  dndDiceBtns: document.querySelectorAll('.dnd-dice-btn'),
   
   // Архив чатов (c.ai style)
   chatsArchiveBtn: document.getElementById('chats-archive-btn'),
@@ -1297,6 +1320,133 @@ function updateToggleUI() {
   const dropdownCasual = document.getElementById('dropdown-casual-toggle');
   if (casualWrap) casualWrap.classList.toggle('active', !!state.casualMode);
   if (dropdownCasual) dropdownCasual.setAttribute('aria-checked', state.casualMode ? 'true' : 'false');
+
+  const dndWrap = document.getElementById('dnd-toggle');
+  const dropdownDnd = document.getElementById('dropdown-dnd-toggle');
+  if (dndWrap) dndWrap.classList.toggle('active', !!state.dndMode);
+  if (dropdownDnd) dropdownDnd.setAttribute('aria-checked', state.dndMode ? 'true' : 'false');
+
+  renderDndHud();
+}
+
+function renderDndHud() {
+  if (!elements.dndHudBar) return;
+  if (!state.dndMode) {
+    elements.dndHudBar.style.display = 'none';
+    return;
+  }
+
+  elements.dndHudBar.style.display = 'flex';
+  const stats = state.dndStats || { playerHp: 24, maxPlayerHp: 24, enemyHp: 30, maxEnemyHp: 30, enemyName: 'Goblin Boss' };
+
+  // Update Player HP
+  const playerPct = Math.max(0, Math.min(100, Math.round((stats.playerHp / stats.maxPlayerHp) * 100)));
+  if (elements.dndPlayerHpText) elements.dndPlayerHpText.textContent = `${stats.playerHp}/${stats.maxPlayerHp}`;
+  if (elements.dndPlayerHpFill) {
+    elements.dndPlayerHpFill.style.width = `${playerPct}%`;
+    if (playerPct < 30) {
+      elements.dndPlayerHpFill.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
+    } else if (playerPct < 60) {
+      elements.dndPlayerHpFill.style.background = 'linear-gradient(90deg, #f59e0b, #eab308)';
+    } else {
+      elements.dndPlayerHpFill.style.background = 'linear-gradient(90deg, #22c55e, #10b981)';
+    }
+  }
+
+  // Update Enemy HP
+  if (stats.enemyHp > 0) {
+    if (elements.dndEnemyCard) elements.dndEnemyCard.style.display = 'flex';
+    const enemyPct = Math.max(0, Math.min(100, Math.round((stats.enemyHp / stats.maxEnemyHp) * 100)));
+    if (elements.dndEnemyName) elements.dndEnemyName.textContent = stats.enemyName || 'Enemy HP';
+    if (elements.dndEnemyHpText) elements.dndEnemyHpText.textContent = `${stats.enemyHp}/${stats.maxEnemyHp}`;
+    if (elements.dndEnemyHpFill) elements.dndEnemyHpFill.style.width = `${enemyPct}%`;
+  } else {
+    if (elements.dndEnemyCard) elements.dndEnemyCard.style.display = 'none';
+  }
+}
+
+function handleDndToggle() {
+  state.dndMode = !state.dndMode;
+  safeSetStorage('odai_dnd_mode', String(state.dndMode));
+  updateToggleUI();
+  saveStateToStorage();
+}
+
+function rollDiceRandom(sides) {
+  return Math.floor(Math.random() * sides) + 1;
+}
+
+async function handleDndAttack() {
+  if (state.isGenerating) return;
+
+  const d20 = rollDiceRandom(20);
+  const isCritHit = d20 === 20;
+  const isCritMiss = d20 === 1;
+
+  let baseDamage = rollDiceRandom(8) + 3; // 1d8 + 3
+  if (isCritHit) baseDamage *= 2;
+  if (isCritMiss) baseDamage = 0;
+
+  const stats = state.dndStats;
+  if (baseDamage > 0) {
+    stats.enemyHp = Math.max(0, stats.enemyHp - baseDamage);
+  }
+
+  renderDndHud();
+
+  let actionText = "";
+  if (isCritHit) {
+    actionText = `*Атакую врага! ⚔️ (🎲 [Бросок d20: 20 — КРИТИЧЕСКИЙ ПОПАДАНИЕ!💥] — Урон: ${baseDamage} HP! Осталось HP врага: ${stats.enemyHp}/${stats.maxEnemyHp})*`;
+  } else if (isCritMiss) {
+    actionText = `*Пытаюсь атаковать, но промахиваюсь! ⚔️ (🎲 [Бросок d20: 1 — КРИТИЧЕСКИЙ ПРОМАХ!])*`;
+  } else if (d20 >= 10) {
+    actionText = `*Атакую врага оружием! ⚔️ (🎲 [Бросок d20: ${d20} — Попадание] — Нанесено урона: ${baseDamage} HP. Осталось HP врага: ${stats.enemyHp}/${stats.maxEnemyHp})*`;
+  } else {
+    actionText = `*Наношу удар, но враг блокирует! ⚔️ (🎲 [Бросок d20: ${d20} — Промах])*`;
+  }
+
+  if (elements.promptInput) {
+    elements.promptInput.value = actionText;
+  }
+  await handleSendAction();
+}
+
+function handleDndHeal() {
+  const stats = state.dndStats;
+  const healAmount = rollDiceRandom(8) + 2;
+  const oldHp = stats.playerHp;
+  stats.playerHp = Math.min(stats.maxPlayerHp, stats.playerHp + healAmount);
+  const actualHeal = stats.playerHp - oldHp;
+
+  renderDndHud();
+
+  if (elements.promptInput) {
+    elements.promptInput.value = `*Использую зелье / отдыхаю! ❤️ (🎲 [Восстановлено: +${actualHeal} HP] — Ваши HP: ${stats.playerHp}/${stats.maxPlayerHp})*`;
+  }
+}
+
+function handleDndDiceRollBtn(sides) {
+  const result = rollDiceRandom(sides);
+  const text = `🎲 (Бросок d${sides}: ${result})`;
+
+  if (elements.promptInput) {
+    const cur = elements.promptInput.value.trim();
+    elements.promptInput.value = cur ? `${cur} ${text}` : text;
+  }
+}
+
+function processAIDndResponse(text) {
+  if (!state.dndMode || !text) return;
+  const dmgMatch = text.match(/(?:урон|damage|наносит|inflige|deals|hits for|-)\s*:?\s*(\d+)\s*(?:hp|урона|кп|daño)?/i);
+  if (dmgMatch) {
+    const damageDealt = parseInt(dmgMatch[1], 10);
+    if (!isNaN(damageDealt) && damageDealt > 0 && damageDealt <= 50) {
+      const stats = state.dndStats;
+      stats.playerHp = Math.max(0, stats.playerHp - damageDealt);
+      console.log(`[D&D Engine] AI dealt ${damageDealt} damage to player. Player HP: ${stats.playerHp}/${stats.maxPlayerHp}`);
+      renderDndHud();
+    }
+  }
 }
 
 function toggleRealismGuard() {
@@ -1421,6 +1571,25 @@ function setupEventListeners() {
   if (elements.dropdownCasualToggle) {
     elements.dropdownCasualToggle.addEventListener('click', () => {
       toggleCasualMode();
+    });
+  }
+  if (elements.dropdownDndToggle) {
+    elements.dropdownDndToggle.addEventListener('click', () => {
+      handleDndToggle();
+    });
+  }
+  if (elements.dndAttackBtn) {
+    elements.dndAttackBtn.addEventListener('click', handleDndAttack);
+  }
+  if (elements.dndHealBtn) {
+    elements.dndHealBtn.addEventListener('click', handleDndHeal);
+  }
+  if (elements.dndDiceBtns) {
+    elements.dndDiceBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sides = parseInt(btn.dataset.dice, 10);
+        if (sides) handleDndDiceRollBtn(sides);
+      });
     });
   }
   if (elements.dropdownBehaviorSelect) {
@@ -2696,6 +2865,7 @@ async function generateAIResponse() {
 
     aiResponseText = sanitizeAIResponseText(aiResponseText);
     parseItemsFromAIText(aiResponseText);
+    processAIDndResponse(aiResponseText);
 
     state.history.push({
       id: Date.now(),
@@ -2975,6 +3145,38 @@ async function fetchGeminiContinuation() {
   return langDict[p] || langDict.classic;
 }
 
+function getDndModeDirective(lang) {
+  if (!state.dndMode) return "";
+  const stats = state.dndStats || { playerHp: 24, maxPlayerHp: 24, enemyHp: 30, maxEnemyHp: 30, enemyName: 'Enemy' };
+
+  if (lang === 'ru') {
+    return `- [РЕЖИМ D&D 5E С БРОСКАМИ УРОНА И HP]:
+  * Отыгрывай бои по правилам D&D 5e (Атака d20 против Класса Доспеха AC, броски урона d4/d6/d8/d10/d12).
+  * Текущие HP Игрока: ${stats.playerHp}/${stats.maxPlayerHp}. Текущие HP Врага (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
+  * Если враг атакует игрока и попадает, обязательно укажи нанесенный урон в формате: (Враг наносит урон: X HP. Ваши HP: Y/${stats.maxPlayerHp}).
+  * Если HP врага равны 0, он повержен. Если HP игрока равны 0, он теряет сознание.`;
+  }
+  if (lang === 'uk') {
+    return `- [РЕЖИМ D&D 5E З БРОСКАМИ УРОНУ ТА HP]:
+  * Отигруй бої за правилами D&D 5e (Атака d20 проти Класу Обліку AC, броски урону d4/d6/d8/d10/d12).
+  * Поточні HP Гравця: ${stats.playerHp}/${stats.maxPlayerHp}. Поточні HP Ворога (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
+  * Якщо ворог атакує гравця і влучає, обов'язково вкажи завданий урон у форматі: (Ворог завдає урон: X HP. Ваші HP: Y/${stats.maxPlayerHp}).
+  * Якщо HP ворога дорівнюють 0, він повержений. Якщо HP гравця дорівнюють 0, він непритомніє.`;
+  }
+  if (lang === 'es') {
+    return `- [MODO D&D 5E CON DADOS DE DAÑO Y HP]:
+  * Interpreta los combates bajo las reglas de D&D 5e (Ataque d20 vs Clase de Armadura AC, dados de daño d4/d6/d8/d10/d12).
+  * HP actual del Jugador: ${stats.playerHp}/${stats.maxPlayerHp}. HP actual del Enemigo (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
+  * Si el enemigo ataca al jugador y acierta, indica el daño en el formato: (El enemigo inflige: X HP de daño. Tus HP: Y/${stats.maxPlayerHp}).
+  * Si los HP del enemigo caen a 0, queda derrotado. Si los HP del jugador caen a 0, cae inconsciente.`;
+  }
+  return `- [D&D 5E COMBAT MODE WITH DAMAGE ROLLS & HP TRACKING]:
+  * DM combat using D&D 5e rules (d20 Attack Roll vs Armor Class AC, damage dice d4/d6/d8/d10/d12).
+  * Player HP: ${stats.playerHp}/${stats.maxPlayerHp}. Enemy HP (${stats.enemyName}): ${stats.enemyHp}/${stats.maxEnemyHp}.
+  * If an enemy hits the player, explicitly specify damage dealt in format: (Enemy deals X HP damage. Your HP: Y/${stats.maxPlayerHp}).
+  * If enemy HP hits 0, enemy is defeated. If player HP hits 0, player is knocked unconscious.`;
+}
+
 function constructAIPrompt() {
   const lang = state.language || 'en';
   let prompt = "";
@@ -2999,6 +3201,7 @@ INTERPRETACIONAL DE DADOS D20 (CUANDO ESTÉ PRESENTE):
 MODO Y PERSONALIDAD DEL MASTER:
 ${state.casualMode ? '- [MODO CASUAL / FANTASÍA DE PODER]: ¡El jugador es el héroe indiscutible! Proporciona victorias gloriosas y momentos cinemáticos sin castigos severos.' : '- [MODO REALISMO]: Aplica física realista, escasez de recursos y consecuencias reales para las decisiones.'}
 ${getBehaviorPresetDirective(state.behaviorPreset, 'es')}
+${getDndModeDirective('es')}
 
 Escenario del Mundo: ${state.currentScenarioKey}
 ${state.memory ? `Memoria del Mundo (Recordar): ${state.memory}\n` : ''}${state.authorNote ? `Estilo de Escritura: ${state.authorNote}\n` : ''}Inventario del Jugador: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Vacío'}
@@ -3037,6 +3240,7 @@ Historia de la aventura hasta ahora:
 РЕЖИМ ТА ОСОБИСТІСТЬ МАЙСТРА:
 ${state.casualMode ? '- [РЕЖИМ КАЗУАЛЬНИЙ / POWER FANTASY]: Гравець — головний герой! Даруйте йому епічні перемоги та драйв без жорстких покарань.' : '- [РЕЖИМ РЕАЛІЗМУ]: Дотримуйтесь фізики, логіки світу, обмеженості ресурсів та реальних наслідків помилок.'}
 ${getBehaviorPresetDirective(state.behaviorPreset, 'uk')}
+${getDndModeDirective('uk')}
 
 Сценарій Світу: ${state.currentScenarioKey}
 ${state.memory ? `Пам'ять Світу (Пам'ятати): ${state.memory}\n` : ''}${state.authorNote ? `Стиль Написання: ${state.authorNote}\n` : ''}Інвентар Гравця: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Порожньо'}
@@ -3075,6 +3279,7 @@ ${state.memory ? `Пам'ять Світу (Пам'ятати): ${state.memory}\
 РЕЖИМ И МОДЕЛЬ ПОВЕДЕНИЯ МАСТЕРА:
 ${state.casualMode ? '- [РЕЖИМ КАЗУАЛ / POWER FANTASY]: Игрок — главный герой! Описывай яркие победы, кинематографичный драйв и давай ему чувствовать себя сильным.' : '- [РЕЖИМ РЕАЛИЗМА]: Соблюдай физику, логику мира, ограниченность ресурсов и реальную угрозу от ошибок.'}
 ${getBehaviorPresetDirective(state.behaviorPreset, 'ru')}
+${getDndModeDirective('ru')}
 
 Сценарий мира: ${state.currentScenarioKey}
 ${state.memory ? `Память мира (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Стиль написания: ${state.authorNote}\n` : ''}Инвенварь игрока: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Пусто'}
@@ -3113,6 +3318,7 @@ D20 DICE MECHANICS INTERPRETATION (WHEN PRESENT):
 GAMEPLAY MODE & MASTER PERSONA:
 ${state.casualMode ? '- [CASUAL MODE / POWER FANTASY]: The player is the epic protagonist! Provide glorious victories, cinematic flair, and heroic fun without harsh punishment.' : '- [REALISM MODE]: Enforce realistic physics, resource limitations, and genuine consequences for mistakes.'}
 ${getBehaviorPresetDirective(state.behaviorPreset, 'en')}
+${getDndModeDirective('en')}
 
 Setting Scenario: ${state.currentScenarioKey}
 ${state.memory ? `World Memory (Remember): ${state.memory}\n` : ''}${state.authorNote ? `Writing Style: ${state.authorNote}\n` : ''}Player Inventory: ${state.inventory.length > 0 ? state.inventory.join(', ') : 'Empty'}

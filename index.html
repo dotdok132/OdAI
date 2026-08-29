@@ -87,6 +87,10 @@
             <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> <span data-i18n="realismGuard">Realism Guard</span></span>
             <div class="toggle-wrapper active" id="realism-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
           </div>
+          <div class="dropdown-item" id="dropdown-dnd-toggle" style="justify-content: space-between;" role="switch" tabindex="0" aria-checked="false">
+            <span style="display:flex; align-items:center; gap:0.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 3 3"/><path d="m19 13 3 3"/></svg> <span data-i18n="dndModeLabel">⚔️ D&D 5e Mode (HP & Combat Rolls)</span></span>
+            <div class="toggle-wrapper" id="dnd-toggle" style="padding:0; border:none; background:transparent;"><div class="toggle-switch"></div></div>
+          </div>
           <button class="dropdown-item" id="dropdown-scenarios-btn">
              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
              <span data-i18n="changeScenario">Change World</span>
@@ -178,6 +182,47 @@
 
     <!-- Main Story Viewport -->
     <main class="story-viewport">
+      <!-- D&D 5e Combat & Stat HUD Bar -->
+      <div class="dnd-hud-bar" id="dnd-hud-bar" style="display: none;">
+        <div class="dnd-hud-stats">
+          <div class="dnd-stat-card dnd-player-card">
+            <div class="dnd-stat-header">
+              <span class="dnd-stat-title">💚 <span data-i18n="dndPlayerHp">Player HP</span></span>
+              <span class="dnd-hp-text" id="dnd-player-hp-text">24/24</span>
+            </div>
+            <div class="dnd-hp-bar-bg">
+              <div class="dnd-hp-bar-fill dnd-player-hp-fill" id="dnd-player-hp-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="dnd-stat-card dnd-enemy-card" id="dnd-enemy-card">
+            <div class="dnd-stat-header">
+              <span class="dnd-stat-title">⚔️ <span id="dnd-enemy-name">Enemy HP</span></span>
+              <span class="dnd-hp-text" id="dnd-enemy-hp-text">30/30</span>
+            </div>
+            <div class="dnd-hp-bar-bg">
+              <div class="dnd-hp-bar-fill dnd-enemy-hp-fill" id="dnd-enemy-hp-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dnd-actions-bar">
+          <button class="dnd-btn dnd-attack-btn" id="dnd-attack-btn" title="Attack Enemy (d20 + Damage)">
+            ⚔️ <span data-i18n="dndAttackBtn">Attack</span>
+          </button>
+          <div class="dnd-dice-group">
+            <button class="dnd-dice-btn" data-dice="4">d4</button>
+            <button class="dnd-dice-btn" data-dice="6">d6</button>
+            <button class="dnd-dice-btn" data-dice="8">d8</button>
+            <button class="dnd-dice-btn" data-dice="10">d10</button>
+            <button class="dnd-dice-btn" data-dice="12">d12</button>
+          </div>
+          <button class="dnd-btn dnd-heal-btn" id="dnd-heal-btn" title="Rest / Heal (1d8+CON)">
+            ❤️ <span data-i18n="dndHealBtn">Heal</span>
+          </button>
+        </div>
+      </div>
+
       <div class="story-feed" id="story-feed">
         <!-- Chat bubbles appended dynamically -->
       </div>
